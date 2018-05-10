@@ -30,6 +30,14 @@
         android:icon="@drawable/cr3_logo"
         android:label="@string/app_name"
         android:process="org.coolreader">
+
+        <meta-data
+        android:name="com.google.android.geo.API_KEY"
+        android:value="AIzaSyCr_nWVRATHYaPyTn0wxpjpy4QR2eTEvB0" />
+
+        <meta-data
+        android:name="com.google.android.gms.version"
+        android:value="@integer/google_play_services_version" />
 <!--
            android:configChanges="orientation|keyboardHidden|locale|screenSize"
 -->

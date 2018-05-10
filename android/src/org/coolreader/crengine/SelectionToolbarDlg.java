@@ -29,6 +29,7 @@ public class SelectionToolbarDlg {
 	ReaderView mReaderView;
 	View mPanel;
 	Selection selection;
+
 	static public void showDialog( CoolReader coolReader, ReaderView readerView, final Selection selection )
 	{
 		SelectionToolbarDlg dlg = new SelectionToolbarDlg(coolReader, readerView, selection);
@@ -156,6 +157,16 @@ public class SelectionToolbarDlg {
 			public void onClick(View v) {
 				mReaderView.copyToClipboard(selection.text);
 				closeDialog(true);
+			}
+		});
+
+		mPanel.findViewById(R.id.selection_copy).setOnLongClickListener(new View.OnLongClickListener() {
+			public boolean onLongClick(View v) {
+				mCoolReader.showToast("long tap on copy");
+                GoogleDriveToolsActivity gdta = new GoogleDriveToolsActivity(mCoolReader);
+                gdta.signIn();
+				//gdta.getGoogleAccount();
+                return true;
 			}
 		});
 

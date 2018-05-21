@@ -118,6 +118,7 @@ public interface Settings {
     public static final String PROP_APP_SELECTION_ACTION = "app.selection.action";
     public static final String PROP_APP_MULTI_SELECTION_ACTION = "app.multiselection.action";
     public static final String PROP_APP_SELECTION_PERSIST = "app.selection.persist";
+    public static final String PROP_SAVE_POS_TO_GD_TIMEOUT = "app.autosave.reading.pos.timeout";
 
     public static final String PROP_APP_HIGHLIGHT_BOOKMARKS = "crengine.highlight.bookmarks";
     public static final String PROP_HIGHLIGHT_SELECTION_COLOR = "crengine.highlight.selection.color";

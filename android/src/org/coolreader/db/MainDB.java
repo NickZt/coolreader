@@ -311,6 +311,20 @@ public class MainDB extends BaseDB {
 		return true;
 	}
 
+	public boolean clearSearchHistory(BookInfo book) {
+		if (!isOpened())
+			return false;
+		if (book.getFileInfo().id == null)
+			return false; // unknown book id
+		try {
+			execSQL("DELETE FROM search_history where book_fk = " + book.getFileInfo().id);
+		} catch (Exception e) {
+			log.e("exception while clearing search history", e);
+			return false;
+		}
+		return true;
+	}
+
 	public ArrayList<String> loadSearchHistory(BookInfo book) {
 		log.i("loadSearchHistory()");
 		Cursor rs = null;

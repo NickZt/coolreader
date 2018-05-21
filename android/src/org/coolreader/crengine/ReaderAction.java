@@ -106,8 +106,16 @@ public class ReaderAction {
 	public final static ReaderAction NEXT_CHAPTER = new ReaderAction("NEXT_CHAPTER", R.string.action_chapter_next, ReaderCommand.DCMD_MOVE_BY_CHAPTER, 1);
 	public final static ReaderAction PREV_CHAPTER = new ReaderAction("PREV_CHAPTER", R.string.action_chapter_prev, ReaderCommand.DCMD_MOVE_BY_CHAPTER, -1);
 	public final static ReaderAction EXIT = new ReaderAction("EXIT", R.string.action_exit, ReaderCommand.DCMD_EXIT, 0, R.id.cr3_mi_exit ).setIconId(R.drawable.cr3_viewer_exit);
-	
-	
+
+	public final static ReaderAction SAVE_SETTINGS_TO_GD = new ReaderAction("SAVE_SETTINGS_TO_GD", R.string.save_settings_to_gd, ReaderCommand.DCMD_SAVE_SETTINGS_TO_GD, 0);
+	public final static ReaderAction LOAD_SETTINGS_FROM_GD = new ReaderAction("LOAD_SETTINGS_FROM_GD", R.string.load_settings_from_gd, ReaderCommand.DCMD_LOAD_SETTINGS_FROM_GD, 0);
+	public final static ReaderAction SAVE_READING_POS = new ReaderAction("SAVE_READING_POS", R.string.save_reading_pos_to_gd, ReaderCommand.DCMD_SAVE_READING_POS, 0);
+	public final static ReaderAction LOAD_READING_POS = new ReaderAction("LOAD_READING_POS", R.string.load_reading_pos_from_gd, ReaderCommand.DCMD_LOAD_READING_POS, 0);
+	public final static ReaderAction SAVE_BOOKMARKS = new ReaderAction("SAVE_BOOKMARKS", R.string.save_bookmarks_to_gd, ReaderCommand.DCMD_SAVE_BOOKMARKS, 0);
+	public final static ReaderAction LOAD_BOOKMARKS = new ReaderAction("LOAD_BOOKMARKS", R.string.load_bookmarks_from_gd, ReaderCommand.DCMD_LOAD_BOOKMARKS, 0);
+    public final static ReaderAction GD_MENU = new ReaderAction("GD_MENU", R.string.gd_menu, ReaderCommand.DCMD_GD_MENU, 0);
+    public final static ReaderAction SAVE_CURRENT_BOOK_TO_GD = new ReaderAction("SAVE_CURRENT_BOOK_TO_GD", R.string.save_current_book_to_gd, ReaderCommand.DCMD_SAVE_CURRENT_BOOK_TO_GD, 0);
+
 	public final static ReaderAction[] AVAILABLE_ACTIONS = {
 		NONE,
 		PAGE_DOWN,
@@ -157,7 +165,15 @@ public class ReaderAction {
 //		AUTOSCROLL_SPEED_INCREASE,
 //		AUTOSCROLL_SPEED_DECREASE,
 		TOGGLE_DICT_ONCE,
-		TOGGLE_DICT
+		TOGGLE_DICT,
+		SAVE_SETTINGS_TO_GD,
+		LOAD_SETTINGS_FROM_GD,
+		SAVE_READING_POS,
+		LOAD_READING_POS,
+		SAVE_BOOKMARKS,
+		LOAD_BOOKMARKS,
+        GD_MENU,
+        SAVE_CURRENT_BOOK_TO_GD
 	};
 
 	public boolean isNone() {

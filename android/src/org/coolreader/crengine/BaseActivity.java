@@ -90,6 +90,8 @@ public class BaseActivity extends Activity implements Settings {
 	public Properties settings() { return mSettingsManager.mSettings; }
 	
 	private SettingsManager mSettingsManager;
+
+	public File getSettingsFile(int profile) { return mSettingsManager.getSettingsFile(profile); }
 	
 	protected void startServices() {
 		// create settings

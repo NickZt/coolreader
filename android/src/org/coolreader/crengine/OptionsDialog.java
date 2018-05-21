@@ -508,6 +508,72 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 		}
 	}
 
+	class SaveOptionsToGDOption extends OptionBase {
+		private boolean inverse = false;
+		public SaveOptionsToGDOption( OptionOwner owner, String label, String property ) {
+			super(owner, label, property);
+		}
+		public int getItemViewType() {
+			return OPTION_VIEW_TYPE_NORMAL;
+		}
+		public View getView(View convertView, ViewGroup parent) {
+			View view;
+			convertView = myView;
+			if ( convertView==null ) {
+				view = mInflater.inflate(R.layout.option_item, null);
+			} else {
+				view = (View)convertView;
+			}
+			myView = view;
+			TextView labelView = (TextView)view.findViewById(R.id.option_label);
+			TextView valueView = (TextView)view.findViewById(R.id.option_value);
+			labelView.setText(label);
+			valueView.setText(property);
+			view.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_SAVE_SETTINGS, null);
+					return;
+				}
+			});
+			//setupIconView((ImageView)view.findViewById(R.id.option_icon));
+			return view;
+		}
+	}
+
+	class LoadOptionsFromGDOption extends OptionBase {
+		private boolean inverse = false;
+		public LoadOptionsFromGDOption( OptionOwner owner, String label, String property ) {
+			super(owner, label, property);
+		}
+		public int getItemViewType() {
+			return OPTION_VIEW_TYPE_NORMAL;
+		}
+		public View getView(View convertView, ViewGroup parent) {
+			View view;
+			convertView = myView;
+			if ( convertView==null ) {
+				view = mInflater.inflate(R.layout.option_item, null);
+			} else {
+				view = (View)convertView;
+			}
+			myView = view;
+			TextView labelView = (TextView)view.findViewById(R.id.option_label);
+			TextView valueView = (TextView)view.findViewById(R.id.option_value);
+			labelView.setText(label);
+			valueView.setText(property);
+			view.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_LOAD_SETTINGS_LIST, null);
+					return;
+				}
+			});
+			//setupIconView((ImageView)view.findViewById(R.id.option_icon));
+			return view;
+		}
+	}
+
 	static public void saveColor( Properties mProperties, boolean night )
 	{
 		if ( night ) {
@@ -1988,7 +2054,11 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 		mOptionsApplication.add(new BoolOption(this, getString(R.string.options_app_scan_book_props), PROP_APP_BOOK_PROPERTY_SCAN_ENABLED).setDefaultValue("1").noIcon());
 		mOptionsApplication.add(new BoolOption(this, getString(R.string.options_app_browser_hide_empty_dirs), PROP_APP_FILE_BROWSER_HIDE_EMPTY_FOLDERS).setDefaultValue("0").noIcon());
 		mOptionsApplication.add(new BoolOption(this, getString(R.string.mi_book_browser_simple_mode), PROP_APP_FILE_BROWSER_SIMPLE_MODE).noIcon());
-		
+
+		mOptionsApplication.add(new SaveOptionsToGDOption(this, getString(R.string.save_settings_to_gd), getString(R.string.save_settings_to_gd_v)));
+		mOptionsApplication.add(new LoadOptionsFromGDOption(this, getString(R.string.load_settings_from_gd), getString(R.string.load_settings_from_gd_v)));
+		mOptionsApplication.add(new ListOption(this, getString(R.string.save_pos_to_gd_timeout), PROP_SAVE_POS_TO_GD_TIMEOUT).add(mMotionTimeouts, mMotionTimeoutsTitles).setDefaultValue(Integer.toString(mMotionTimeouts[0])).noIcon());
+
 		fillStyleEditorOptions();
 		
 		mOptionsStyles.refresh();

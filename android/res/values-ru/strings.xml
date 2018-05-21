@@ -566,4 +566,26 @@
     <string name="motion_timeout_100min">"100 минут"</string>
     <string name="options_app_ui_theme_hicontrast1">Контрастная белая</string>
     <string name="options_app_ui_theme_hicontrast2">Контрастная черная</string>
+    <string name="save_settings_to_gd">Сохранить настройки на диск Google One</string>
+    <string name="save_settings_to_gd_v">Сохранить файл cr3.ini на диск Google One в папку CoolReader&#47;settings</string>
+    <string name="load_settings_from_gd">Восстановить настройки с диска Google One</string>
+    <string name="load_settings_from_gd_v">Восстановить настройки из файла cr3.ini на диске Google One (из папки CoolReader&#47;settings)</string>
+    <string name="switched_to_dic">Переключение на словарь</string>
+    <string name="next_dict_will_be_2nd">Следующий перевод будет в словаре 2 (однократно)</string>
+    <string name="gd_begin">Google One - начало операции</string>
+    <string name="gd_error">Ошибка работы с Google One</string>
+    <string name="gd_ok">Google One - операция выполнена успешно</string>
+    <string name="win_title_conf_file">Выбрать файл конфигурации</string>
+    <string name="save_reading_pos_to_gd">Сохранить позицию чтения на диск Google One</string>
+    <string name="dlg_button_delete_word">Удалить слово</string>
+    <string name="dlg_button_pronoun_replace">Замена местоимений (на smb)</string>
+    <string name="dlg_button_clear_hist">Очистить историю</string>
+    <string name="search_hist_will_be_cleared">История поиска очищена</string>
+    <string name="win_title_reading_pos">Выберите сохраненную позицию</string>
+    <string name="load_reading_pos_from_gd">Восстановить позицию чтения с диска Google One</string>
+    <string name="save_pos_to_gd_timeout">Интервал автосохранения позиции чтения на диск Google One</string>
+    <string name="save_bookmarks_to_gd">Сохранить закладки на диск Google One</string>
+    <string name="load_bookmarks_from_gd">Загрузить закладки с диска Google One</string>
+    <string name="gd_menu">Меню Google One</string>
+    <string name="save_current_book_to_gd">Сохранить текущую книгу на диск Google One</string>
 </resources>

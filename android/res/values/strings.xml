@@ -592,4 +592,26 @@
     <string name="motion_timeout_90min">"90 minutes"</string>
     <string name="motion_timeout_95min">"95 minutes"</string>
     <string name="motion_timeout_100min">"100 minutes"</string>
+    <string name="save_settings_to_gd">Save settings to Google One</string>
+    <string name="save_settings_to_gd_v">Save cr3.ini file to Google One at CoolReader&#47;settings folder</string>
+    <string name="load_settings_from_gd">Restore settings from Google One</string>
+    <string name="load_settings_from_gd_v">Restore settings from file cr3.ini located in CoolReader&#47;settings folder on Google One</string>
+    <string name="switched_to_dic">Switched to dictionary</string>
+    <string name="next_dict_will_be_2nd">Next dictionary will be the 2nd for one time</string>
+    <string name="gd_begin">Google One - begin of operation</string>
+    <string name="gd_error">Google One error</string>
+    <string name="gd_ok">Google One - successfully completed</string>
+    <string name="win_title_conf_file">Choose configuration file</string>
+    <string name="save_reading_pos_to_gd">Save reading position to Google One</string>
+    <string name="dlg_button_delete_word">Delete word</string>
+    <string name="dlg_button_pronoun_replace">Pronoun replace (to smb)</string>
+    <string name="dlg_button_clear_hist">Clear history</string>
+    <string name="search_hist_will_be_cleared">Search history cleared</string>
+    <string name="win_title_reading_pos">Choose reading position</string>
+    <string name="load_reading_pos_from_gd">Restore reading pos from Google One</string>
+    <string name="save_pos_to_gd_timeout">Autosave reading pos to Google One timeout</string>
+    <string name="save_bookmarks_to_gd">Save bookmarks to Google One</string>
+    <string name="load_bookmarks_from_gd">Load bookmarks from Google One</string>
+    <string name="gd_menu">Google One menu</string>
+    <string name="save_current_book_to_gd">Save current book to Google One</string>
 </resources>

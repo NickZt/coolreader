@@ -11,8 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -163,6 +165,18 @@ public class SearchDlg extends BaseDialog {
     		mEditView.setText(initialText);
     	mCaseSensitive = (CheckBox)mDialogView.findViewById(R.id.search_case_sensitive);
     	mReverse = (CheckBox)mDialogView.findViewById(R.id.search_reverse);
+
+		ImageButton btnMinus1 = (ImageButton)mDialogView.findViewById(R.id.search_dlg_clear_hist_btn);
+		btnMinus1.setImageResource(R.drawable.cr3_button_remove);
+
+		btnMinus1.setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View v) {
+				activity.getDB().clearSearchHistory(mBookInfo);
+				mCoolReader.showToast(mCoolReader.getString(R.string.search_hist_will_be_cleared));
+				dismiss();
+			}
+		});
+
 		activity.getDB().loadSearchHistory(this.mBookInfo, new CRDBService.SearchHistoryLoadingCallback() {
 			@Override
 			public void onSearchHistoryLoaded(ArrayList<String> searches) {

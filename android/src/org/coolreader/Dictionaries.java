@@ -42,7 +42,7 @@ public class Dictionaries {
 	DictInfo currentDictionary;
 	DictInfo currentDictionary2;
 	DictInfo currentDictionary3;
-	
+
 	public static class DictInfo {
 		public final String id; 
 		public final String name;
@@ -50,7 +50,17 @@ public class Dictionaries {
 		public final String className;
 		public final String action;
 		public final Integer internal;
-		public String dataKey = SearchManager.QUERY; 
+		public String dataKey = SearchManager.QUERY;
+
+		public boolean isInstalled() {
+			return isInstalled;
+		}
+
+		public void setInstalled(boolean installed) {
+			isInstalled = installed;
+		}
+
+		public boolean isInstalled = false;
 		public DictInfo ( String id, String name, String packageName, String className, String action, Integer internal ) {
 			this.id = id;
 			this.name = name;
@@ -103,13 +113,22 @@ public class Dictionaries {
 
 
 	public static List<DictInfo> getDictListExt(BaseActivity act, boolean bOnlyInstalled) {
-		ArrayList<DictInfo> dlist = new ArrayList<DictInfo>();
+		boolean bNeedSearchInstalled = true;
 		for (DictInfo dict : dicts) {
-			boolean installed = act.isPackageInstalled(dict.packageName);
-			if ((dict.internal == 1) && (dict.packageName.equals("com.socialnmobile.colordict")) && (!installed)) {
-				installed = act.isPackageInstalled("mobi.goldendict.android");
+			if (dict.isInstalled()) bNeedSearchInstalled = false;
+		}
+		ArrayList<DictInfo> dlist = new ArrayList<DictInfo>();
+
+		if (bNeedSearchInstalled) {
+			for (DictInfo dict : dicts) {
+				dict.setInstalled(act.isPackageInstalled(dict.packageName));
+				if ((dict.internal == 1) && (dict.packageName.equals("com.socialnmobile.colordict")) && (!dict.isInstalled())) {
+					dict.setInstalled(act.isPackageInstalled("mobi.goldendict.android"));
+				}
 			}
-			if ((installed) || (!bOnlyInstalled)) dlist.add(dict);
+		}
+		for (DictInfo dict : dicts) {
+			if ((dict.isInstalled()) || (!bOnlyInstalled)) dlist.add(dict);
 		}
 		return dlist;
 	}

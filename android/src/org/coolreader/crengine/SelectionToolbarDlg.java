@@ -160,28 +160,26 @@ public class SelectionToolbarDlg {
 			}
 		});
 
-		mPanel.findViewById(R.id.selection_copy).setOnLongClickListener(new View.OnLongClickListener() {
-			public boolean onLongClick(View v) {
-				mCoolReader.showToast("long tap on copy");
-                GoogleDriveToolsActivity gdta = new GoogleDriveToolsActivity(mCoolReader);
-                gdta.signIn();
-				//gdta.getGoogleAccount();
-                return true;
-			}
-		});
+//		mPanel.findViewById(R.id.selection_copy).setOnLongClickListener(new View.OnLongClickListener() {
+//			public boolean onLongClick(View v) {
+//				mCoolReader.showToast("long tap on copy");
+//				//gdta.getGoogleAccount();
+//                return true;
+//			}
+//		});
 
 		mPanel.findViewById(R.id.selection_dict).setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				mCoolReader.findInDictionary( selection.text );
+				//mCoolReader.showToast("long tap on dic");
+				DictsDlg dlg = new DictsDlg(mCoolReader, mReaderView, selection.text);
+				dlg.show();
 				closeDialog(!mReaderView.getSettings().getBool(ReaderView.PROP_APP_SELECTION_PERSIST, false));
 			}
 		});
 
 		mPanel.findViewById(R.id.selection_dict).setOnLongClickListener(new View.OnLongClickListener() {
 			public boolean onLongClick(View v) {
-				//mCoolReader.showToast("long tap on dic");
-				DictsDlg dlg = new DictsDlg(mCoolReader, mReaderView, selection.text);
-				dlg.show();
+				mCoolReader.findInDictionary( selection.text );
 				closeDialog(!mReaderView.getSettings().getBool(ReaderView.PROP_APP_SELECTION_PERSIST, false));
 				return true;
 			}

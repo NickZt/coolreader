@@ -1,6 +1,9 @@
 package org.coolreader.crengine;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.coolreader.CoolReader;
 import org.coolreader.Dictionaries;
@@ -15,6 +18,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,6 +31,7 @@ public class DictsDlg extends BaseDialog {
 	private LayoutInflater mInflater;
 	private DictList mList;
 	private String mSearchText;
+	private EditText selEdit;
 
 	//DictsDlg mThis;
 
@@ -68,7 +76,7 @@ public class DictsDlg extends BaseDialog {
 			view = mInflater.inflate(res, null);
 			TextView labelView = (TextView)view.findViewById(R.id.dict_item_shortcut);
 			TextView titleTextView = (TextView)view.findViewById(R.id.dict_item_title);
-		 	Dictionaries.DictInfo b = (Dictionaries.DictInfo)getItem(position);
+			Dictionaries.DictInfo b = (Dictionaries.DictInfo)getItem(position);
 			if ( labelView!=null ) {
 				labelView.setText(String.valueOf(position+1));
 			}
@@ -120,13 +128,10 @@ public class DictsDlg extends BaseDialog {
 
 		@Override
 		public boolean performItemClick(View view, int position, long id) {
-			//Dict b = mBookInfo.findShortcutDict(position+1);
-			//if ( b==null ) {
-			//	mThis.dismiss();
-			//	return true;
-			//selectedItem = position;
 			mCoolReader.mDictionaries.setAdHocDict(Dictionaries.getDictListExt(mCoolReader,true).get(position));
-			mCoolReader.findInDictionary(mSearchText);
+			String sSText = mSearchText.trim();
+			if (selEdit!=null) sSText = selEdit.getText().toString().trim();
+			mCoolReader.findInDictionary(sSText);
 			if (!mReaderView.getSettings().getBool(mReaderView.PROP_APP_SELECTION_PERSIST, false))
 				mReaderView.clearSelection();
 			dismiss();
@@ -139,17 +144,149 @@ public class DictsDlg extends BaseDialog {
 	public DictsDlg( CoolReader activity, ReaderView readerView, String search_text )
 	{
 		super(activity, activity.getResources().getString(R.string.win_title_dicts), false, true);
-		//mThis = this; // for inner classes
 		mInflater = LayoutInflater.from(getContext());
 		mSearchText = search_text;
+		if ((mSearchText.startsWith("\"")) && (mSearchText.endsWith("\""))) {
+			mSearchText = mSearchText.substring(1,mSearchText.length()-1);
+		}
+		if ((mSearchText.startsWith("(")) && (mSearchText.endsWith(")"))) {
+			mSearchText = mSearchText.substring(1,mSearchText.length()-1);
+		}
+		if ((mSearchText.startsWith("[")) && (mSearchText.endsWith("]"))) {
+			mSearchText = mSearchText.substring(1,mSearchText.length()-1);
+		}
+		if ((mSearchText.startsWith("{")) && (mSearchText.endsWith("}"))) {
+			mSearchText = mSearchText.substring(1,mSearchText.length()-1);
+		}
+		if ((mSearchText.startsWith("<")) && (mSearchText.endsWith(">"))) {
+			mSearchText = mSearchText.substring(1,mSearchText.length()-1);
+		}
+		if ((mSearchText.startsWith("'")) && (mSearchText.endsWith("'"))) {
+			mSearchText = mSearchText.substring(1,mSearchText.length()-1);
+		}
 		mCoolReader = activity;
 		mReaderView = readerView;
-		//setPositiveButtonImage(R.drawable.cr3_button_add, R.string.mi_Dict_add);
-		View frame = mInflater.inflate(R.layout.dict_list_dialog, null);
+		View frame = mInflater.inflate(R.layout.dict_dialog, null);
+		ImageButton btnMinus1 = (ImageButton)frame.findViewById(R.id.dict_dlg_minus1_btn);
+		btnMinus1.setImageResource(R.drawable.cr3_button_remove);
+		ImageButton btnMinus2 = (ImageButton)frame.findViewById(R.id.dict_dlg_minus2_btn);
+		btnMinus2.setImageResource(R.drawable.cr3_button_remove);
+		Button btnPronoun = (Button)frame.findViewById(R.id.dict_dlg_btn_pronoun);
+		selEdit = (EditText)frame.findViewById(R.id.selection_text);
+		selEdit.setText(mSearchText);
+		btnPronoun.setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View v) {
+				String s = selEdit.getText().toString()
+						.replace(",",", ")
+						.replace(".",". ")
+						.replace(";","; ")
+						.replace(":",": ")
+						.replace("-","- ")
+						.replace("/","/ ")
+						.replace("\\","\\ ");
+				String res = "";
+				String [] arrS = s.split(" ");
+				for (String ss: arrS) {
+					String repl = ss.trim().toLowerCase()
+							.replace("me","smb")
+							.replace("you","smb")
+							.replace("him","smb")
+							.replace("her","smb")
+							.replace("thee","smb")
+							.replace("my","smb's")
+							.replace("mine","smb's")
+							.replace("yours","smb's")
+							.replace("your","smb's")
+							.replace("thy","smb's")
+							.replace("his","smb's")
+							.replace("hers","smb's");
+					if (repl.equals("smb")||repl.equals("smb's")||
+						repl.equals("smb.")||repl.equals("smb's.")||
+						repl.equals("smb,")||repl.equals("smb's,")||
+						repl.equals("smb:")||repl.equals("smb's:")||
+						repl.equals("smb;")||repl.equals("smb's;")||
+						repl.equals("smb;")||repl.equals("smb's;")||
+						repl.equals("smb/")||repl.equals("smb's/")||
+						repl.equals("smb\\")||repl.equals("smb's\\")) res=res+" "+repl; else res=res.trim()+" "+ss.trim();
+				}
+				selEdit.setText(res.trim());
+			}
+		});
+		btnMinus1.setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View v) {
+				String s = selEdit.getText().toString()
+						.replace(",",", ")
+						.replace(".",". ")
+						.replace(";","; ")
+						.replace(":",": ")
+						.replace("-","- ")
+						.replace("/","/ ")
+						.replace("\\","\\ ");
+				String res = "";
+				String [] arrS = s.split(" ");
+				boolean bFirst = true;
+				for (String ss: arrS) {
+					String repl = ss.trim().toLowerCase()
+							.replace(",","")
+							.replace(".","")
+							.replace(";","")
+							.replace(":","")
+							.replace("-","")
+							.replace("/","")
+							.replace("\\","");
+					if (!repl.trim().equals("")) {
+						if (bFirst) {
+							bFirst = false;
+						} else {
+							res=res.trim()+" "+ss.trim();
+						}
+					}
+				}
+				selEdit.setText(res.trim());
+			}
+		});
+		btnMinus2.setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View v) {
+				String s = selEdit.getText().toString()
+						.replace(",",", ")
+						.replace(".",". ")
+						.replace(";","; ")
+						.replace(":",": ")
+						.replace("-","- ")
+						.replace("/","/ ")
+						.replace("\\","\\ ");
+				String res = "";
+				String [] arrS = s.split(" ");
+				List<String> list = Arrays.asList(arrS);
+				Collections.reverse(list);
+				arrS = (String[]) list.toArray();
+				boolean bFirst = true;
+				for (String ss: arrS) {
+					String repl = ss.trim().toLowerCase()
+							.replace(",","")
+							.replace(".","")
+							.replace(";","")
+							.replace(":","")
+							.replace("-","")
+							.replace("/","")
+							.replace("\\","");
+					if (!repl.trim().equals("")) {
+						if (bFirst) {
+							bFirst = false;
+						} else {
+							res=ss.trim()+" "+res.trim();
+						}
+					}
+				}
+				selEdit.setText(res.trim());
+			}
+		});
 		ViewGroup body = (ViewGroup)frame.findViewById(R.id.dict_list);
 		mList = new DictList(activity, false);
 		body.addView(mList);
 		setView(frame);
+		selEdit.clearFocus();
+		btnPronoun.requestFocus();
 		setFlingHandlers(mList, null, null);
 	}
 

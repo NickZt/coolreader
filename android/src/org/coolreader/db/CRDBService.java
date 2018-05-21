@@ -212,6 +212,15 @@ public class CRDBService extends Service {
 			}
 		});
 	}
+
+	public void clearSearchHistory(final BookInfo book) {
+		execTask(new Task("clearSearchHistory") {
+			@Override
+			public void work() {
+				mainDB.clearSearchHistory(book);
+			}
+		});
+	}
 	
 	public void updateOPDSCatalogLastUsage(final String url) {
 		execTask(new Task("saveOPDSCatalog") {
@@ -795,6 +804,10 @@ public class CRDBService extends Service {
 
 		public void saveSearchHistory(final BookInfo book, String sHist) {
 			getService().saveSearchHistory(new BookInfo(book), sHist);
+		}
+
+		public void clearSearchHistory(final BookInfo book) {
+			getService().clearSearchHistory(new BookInfo(book));
 		}
 
     	public void deleteRecentPosition(final FileInfo fileInfo)	{

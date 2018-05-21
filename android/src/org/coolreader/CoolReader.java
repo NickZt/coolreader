@@ -22,6 +22,7 @@ import org.coolreader.crengine.Engine;
 import org.coolreader.crengine.ErrorDialog;
 import org.coolreader.crengine.FileBrowser;
 import org.coolreader.crengine.FileInfo;
+import org.coolreader.crengine.GoogleDriveTools;
 import org.coolreader.crengine.History.BookInfoLoadedCallack;
 import org.coolreader.crengine.InterfaceTheme;
 import org.coolreader.crengine.L;
@@ -54,17 +55,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.drive.Drive;
-import com.google.android.gms.drive.DriveClient;
-import com.google.android.gms.drive.DriveResourceClient;
+import android.provider.Settings.Secure;
+
+import com.google.android.gms.common.util.Strings;
 
 public class CoolReader extends BaseActivity
 {
@@ -97,12 +94,19 @@ public class CoolReader extends BaseActivity
 	private static final int PERM_REQUEST_STORAGE_CODE = 1;
 	private static final int PERM_REQUEST_READ_PHONE_STATE_CODE = 2;
 
-	private static final int REQUEST_CODE_SIGN_IN = 0;
-	private static final int REQUEST_CODE_CAPTURE_IMAGE = 1;
-	private static final int REQUEST_CODE_CREATOR = 2;
+	public GoogleDriveTools mGoogleDriveTools = null;
 
-	private DriveClient mDriveClient;
-	private DriveResourceClient mDriveResourceClient;
+	public String getAndroid_id() {
+		return android_id;
+	}
+
+	private String android_id = "";
+
+	public String getModel() {
+		return mModel;
+	}
+
+	private String mModel = "";
 
 	/** Called when the activity is first created. */
     @Override
@@ -166,29 +170,21 @@ public class CoolReader extends BaseActivity
 
 		N2EpdController.n2MainActivity = this;
 
-		// google drive
-		signIn();
-        
+		mGoogleDriveTools = new GoogleDriveTools(this);
+		android_id = Secure.getString(getApplicationContext().getContentResolver(),
+				Secure.ANDROID_ID);
+
+		String manufacturer = Build.MANUFACTURER;
+		String model = Build.MODEL;
+		if (model.startsWith(manufacturer)) {
+			mModel = Strings.capitalize(model);
+		} else {
+			mModel = Strings.capitalize(manufacturer) + " " + model;
+		}
 		showRootWindow();
 		
         log.i("CoolReader.onCreate() exiting");
     }
-
-	public void signIn() {
-//		Log.i(TAG, "Start sign in");
-		GoogleSignInClient GoogleSignInClient = buildGoogleSignInClient();
-		Intent signInIntent = GoogleSignInClient.getSignInIntent();
-		startActivityForResult(signInIntent, REQUEST_CODE_SIGN_IN);
-	}
-
-	/** Build a Google SignIn client. */
-	private GoogleSignInClient buildGoogleSignInClient() {
-		GoogleSignInOptions signInOptions =
-				new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-						.requestScopes(Drive.SCOPE_FILE)
-						.build();
-		return GoogleSignIn.getClient(this, signInOptions);
-	}
 
 	public final static boolean CLOSE_BOOK_ON_STOP = false;
 	
@@ -1022,46 +1018,10 @@ public class CoolReader extends BaseActivity
     		mDonationService.onActivityResult(requestCode, resultCode, intent);
     	}
 
-		switch (requestCode) {
-			case REQUEST_CODE_SIGN_IN:
-		//		Log.i(TAG, "Sign in request code");
-				// Called after user is signed in.
-				if (resultCode == RESULT_OK) {
-		//			Log.i(TAG, "Signed in successfully.");
-					// Use the last signed in account here since it already have a Drive scope.
-					mDriveClient = Drive.getDriveClient(this, GoogleSignIn.getLastSignedInAccount(this));
-					// Build a drive resource client.
-					mDriveResourceClient =
-							Drive.getDriveResourceClient(this, GoogleSignIn.getLastSignedInAccount(this));
-					// Start camera.
-					//startActivityForResult(
-					//      new Intent(MediaStore.ACTION_IMAGE_CAPTURE), REQUEST_CODE_CAPTURE_IMAGE);
-				}
-				break;
-			case REQUEST_CODE_CAPTURE_IMAGE:
-		//		Log.i(TAG, "capture image request code");
-				// Called after a photo has been taken.
-				if (resultCode == Activity.RESULT_OK) {
-		//			Log.i(TAG, "Image captured successfully.");
-					// Store the image data as a bitmap for writing later.
-					//mBitmapToSave = (Bitmap) data.getExtras().get("data");
-					//saveFileToDrive();
-		//			createFile();
-				}
-				break;
-			case REQUEST_CODE_CREATOR:
-		//		Log.i(TAG, "creator request code");
-				// Called after a file is saved to Drive.
-				if (resultCode == RESULT_OK) {
-		//			Log.i(TAG, "Image successfully saved.");
-					//mBitmapToSave = null;
-					// Just start the camera again for another photo.
-					//startActivityForResult(
-					//      new Intent(MediaStore.ACTION_IMAGE_CAPTURE), REQUEST_CODE_CAPTURE_IMAGE);
-				}
-				break;
-		}
-    }
+        if (mGoogleDriveTools != null) {
+			mGoogleDriveTools.onActivityResult(requestCode, resultCode, intent);
+        }
+	}
 	
 	public void setDict( String id ) {
 		mDictionaries.setDict(id);

@@ -588,4 +588,8 @@
     <string name="load_bookmarks_from_gd">Загрузить закладки с диска Google One</string>
     <string name="gd_menu">Меню Google One</string>
     <string name="save_current_book_to_gd">Сохранить текущую книгу на диск Google One</string>
+    <string name="set_comment_from_cb">Сохранить с комментарием</string>
+    <string name="fonts_menu">Меню шрифтов</string>
+    <string name="copied_to_cb">Скопировано в буфер обмена</string>
+    <string name="options_app_dict_word_correction">Обработка слова перед словарем</string>
 </resources>

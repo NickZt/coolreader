@@ -76,5 +76,16 @@
 			android:editable="true"
 			android:singleLine="false"
 			android:text="comment text" />
+		<Button android:id="@+id/set_comment_from_cb"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="5dip"
+			android:layout_marginBottom="5dip"
+			android:layout_marginLeft="5dip"
+			android:layout_marginRight="5dip"
+			android:src="?attr/cr3_button_cancel_drawable"
+			android:focusable="false"
+			android:focusableInTouchMode="true"
+			android:text="@string/set_comment_from_cb"/>
 	</LinearLayout>
 </ScrollView>

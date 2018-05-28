@@ -58,7 +58,7 @@ public class BaseActivity extends Activity implements Settings {
 
 	private CRDBServiceAccessor mCRDBService;
 	protected Dictionaries mDictionaries;
-	
+
 	protected void unbindCRDBService() {
 		if (mCRDBService != null) {
 			mCRDBService.unbind();

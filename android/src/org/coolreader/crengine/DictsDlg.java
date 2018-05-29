@@ -141,29 +141,61 @@ public class DictsDlg extends BaseDialog {
 		
 	}
 
+	public String updateSearchText(String s){
+		String str = s;
+		if(str != null){
+			if (str.length()>2) {
+				if ((str.startsWith("\"")) && (str.endsWith("\""))) {
+					str = str.substring(1,str.length()-1);
+				}
+				if ((str.startsWith("(")) && (str.endsWith(")"))) {
+					str = str.substring(1,str.length()-1);
+				}
+				if ((str.startsWith("[")) && (str.endsWith("]"))) {
+					str = str.substring(1,str.length()-1);
+				}
+				if ((str.startsWith("{")) && (str.endsWith("}"))) {
+					str = str.substring(1,str.length()-1);
+				}
+				if ((str.startsWith("<")) && (str.endsWith(">"))) {
+					str = str.substring(1,str.length()-1);
+				}
+				if ((str.startsWith("'")) && (str.endsWith("'"))) {
+					str = str.substring(1,str.length()-1);
+				}
+				if (
+						(str.startsWith(",")) ||
+						(str.startsWith(".")) ||
+						(str.startsWith(":")) ||
+						(str.startsWith(";")) ||
+						(str.startsWith("/")) ||
+						(str.startsWith("\\")) ||
+						(str.startsWith("-"))
+					) {
+					str = str.substring(1, str.length());
+				}
+				if (
+						(str.endsWith(",")) ||
+						(str.endsWith(".")) ||
+						(str.endsWith(":")) ||
+						(str.endsWith(";")) ||
+						(str.endsWith("/")) ||
+						(str.endsWith("\\")) ||
+						(str.endsWith("-"))
+					) {
+					str = str.substring(0,str.length()-1);
+				}
+			}
+		}
+		return str.trim();
+	}
+
 	public DictsDlg( CoolReader activity, ReaderView readerView, String search_text )
 	{
 		super(activity, activity.getResources().getString(R.string.win_title_dicts), false, true);
 		mInflater = LayoutInflater.from(getContext());
-		mSearchText = search_text;
-		if ((mSearchText.startsWith("\"")) && (mSearchText.endsWith("\""))) {
-			mSearchText = mSearchText.substring(1,mSearchText.length()-1);
-		}
-		if ((mSearchText.startsWith("(")) && (mSearchText.endsWith(")"))) {
-			mSearchText = mSearchText.substring(1,mSearchText.length()-1);
-		}
-		if ((mSearchText.startsWith("[")) && (mSearchText.endsWith("]"))) {
-			mSearchText = mSearchText.substring(1,mSearchText.length()-1);
-		}
-		if ((mSearchText.startsWith("{")) && (mSearchText.endsWith("}"))) {
-			mSearchText = mSearchText.substring(1,mSearchText.length()-1);
-		}
-		if ((mSearchText.startsWith("<")) && (mSearchText.endsWith(">"))) {
-			mSearchText = mSearchText.substring(1,mSearchText.length()-1);
-		}
-		if ((mSearchText.startsWith("'")) && (mSearchText.endsWith("'"))) {
-			mSearchText = mSearchText.substring(1,mSearchText.length()-1);
-		}
+		mSearchText = updateSearchText(search_text.trim());
+		
 		mCoolReader = activity;
 		mReaderView = readerView;
 		View frame = mInflater.inflate(R.layout.dict_dialog, null);

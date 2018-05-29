@@ -592,4 +592,5 @@
     <string name="fonts_menu">Меню шрифтов</string>
     <string name="copied_to_cb">Скопировано в буфер обмена</string>
     <string name="options_app_dict_word_correction">Обработка слова перед словарем</string>
+    <string name="save_bookmark_last_sel">Сохранить закладку (последнее выделение)</string>
 </resources>

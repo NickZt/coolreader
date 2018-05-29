@@ -304,6 +304,8 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 	private final CoolReader mActivity;
 	private final Engine mEngine;
 
+	private Selection lastSelection;
+
 	private BookInfo mBookInfo;
 
 	private Properties mSettings = new Properties();
@@ -557,18 +559,18 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 		return false;
 	}
 
-	public static String dictWordCorrection(String s){
+	public String dictWordCorrection(String s){
 		String str = s;
-		if(str != null){
+        if(str != null){
 			if (str.length()>2) {
 				if (
-						(str.substring(1,2).equals("'"))&&
+						((str.substring(1,2).equals("'")) || (str.substring(1,2).equals("’")))
+								&&
 						(!str.toLowerCase().substring(0,1).equals("i"))
 						) {
 					str = str.substring(2,str.length());
 				}
-
-			}
+            }
 		}
 		return str;
 	}
@@ -576,6 +578,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 	private int mSelectionAction = SELECTION_ACTION_TOOLBAR;
 	private int mMultiSelectionAction = SELECTION_ACTION_TOOLBAR;
 	private void onSelectionComplete( Selection sel ) {
+		lastSelection = sel;
 		int iSelectionAction;
 		iSelectionAction = isMultiSelection(sel) ? mMultiSelectionAction : mSelectionAction;
 
@@ -2497,6 +2500,14 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 						return false;
 					}
 				});
+				break;
+			case DCMD_SAVE_BOOKMARK_LAST_SEL:
+				if (lastSelection!=null) {
+					if (!lastSelection.isEmpty()) {
+						clearSelection();
+						showNewBookmarkDialog(lastSelection);
+					}
+				}
 				break;
 		}
 	}

@@ -618,4 +618,5 @@
     <string name="fonts_menu">Fonts menu</string>
     <string name="copied_to_cb">Selection text copied to clipboard</string>
     <string name="options_app_dict_word_correction">Word correction before dictionary</string>
+    <string name="save_bookmark_last_sel">Save bookmark (last selection)</string>
 </resources>

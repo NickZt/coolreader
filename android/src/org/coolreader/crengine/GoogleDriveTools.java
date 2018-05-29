@@ -1455,7 +1455,10 @@ public class GoogleDriveTools {
                                     .setTitle(sBookFNameF)
                                     .setMimeType("application/octet-stream")
                                     .setStarred(false)
-                                    .setDescription("Saved from " + mCoolReader.getModel()+" ("+mCoolReader.getAndroid_id()+")")
+                                    .setDescription(
+                                            rv.getBookInfo().getFileInfo().getTitleOrFileName() + "\\n" +
+                                            "authors: " + rv.getBookInfo().getFileInfo().getAuthors() + "\\n"+
+                                            "Saved from " + mCoolReader.getModel()+" ("+mCoolReader.getAndroid_id()+")")
                                     .build();
                             return getDriveResourceClient().createFile(parent, changeSet, contents);
                         }

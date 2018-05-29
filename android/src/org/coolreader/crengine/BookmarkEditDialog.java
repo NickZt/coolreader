@@ -3,8 +3,10 @@ package org.coolreader.crengine;
 import org.coolreader.CoolReader;
 import org.coolreader.R;
 
+import android.content.ClipboardManager;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
@@ -43,7 +45,25 @@ public class BookmarkEditDialog extends BaseDialog {
 		final RadioButton btnCorrection = (RadioButton)view.findViewById(R.id.rb_correction);
 		final TextView posLabel = (TextView)view.findViewById(R.id.lbl_position); 
 		final TextView commentLabel = (TextView)view.findViewById(R.id.lbl_comment_text); 
-		final EditText posEdit = (EditText)view.findViewById(R.id.position_text); 
+		final EditText posEdit = (EditText)view.findViewById(R.id.position_text);
+		Button btnSetComment = (Button)view.findViewById(R.id.set_comment_from_cb);
+
+		android.text.ClipboardManager cm = mCoolReader.getClipboardmanager();
+		String cbtext = cm.getText().toString();
+		if (cbtext.length()>100) {
+			cbtext = cbtext.substring(0, 100)+"...";
+		}
+		final String cbtextFull = cm.getText().toString().trim();
+		btnSetComment.setText(mCoolReader.getString(R.string.set_comment_from_cb)+": "+cbtext.trim());
+		if (cbtext.trim().equals("")) {
+			btnSetComment.setEnabled(false);
+		}
+		btnSetComment.setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View v) {
+				commentEdit.setText(cbtextFull);
+				onPositiveButtonClick();
+			}
+		});
 		commentEdit = (EditText)view.findViewById(R.id.comment_edit);
 		String postext = mBookmark.getPercent()/100 + "%";
 		if ( mBookmark.getTitleText()!=null )

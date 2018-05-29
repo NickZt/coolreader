@@ -115,6 +115,7 @@ public class ReaderAction {
 	public final static ReaderAction LOAD_BOOKMARKS = new ReaderAction("LOAD_BOOKMARKS", R.string.load_bookmarks_from_gd, ReaderCommand.DCMD_LOAD_BOOKMARKS, 0);
     public final static ReaderAction GD_MENU = new ReaderAction("GD_MENU", R.string.gd_menu, ReaderCommand.DCMD_GD_MENU, 0);
     public final static ReaderAction SAVE_CURRENT_BOOK_TO_GD = new ReaderAction("SAVE_CURRENT_BOOK_TO_GD", R.string.save_current_book_to_gd, ReaderCommand.DCMD_SAVE_CURRENT_BOOK_TO_GD, 0);
+	public final static ReaderAction FONTS_MENU = new ReaderAction("FONTS_MENU", R.string.fonts_menu, ReaderCommand.DCMD_FONTS_MENU, 0);
 
 	public final static ReaderAction[] AVAILABLE_ACTIONS = {
 		NONE,
@@ -173,7 +174,8 @@ public class ReaderAction {
 		SAVE_BOOKMARKS,
 		LOAD_BOOKMARKS,
         GD_MENU,
-        SAVE_CURRENT_BOOK_TO_GD
+        SAVE_CURRENT_BOOK_TO_GD,
+		FONTS_MENU
 	};
 
 	public boolean isNone() {

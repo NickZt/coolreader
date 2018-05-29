@@ -614,4 +614,8 @@
     <string name="load_bookmarks_from_gd">Load bookmarks from Google One</string>
     <string name="gd_menu">Google One menu</string>
     <string name="save_current_book_to_gd">Save current book to Google One</string>
+    <string name="set_comment_from_cb">Set comment, then save</string>
+    <string name="fonts_menu">Fonts menu</string>
+    <string name="copied_to_cb">Selection text copied to clipboard</string>
+    <string name="options_app_dict_word_correction">Word correction before dictionary</string>
 </resources>

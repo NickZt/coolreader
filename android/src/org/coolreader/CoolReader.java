@@ -75,6 +75,13 @@ public class CoolReader extends BaseActivity
 	private BrowserViewLayout mBrowserFrame;
 	CRRootView mHomeFrame;
 	private Engine mEngine;
+
+    public boolean ismDictWordCorrrection() {
+        return mDictWordCorrrection;
+    }
+
+    private boolean mDictWordCorrrection = false;
+
 	//View startupView;
 	//CRDB mDB;
 	private ViewGroup mCurrentFrame;
@@ -255,6 +262,8 @@ public class CoolReader extends BaseActivity
         	setDict(value);
         } else if ( key.equals(PROP_APP_DICTIONARY_2) ) {
 			setDict2(value);
+		} else if ( key.equals(PROP_APP_DICT_WORD_CORRECTION) ) {
+			setDictWordCorrection(value);
 		} else if ( key.equals(PROP_TOOLBAR_APPEARANCE) ) {
 			setToolbarAppearance(value);
 	    } else if (key.equals(PROP_APP_BOOK_SORT_ORDER)) {
@@ -1029,6 +1038,12 @@ public class CoolReader extends BaseActivity
 
 	public void setDict2( String id ) {
 		mDictionaries.setDict2(id);
+	}
+
+	public void setDictWordCorrection (String id) {
+		mDictWordCorrrection = false;
+		if (id.equals("1"))
+			mDictWordCorrrection = true;
 	}
 
 	public void setToolbarAppearance( String id ) {

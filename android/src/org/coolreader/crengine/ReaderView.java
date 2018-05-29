@@ -65,6 +65,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 		@Override 
 		public void onPause() {
 			
+
 		}
 		@Override 
 		public void onResume() {

@@ -8,11 +8,13 @@ import org.coolreader.R;
 import android.graphics.Bitmap;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -98,7 +100,7 @@ public class CRToolBar extends ViewGroup {
 		final LinearLayout view = (LinearLayout)inflater.inflate(R.layout.popup_toolbar_item, null);
 		ImageView icon = (ImageView)view.findViewById(R.id.action_icon);
 		TextView label = (TextView)view.findViewById(R.id.action_label);
-		icon.setImageResource(action != null ? action.iconId : Utils.resolveResourceIdByAttr(activity, R.attr.cr3_button_more_drawable, R.drawable.cr3_button_more));
+		icon.setImageResource(action != null ? action.getIconIdWithDef(activity) : Utils.resolveResourceIdByAttr(activity, R.attr.cr3_button_more_drawable, R.drawable.cr3_button_more));
 		//icon.setMinimumHeight(buttonHeight);
 		icon.setMinimumWidth(buttonWidth);
 		Utils.setContentDescription(icon, activity.getString(action != null ? action.nameId : R.string.btn_toolbar_more));
@@ -128,7 +130,7 @@ public class CRToolBar extends ViewGroup {
 		L.d("CRToolBar preferredItemHeight=" + preferredItemHeight + " buttonWidth=" + buttonWidth + " buttonHeight=" + buttonHeight + " buttonSpacing=" + BUTTON_SPACING);
 	}
 	
-	private void calcLayout() {
+	public void calcLayout() {
 		if (activity instanceof CoolReader) {
 			//Properties settings = ((CoolReader)activity).getReaderView().getSettings();
 			//this.optionAppearance = settings.getInt(ReaderView.PROP_TOOLBAR_APPEARANCE, 0);
@@ -171,12 +173,15 @@ public class CRToolBar extends ViewGroup {
 			ReaderAction item = actions.get(i);
 			int iconId = item.iconId;
 			if (iconId == 0) {
-				itemsOverflow.add(item);
-				visibleNonButtonCount++;
-				continue;
+				iconId = Utils.resolveResourceIdByAttr(activity, R.attr.cr3_option_other_drawable, R.drawable.cr3_option_other);
 			}
+			//if (iconId == 0) {
+			//	itemsOverflow.add(item);
+			//	visibleNonButtonCount++;
+			//	continue;
+			//}
 			iconActions.add(item);
-			Drawable d = activity.getResources().getDrawable(iconId);
+			Drawable d = activity.getResources().getDrawable(item.getIconIdWithDef(activity));
 			visibleButtonCount++;
 			int w = d.getIntrinsicWidth();// * dpi / 160;
 			int h = d.getIntrinsicHeight();// * dpi / 160;
@@ -221,10 +226,10 @@ public class CRToolBar extends ViewGroup {
 	}
 	
 	private static boolean allActionsHaveIcon(ArrayList<ReaderAction> list) {
-		for (ReaderAction item : list) {
-			if (item.iconId == 0)
-				return false;
-		}
+		//for (ReaderAction item : list) {
+		//	if (item.iconId == 0)
+		//		return false;
+		//}
 		return true;
 	}
 	
@@ -263,11 +268,11 @@ public class CRToolBar extends ViewGroup {
 			onActionHandler.onActionSelected(item);
 	}
 
-	private void setButtonImageResource(ImageButton ib, int resId) {
-		if (optionAppearance == Settings.VIEWER_TOOLBAR_100) {
-			ib.setImageResource(resId);
-			return;
-		}
+	private void setButtonImageResource(final ReaderAction item, ImageButton ib, int resId) {
+		//if (optionAppearance == Settings.VIEWER_TOOLBAR_100) {
+		//	ib.setImageResource(resId);
+		//	return;
+		//}
 		Drawable dr = getResources().getDrawable(resId);
 		int iWidth = dr.getIntrinsicWidth();
 		iWidth = (int) ((float) iWidth * this.toolbarScale);
@@ -277,18 +282,68 @@ public class CRToolBar extends ViewGroup {
 		Canvas canvas = new Canvas(bitmap);
 		dr.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
 		dr.draw(canvas);
-		if (this.grayIcons) {
-			Bitmap bmpGrayscale = Bitmap.createBitmap(iWidth, iHeight, Bitmap.Config.ARGB_8888);
-			Canvas c = new Canvas(bmpGrayscale);
-			Paint paint = new Paint();
-			ColorMatrix cm = new ColorMatrix();
-			cm.setSaturation(0);
-			ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
-			paint.setColorFilter(f);
-			c.drawBitmap(bitmap, 0, 0, paint);
-			ib.setImageBitmap(bmpGrayscale);
-		} else {
-			ib.setImageBitmap(bitmap);
+		int icId = 0;
+		if (item != null) {
+			icId = item.iconId;
+			if (item.iconId == 0) {
+				Bitmap bmpWithText = Bitmap.createBitmap(iWidth, iHeight, Bitmap.Config.ARGB_8888);
+				Canvas c = new Canvas(bmpWithText);
+				Paint paint = Utils.createSolidPaint(0xFF000000 | textColor);
+				//paint.setColor(0xFF000000);
+				paint.setTextAlign(Paint.Align.LEFT);
+				int newTextSize = 12;
+				float textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
+						newTextSize, getResources().getDisplayMetrics());
+				paint.setTextSize(textSize);
+				//paint.setTextSize(25f);
+				paint.setSubpixelText(true);
+				paint.setAntiAlias(true);
+				paint.setFakeBoldText(true);
+				paint.setShadowLayer(6f, 0, 0, Color.WHITE);
+				paint.setStyle(Paint.Style.FILL);
+				paint.setTextAlign(Paint.Align.LEFT);
+				Paint paintG = paint;
+				if (this.grayIcons) {
+					paintG = new Paint();
+					ColorMatrix cm = new ColorMatrix();
+					cm.setSaturation(0);
+					ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
+					paintG.setColorFilter(f);
+				}
+				String sText = activity.getString(item.nameId);
+				String sTextR = "";
+				if(sText != null){
+					for(int i = 0; i < sText.length(); i++){
+						if(Character.isWhitespace(sText.charAt(i))){
+							sTextR = sTextR + " ";
+						} else sTextR = sTextR + sText.charAt(i);
+					}
+				}
+				String res = "";
+				for (String word: sTextR.split(" ")) {
+					if (word.length()>0)
+						res = res + word.substring(0,1);
+				}
+				res = res.toUpperCase();
+				//c.drawBitmap(bitmap, 0, 0, paintG);
+				c.drawText(res, 0, textSize + ((iHeight-textSize)/2), paint);
+				ib.setImageBitmap(bmpWithText);
+			}
+		}
+		if ((icId!=0)||(item == null)) {
+			if (this.grayIcons) {
+				Bitmap bmpGrayscale = Bitmap.createBitmap(iWidth, iHeight, Bitmap.Config.ARGB_8888);
+				Canvas c = new Canvas(bmpGrayscale);
+				Paint paint = new Paint();
+				ColorMatrix cm = new ColorMatrix();
+				cm.setSaturation(0);
+				ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
+				paint.setColorFilter(f);
+				c.drawBitmap(bitmap, 0, 0, paint);
+				ib.setImageBitmap(bmpGrayscale);
+			} else {
+				ib.setImageBitmap(bitmap);
+			}
 		}
 	}
 	
@@ -315,11 +370,11 @@ public class CRToolBar extends ViewGroup {
 			return null;
 		ImageButton ib = new ImageButton(getContext());
 		if (item != null) {
-			setButtonImageResource(ib,item.iconId);
+			if (item.getIconIdWithDef(activity)!=0)	setButtonImageResource(item, ib,item.getIconIdWithDef(activity));
 			Utils.setContentDescription(ib, getContext().getString(item.nameId));
 			ib.setTag(item);
 		} else {
-			setButtonImageResource(ib,Utils.resolveResourceIdByAttr(activity, R.attr.cr3_button_more_drawable, R.drawable.cr3_button_more));
+			setButtonImageResource(item, ib,Utils.resolveResourceIdByAttr(activity, R.attr.cr3_button_more_drawable, R.drawable.cr3_button_more));
 			Utils.setContentDescription(ib, getContext().getString(R.string.btn_toolbar_more));
 		}
 		TypedArray a = activity.getTheme().obtainStyledAttributes( new int[] { R.attr.cr3_toolbar_button_background_drawable } );
@@ -447,7 +502,7 @@ public class CRToolBar extends ViewGroup {
 
 		visibleButtonCount = 0;
 		for (int i=0; i<actions.size(); i++) {
-			if (actions.get(i).iconId != 0)
+			//if (actions.get(i).iconId != 0)
 				visibleButtonCount++;
 		}
 		
@@ -479,10 +534,10 @@ public class CRToolBar extends ViewGroup {
 				itemsOverflow.add(item);
 				continue;
 			}
-			if (item.iconId == 0) {
-				itemsOverflow.add(item);
-				continue;
-			}
+			//if (item.iconId == 0) {
+			//	itemsOverflow.add(item);
+			//	continue;
+			//}
 			itemsToShow.add(item);
 			count++;
 			addButton(rect, item, true);
@@ -613,6 +668,7 @@ public class CRToolBar extends ViewGroup {
 		// close on menu or back keys
 		tb.setFocusable(true);
 		tb.setFocusableInTouchMode(true);
+		//asdf
 		tb.setOnKeyListener(new OnKeyListener() {
 			@Override
 			public boolean onKey(View view, int keyCode, KeyEvent event) {

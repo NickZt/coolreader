@@ -1,77 +1,79 @@
 package org.coolreader.crengine;
 
-import org.coolreader.CoolReader;
-import org.coolreader.R;
-
+import android.graphics.Paint;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class StatusBar extends LinearLayout implements Settings {
+import org.coolreader.CoolReader;
+import org.coolreader.R;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
+
+public class UserDicPanel extends LinearLayout implements Settings {
 		private CoolReader activity;
 		private LinearLayout content;
-		private TextView lblTitle;
-		private TextView lblPosition;
-		private PositionIndicator indicator;
+		private TextView lblWordFound;
+		private ArrayList<TextView> arrLblWords = new ArrayList<TextView>();
+
+	public ArrayList<UserDicEntry> getArrUdeWords() {
+		return arrUdeWords;
+	}
+
+	private ArrayList<UserDicEntry> arrUdeWords = new ArrayList<UserDicEntry>();
+		private TextView lblWord;
 		private int textSize = 14;
 		private int color = 0;
-		private boolean showBookAuthor;
-		private boolean showBookTitle;
-		private boolean showBattery;
-		private boolean showTime;
-		private boolean showPageNumber;
-		private boolean showPosPercent;
+		private int wc = 0;
 		private boolean fullscreen;
 		private boolean nightMode;
-		
-		FileInfo book;
+		private PositionProperties prevrpos1;
+		private PositionProperties prevrpos2;
+
+			FileInfo book;
 		Bookmark position;
 		PositionProperties props;
-		
+
 		public void updateFullscreen(boolean fullscreen) {
 			if (this.fullscreen == fullscreen)
 				return;
 			this.fullscreen = fullscreen;
 			requestLayout();
 		}
-		
+
 		public boolean updateSettings(Properties props) {
 			int newTextSize = props.getInt(Settings.PROP_STATUS_FONT_SIZE, 16);
 			boolean needRelayout = (textSize != newTextSize);
 			this.textSize = newTextSize;
-			showBookTitle = props.getBool(PROP_SHOW_TITLE, true);
-			showBattery = true; //props.getBool(PROP_SHOW_BATTERY, true);
-			showTime = true; //props.getBool(PROP_SHOW_TIME, true);
-			showPageNumber = props.getBool(PROP_SHOW_PAGE_NUMBER, true);
-			showPosPercent = props.getBool(PROP_SHOW_POS_PERCENT, true);
 			nightMode = props.getBool(PROP_NIGHT_MODE, false);
 			this.color = props.getColor(Settings.PROP_STATUS_FONT_COLOR, 0);
-			lblTitle.setTextColor(0xFF000000 | color);
-			lblPosition.setTextColor(0xFF000000 | color);
-			indicator.setColor(this.color);
-			lblTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-			lblPosition.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+			lblWordFound.setTextColor(0xFF000000 | color);
+			for (TextView tv: arrLblWords) {
+				tv.setTextColor(0xFF000000 | color);
+				tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+			}
+			lblWordFound.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 			if (needRelayout) {
-				CoolReader.log.d("changing status bar layout");
-				lblPosition.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
-				lblTitle.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+				CoolReader.log.d("changing user dic layout");
+				lblWordFound.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+				for (TextView tv: arrLblWords) {
+					tv.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+				}
 				content.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
 				content.forceLayout();
 				forceLayout();
-//				content.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
-//				measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
-//				content.forceLayout();
-//				requestLayout();
-//				removeAllViews();
-//				addView(content);
-//				addView(indicator);
 			}
 			invalidate();
 			return needRelayout;
 		}
-		
-		public StatusBar(CoolReader context) {
+
+		public UserDicPanel(CoolReader context) {
 			super(context);
 			this.activity = context;
 			setOrientation(VERTICAL);
@@ -79,39 +81,108 @@ public class StatusBar extends LinearLayout implements Settings {
 			this.color = context.settings().getColor(Settings.PROP_STATUS_FONT_COLOR, 0);
 			
 			LayoutInflater inflater = LayoutInflater.from(activity);
-			content = (LinearLayout)inflater.inflate(R.layout.reader_status_bar, null);
-			lblTitle = (TextView)content.findViewById(R.id.title);
-			lblPosition = (TextView)content.findViewById(R.id.position);
+			content = (LinearLayout)inflater.inflate(R.layout.user_dic_panel, null);
+			lblWordFound = (TextView)content.findViewById(R.id.word_found);
+			arrLblWords.clear();
+			arrUdeWords.clear();
+			lblWord = (TextView)content.findViewById(R.id.word1);
+			arrLblWords.add(lblWord);
+			lblWord = (TextView)content.findViewById(R.id.word2);
+			arrLblWords.add(lblWord);
+			lblWord = (TextView)content.findViewById(R.id.word3);
+			arrLblWords.add(lblWord);
+			lblWord = (TextView)content.findViewById(R.id.word4);
+			arrLblWords.add(lblWord);
+			lblWord = (TextView)content.findViewById(R.id.word5);
+			arrLblWords.add(lblWord);
+			lblWord = (TextView)content.findViewById(R.id.word6);
+			arrLblWords.add(lblWord);
+			lblWord = (TextView)content.findViewById(R.id.word7);
+			arrLblWords.add(lblWord);
+			lblWord = (TextView)content.findViewById(R.id.word8);
+			arrLblWords.add(lblWord);
+			lblWord = (TextView)content.findViewById(R.id.word9);
+			arrLblWords.add(lblWord);
+			lblWord = (TextView)content.findViewById(R.id.word10);
+			arrLblWords.add(lblWord);
 
-			lblTitle.setText("Cool Reader " + activity.getVersion());
-			lblTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-			lblTitle.setTextColor(0xFF000000 | color);
+			lblWordFound.setText("");
+			lblWordFound.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+			lblWordFound.setTextColor(0xFF000000 | color);
+            lblWordFound.setPaintFlags(lblWordFound.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
-			lblPosition.setText("");
-			lblPosition.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-			lblPosition.setTextColor(0xFF000000 | color);
-			
+			lblWordFound.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					UserDicDlg dlg = new UserDicDlg(activity);
+					dlg.show();
+				}
+			});
+
+			int i = 0;
+
+			for (TextView tv: arrLblWords) {
+				i++;
+				tv.setText(String.valueOf(""));
+				tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+				tv.setTextColor(0xFF000000 | color);
+				tv.setPaintFlags(tv.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+				tv.setOnClickListener(new OnClickListener() {
+
+				@Override
+					public void onClick(View v) {
+						if (v instanceof TextView) {
+							String sWord = ((TextView) v).getText().toString();
+							for (UserDicEntry ude: arrUdeWords) {
+								String sKey = ude.getDic_word();
+								try {
+									String[] arrKey = sKey.split("~");
+									sKey = arrKey[0];
+									sKey = sKey.replace("|", "");
+								} catch (Exception e) {
+
+								}
+								if (sKey.equals(sWord)) {
+									activity.showToast(StrUtils.updateText(ude.getDic_word_translate(),true));
+									activity.getDB().saveUserDic(ude, UserDicEntry.ACTION_UPDATE_CNT);
+									break;
+								}
+							}
+						}
+					}
+				});
+				tv.setOnLongClickListener(new OnLongClickListener() {
+
+					@Override
+					public boolean onLongClick(View v) {
+						if (v instanceof TextView) {
+							String sWord = ((TextView) v).getText().toString();
+							for (final UserDicEntry ude: arrUdeWords) {
+								if (ude.getDic_word().equals(sWord)) {
+									activity.askConfirmation(R.string.win_title_confirm_ude_delete, new Runnable() {
+										@Override
+										public void run() {
+											activity.getDB().saveUserDic(ude, UserDicEntry.ACTION_DELETE);
+											activity.getmUserDic().remove(ude.getDic_word());
+											activity.getmReaderFrame().getUserDicPanel().updateUserDicWords();
+										}
+									});
+									break;
+								}
+							}
+						}
+						return true;
+					}
+				});
+			}
+
 			addView(content);
-			indicator = new PositionIndicator(activity);
-			addView(indicator);
-			//content.addView(indicator);
 			onThemeChanged(context.getCurrentTheme());
 			updateSettings(context.settings());
 		}
 
 		public void onThemeChanged(InterfaceTheme theme) {
-//			//color = nightMode ? 0x606060 : theme.getStatusTextColor();
-//			lblTitle.setTextColor(0xFF000000 | color);
-//			lblPosition.setTextColor(0xFF000000 | color);
-////			if (DeviceInfo.EINK_SCREEN)
-////				setBackgroundColor(0xFFFFFFFF);
-////			else if (nightMode)
-////				setBackgroundColor(0xFF000000);
-////			else
-////				setBackgroundResource(theme.getReaderStatusBackground());
-//			indicator.setColor(color);
-//			if (isShown())
-//				invalidate();
 		}
 
 		@Override
@@ -137,57 +208,108 @@ public class StatusBar extends LinearLayout implements Settings {
 			this.book = book != null ? new FileInfo(book) : null;
 			this.position = position != null ? new Bookmark(position) : null;
 			this.props = props != null ? new PositionProperties(props) : null;
-			PositionProperties currpos = activity.getReaderView().getDoc().getPositionProps(null);
-			//activity.showToast(currpos.pageText);
-			updateViews();
+			updateUserDicWords();
 		}
-		private void updateViews() {
-			StringBuilder title = new StringBuilder();
-			StringBuilder pos = new StringBuilder();
-			if (book != null) {
-				String authors = Utils.formatAuthorsNormalNames(book.authors);
-				append(title, book.title, null);
-				append(title, authors, " - ");
-				if (title.length() == 0)
-					append(title, book.getFileNameToDisplay(), null);
-				if (props != null) {
-					if (showPageNumber)
-						append(pos, (props.pageNumber + 1) + "/" + props.pageCount, " ");
-					if (showPosPercent) {
-						String percent = props.getPercent() > 0 ? Utils.formatPercent(props.getPercent()) : "0%";
-						append(pos, percent, " ");
+
+		public void updateUserDicWords() {
+			PositionProperties currpos = activity.getReaderView().getDoc().getPositionProps(null);
+			String sPageText = currpos.pageText;
+			this.wc = 0;
+			this.arrUdeWords.clear();
+			Iterator it = activity.getmUserDic().entrySet().iterator();
+			String sCurPage = sPageText.toLowerCase();
+			PositionProperties pr = null;
+			//this all is for a word splitted into two pages..
+			if ((prevrpos1!=null)&&(currpos!=null))
+				if (currpos.pageNumber-1==prevrpos1.pageNumber) pr = prevrpos1;
+			if ((prevrpos2!=null)&&(currpos!=null))
+				if (currpos.pageNumber-1==prevrpos2.pageNumber) pr = prevrpos2;
+			if (pr!=null) {
+				String sPrevPage = pr.pageText.toLowerCase();
+				if (!Character.isWhitespace(sPrevPage.charAt(sPrevPage.length() - 1))) {
+					for (int i=sPrevPage.length()-1;i>0;i--) {
+						if (Character.isWhitespace(sPrevPage.charAt(i))) {
+							sCurPage=sPrevPage.substring(i,sPrevPage.length())+sCurPage;
+							break;
+						}
 					}
 				}
-//				if (position != null) {
-//					if (showPosPercent) {
-//						String percent = position.getPercent() > 0 ? Utils.formatPercent(position.getPercent()) : "0%";
-//						append(pos, percent, " ");
-//					}
-//				}
 			}
-			if (showTime && fullscreen) {
-				append(pos, Utils.formatTime(activity, System.currentTimeMillis()), " ");
+			while (it.hasNext()) {
+				Map.Entry pair = (Map.Entry)it.next();
+				String sKey = pair.getKey().toString().toLowerCase();
+				if (!StrUtils.isEmptyStr(sKey)) {
+					try {
+						String[] arrKey = sKey.split("~");
+						boolean bWas = false;
+						for (String sK : arrKey) {
+							CoolReader.log.i(sK);
+							String sK2 = sK.replaceAll("-", " ");
+							String sK3 = sK.replaceAll("-", "");
+							String[] arrK = sK.split("\\|");
+							String[] arrK2 = sK2.split("\\|");
+							String[] arrK3 = sK3.split("\\|");
+							if ((!bWas)&&
+								  (sCurPage.contains(arrK[0]) || sCurPage.contains(arrK2[0]) || sCurPage.contains(arrK3[0]))) {
+								bWas = true;
+								this.wc = this.wc + 1;
+								UserDicEntry ude = (UserDicEntry) pair.getValue();
+								this.arrUdeWords.add(ude);
+							}
+						}
+					} catch (Exception e) {
+
+					}
+				}
 			}
-			if (showBattery && fullscreen) {
-				int batteryState = activity.getReaderView() != null ? activity.getReaderView().getBatteryState() : 0;
-				if (batteryState >= 0)
-					append(pos, "[" + (batteryState < 10 ? "0" : "") + batteryState + "%]", " ");
+			Collections.sort(arrUdeWords, new Comparator<UserDicEntry>() {
+				@Override
+				public int compare(UserDicEntry lhs, UserDicEntry rhs) {
+					// -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+					return lhs.getDic_word().compareToIgnoreCase(rhs.getDic_word());
+				}
+			});
+			prevrpos2 = prevrpos1;
+			prevrpos1 = currpos;
+			updateViews();
+		}
+
+		private void updateViews() {
+			String sWC = "wc: "+String.valueOf(this.wc);
+			if (this.wc == 0) sWC="";
+			String sAll = this.lblWordFound.getText().toString();
+			for (TextView tv: arrLblWords) {
+				sAll=sAll+tv.getText().toString();
 			}
 			boolean updated = false;
-			if (!lblPosition.getText().equals(pos)) {
-				this.lblPosition.setText(pos);
-				updated = true;
+			if (!lblWordFound.getText().equals(sWC)) {
+				this.lblWordFound.setText(sWC);
 			}
-			if (!lblTitle.getText().equals(title)) {
-				this.lblTitle.setText(title);
-				updated = true;
+			int i=0;
+			for (TextView tv: arrLblWords) {
+				tv.setText("");
 			}
-			if (position != null)
-				indicator.setPosition(position.getPercent());
-			else
-				indicator.setPosition(0);
+			for (UserDicEntry ude: arrUdeWords) {
+				i++;
+				if (i<10) {
+					arrLblWords.get(i).setText("_");
+					try {
+						String sKey = ude.getDic_word();
+						String[] arrKey = sKey.split("~");
+						sKey = arrKey[0];
+						arrLblWords.get(i).setText(sKey.replace("|", ""));
+					} catch (Exception e) {
+
+					}
+				}
+			}
+			String sAll2 = this.lblWordFound.getText().toString();
+			for (TextView tv: arrLblWords) {
+				sAll2=sAll2+tv.getText().toString();
+			}
+			if (!sAll.equals(sAll2)) updated=true;
 			if (updated && isShown()) {
-				CoolReader.log.d("changing status bar layout");
+				CoolReader.log.d("changing user dic layout");
 				measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
 				forceLayout();
 			}

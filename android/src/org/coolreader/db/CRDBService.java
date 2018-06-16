@@ -12,6 +12,7 @@ import org.coolreader.crengine.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 public class CRDBService extends Service {
 	public static final Logger log = L.create("db");
@@ -188,6 +189,11 @@ public class CRDBService extends Service {
 	public interface SearchHistoryLoadingCallback {
 		void onSearchHistoryLoaded(ArrayList<String> searches);
 	}
+
+	public interface UserDicLoadingCallback {
+		void onUserDicLoaded(HashMap<String, UserDicEntry> dic);
+	}
+
 	//=======================================================================================
     // OPDS catalogs access code
     //=======================================================================================
@@ -209,6 +215,15 @@ public class CRDBService extends Service {
 			@Override
 			public void work() {
 				mainDB.saveSearchHistory(book, sHist);
+			}
+		});
+	}
+
+	public void saveUserDic(final UserDicEntry ude, final int action) {
+		execTask(new Task("saveUserDic") {
+			@Override
+			public void work() {
+				mainDB.saveUserDic(ude, action);
 			}
 		});
 	}
@@ -262,6 +277,20 @@ public class CRDBService extends Service {
 		});
 	}
 
+	public void loadUserDic(final UserDicLoadingCallback callback, final Handler handler) {
+		execTask(new Task("loadUserDic") {
+			@Override
+			public void work() {
+				final HashMap<String, UserDicEntry> list = mainDB.loadUserDic();
+				sendTask(handler, new Runnable() {
+					@Override
+					public void run() {
+						callback.onUserDicLoaded(list);
+					}
+				});
+			}
+		});
+	}
 
 	public void removeOPDSCatalog(final Long id) {
 		execTask(new Task("removeOPDSCatalog") {
@@ -766,6 +795,10 @@ public class CRDBService extends Service {
 			getService().loadSearchHistory(book, callback, new Handler());
 		}
 
+		public void loadUserDic(UserDicLoadingCallback callback) {
+			getService().loadUserDic(callback, new Handler());
+		}
+
     	public void loadBooksByRating(int minRating, int maxRating, FileInfoLoadingCallback callback) {
     		getService().findBooksByRating(minRating, maxRating, callback, new Handler());
     	}
@@ -804,6 +837,10 @@ public class CRDBService extends Service {
 
 		public void saveSearchHistory(final BookInfo book, String sHist) {
 			getService().saveSearchHistory(new BookInfo(book), sHist);
+		}
+
+		public void saveUserDic(final UserDicEntry ude, final int action) {
+			getService().saveUserDic(ude, action);
 		}
 
 		public void clearSearchHistory(final BookInfo book) {

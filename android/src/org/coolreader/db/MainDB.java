@@ -8,6 +8,7 @@ import android.util.Log;
 import org.coolreader.crengine.*;
 
 import java.util.*;
+import java.util.zip.CRC32;
 
 public class MainDB extends BaseDB {
 	public static final Logger log = L.create("mdb");
@@ -146,7 +147,18 @@ public class MainDB extends BaseDB {
 				")");
 		execSQL("CREATE INDEX IF NOT EXISTS " +
 				"search_history_index ON search_history (book_fk) ");
-
+		execSQL("CREATE TABLE IF NOT EXISTS user_dic (" +
+				"id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+				"dic_word VARCHAR, " +
+				"dic_word_translate VARCHAR, " +
+				"dic_from_book VARCHAR, " +
+				"create_time INTEGER, " +
+				"last_access_time INTEGER, " +
+				"language VARCHAR DEFAULT NULL, " +
+				"seen_count INTEGER " +
+				")");
+		execSQL("CREATE INDEX IF NOT EXISTS " +
+				"user_dic_index ON user_dic (dic_word) ");
 		dumpStatistics();
 		
 		return true;
@@ -156,7 +168,9 @@ public class MainDB extends BaseDB {
 		log.i("mainDB: " + longQuery("SELECT count(*) FROM author") + " authors, "
 				 + longQuery("SELECT count(*) FROM series") + " series, "
 				 + longQuery("SELECT count(*) FROM book") + " books, "
-				 + longQuery("SELECT count(*) FROM bookmark") + " bookmarks"
+				 + longQuery("SELECT count(*) FROM bookmark") + " bookmarks, "
+				 + longQuery("SELECT count(*) FROM search_history") + " search_historys, "
+				 + longQuery("SELECT count(*) FROM user_dic") + " user_dics, "
 				 + longQuery("SELECT count(*) FROM folder") + " folders"
 		);
 	}
@@ -311,6 +325,78 @@ public class MainDB extends BaseDB {
 		return true;
 	}
 
+	public boolean saveUserDic(UserDicEntry ude, int action) {
+        Log.i("cr3", "saving user dic");
+		if (ude==null)
+			return false;
+        String sWord = ude.getDic_word();
+		String sWordTranslate = ude.getDic_word_translate();
+		if (!isOpened())
+			return false;
+		if (sWord==null)
+			return false;
+		if ((sWordTranslate==null)&&(action == UserDicEntry.ACTION_NEW))
+			return false;
+		sWord = sWord.trim().toLowerCase();
+		if (sWord.length()==0)
+			return false;
+		sWordTranslate = sWordTranslate.trim();
+        if ((sWordTranslate.length()==0)&&(action == UserDicEntry.ACTION_NEW))
+			return false;
+		Cursor rs = null;
+		String sW = "";
+
+        try {
+			if (action == UserDicEntry.ACTION_NEW) {
+				String sql = "SELECT id, dic_word_translate FROM user_dic where dic_word=" + quoteSqlString(sWord);
+				rs = mDB.rawQuery(sql, null);
+				if (rs.moveToFirst()) {
+					sW = rs.getString(1);
+					// need update
+					if (!sW.equals(sWordTranslate)) {
+						execSQL("UPDATE user_dic SET " +
+								" dic_word_translate = " + quoteSqlString(sWordTranslate) + ", " +
+								" dic_from_book = " + quoteSqlString(String.valueOf(ude.getDic_from_book())) + ", " +
+								" last_access_time = " + System.currentTimeMillis() + ", " +
+								" language = " + quoteSqlString(ude.getLanguage()) +
+								" WHERE id = " + rs.getInt(0)
+						);
+					}
+				} else {
+					// need insert
+					execSQL("INSERT INTO user_dic " +
+							"(dic_word, dic_word_translate, dic_from_book, create_time, last_access_time, language, seen_count) " +
+							"values (" + quoteSqlString(sWord) + ", " +
+							quoteSqlString(sWordTranslate) + ", " +
+							quoteSqlString(String.valueOf(ude.getDic_from_book())) + ", " +
+							System.currentTimeMillis() + ", " +
+							System.currentTimeMillis() + ", " +
+							quoteSqlString(ude.getLanguage()) + ", " +
+							"0)"
+					);
+				}
+			}
+			if (action == UserDicEntry.ACTION_DELETE) {
+				execSQL("DELETE FROM user_dic " +
+						" where dic_word = " + quoteSqlString(sWord));
+			}
+			if (action == UserDicEntry.ACTION_UPDATE_CNT) {
+				execSQL("UPDATE user_dic SET " +
+						" last_access_time = " + System.currentTimeMillis() + ", " +
+						" seen_count = seen_count + 1 " +
+						" WHERE dic_word = " + quoteSqlString(sWord)
+				);
+			}
+		} catch (Exception e) {
+			Log.e("cr3", "exception while saving user dic", e);
+			return false;
+		} finally {
+			if ( rs!=null )
+				rs.close();
+		}
+		return true;
+	}
+
 	public boolean clearSearchHistory(BookInfo book) {
 		if (!isOpened())
 			return false;
@@ -345,6 +431,38 @@ public class MainDB extends BaseDB {
 				rs.close();
 		}
 		return list;
+	}
+
+	public HashMap<String, UserDicEntry> loadUserDic() {
+		log.i("loadUserDic()");
+		HashMap<String, UserDicEntry> hshDic = new HashMap<String, UserDicEntry>();
+		Cursor rs = null;
+		try {
+			String sql = "SELECT id, dic_word, dic_word_translate, dic_from_book, "+
+				" create_time, last_access_time, language, seen_count "+
+				" FROM user_dic";
+			rs = mDB.rawQuery(sql, null);
+			if ( rs.moveToFirst() ) {
+				do {
+					UserDicEntry ude = new UserDicEntry();
+					ude.setId(rs.getLong(0));
+					ude.setDic_word(rs.getString(1));
+					ude.setDic_word_translate(rs.getString(2));
+					ude.setDic_from_book(rs.getString(3));
+					ude.setCreate_time(rs.getLong(4));
+					ude.setLast_access_time(rs.getLong(5));
+					ude.setLanguage(rs.getString(6));
+					ude.setSeen_count(rs.getLong(7));
+					hshDic.put(ude.getDic_word(),ude);
+				} while (rs.moveToNext());
+			}
+		} catch (Exception e) {
+			Log.e("cr3", "exception while loading user_dic", e);
+		} finally {
+			if ( rs!=null )
+				rs.close();
+		}
+		return hshDic;
 	}
 
 	public boolean loadOPDSCatalogs(ArrayList<FileInfo> list) {

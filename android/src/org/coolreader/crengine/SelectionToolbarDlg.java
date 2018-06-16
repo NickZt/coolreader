@@ -170,17 +170,29 @@ public class SelectionToolbarDlg {
 
 		mPanel.findViewById(R.id.selection_dict).setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				//mCoolReader.showToast("long tap on dic");
-				DictsDlg dlg = new DictsDlg(mCoolReader, mReaderView, selection.text);
-				dlg.show();
-				closeDialog(!mReaderView.getSettings().getBool(ReaderView.PROP_APP_SELECTION_PERSIST, false));
+				//PositionProperties currpos = mReaderView.getDoc().getPositionProps(null);
+				//Log.e("CURPOS", currpos.pageText);
+				if (mCoolReader.ismDictLongtapChange()) {
+					DictsDlg dlg = new DictsDlg(mCoolReader, mReaderView, selection.text);
+					dlg.show();
+					closeDialog(!mReaderView.getSettings().getBool(ReaderView.PROP_APP_SELECTION_PERSIST, false));
+				} else {
+					mCoolReader.findInDictionary( selection.text );
+					closeDialog(!mReaderView.getSettings().getBool(ReaderView.PROP_APP_SELECTION_PERSIST, false));
+				}
 			}
 		});
 
 		mPanel.findViewById(R.id.selection_dict).setOnLongClickListener(new View.OnLongClickListener() {
 			public boolean onLongClick(View v) {
-				mCoolReader.findInDictionary( selection.text );
-				closeDialog(!mReaderView.getSettings().getBool(ReaderView.PROP_APP_SELECTION_PERSIST, false));
+				if (!mCoolReader.ismDictLongtapChange()) {
+					DictsDlg dlg = new DictsDlg(mCoolReader, mReaderView, selection.text);
+					dlg.show();
+					closeDialog(!mReaderView.getSettings().getBool(ReaderView.PROP_APP_SELECTION_PERSIST, false));
+				} else {
+					mCoolReader.findInDictionary( selection.text );
+					closeDialog(!mReaderView.getSettings().getBool(ReaderView.PROP_APP_SELECTION_PERSIST, false));
+				}
 				return true;
 			}
 		});

@@ -2,11 +2,26 @@ package org.coolreader.crengine;
 
 import java.util.ArrayList;
 
+import org.coolreader.CoolReader;
 import org.coolreader.R;
 
 public class ReaderAction {
 	final public String id;
 	final public int nameId;
+
+	public int getIconId() {
+		return iconId;
+	}
+
+	public int getIconIdWithDef(BaseActivity activity) {
+		if (iconId == 0) {
+			if (activity==null)
+				return R.drawable.cr3_option_other;
+				else return Utils.resolveResourceIdByAttr(activity, R.attr.cr3_option_other_drawable, R.drawable.cr3_option_other);
+		}
+		return iconId;
+	}
+
 	public int    iconId;
 	final public ReaderCommand cmd;
 	final public int param;
@@ -117,6 +132,7 @@ public class ReaderAction {
     public final static ReaderAction SAVE_CURRENT_BOOK_TO_GD = new ReaderAction("SAVE_CURRENT_BOOK_TO_GD", R.string.save_current_book_to_gd, ReaderCommand.DCMD_SAVE_CURRENT_BOOK_TO_GD, 0);
 	public final static ReaderAction FONTS_MENU = new ReaderAction("FONTS_MENU", R.string.fonts_menu, ReaderCommand.DCMD_FONTS_MENU, 0);
 	public final static ReaderAction SAVE_BOOKMARK_LAST_SEL = new ReaderAction("SAVE_BOOKMARK_LAST_SEL", R.string.save_bookmark_last_sel, ReaderCommand.DCMD_SAVE_BOOKMARK_LAST_SEL, 0);
+	public final static ReaderAction SHOW_USER_DIC = new ReaderAction("SHOW_USER_DIC", R.string.win_title_user_dic, ReaderCommand.DCMD_SHOW_USER_DIC, 0);
 
 	public final static ReaderAction[] AVAILABLE_ACTIONS = {
 		NONE,
@@ -177,7 +193,8 @@ public class ReaderAction {
         GD_MENU,
         SAVE_CURRENT_BOOK_TO_GD,
 		FONTS_MENU,
-		SAVE_BOOKMARK_LAST_SEL
+		SAVE_BOOKMARK_LAST_SEL,
+		SHOW_USER_DIC
 	};
 
 	public boolean isNone() {

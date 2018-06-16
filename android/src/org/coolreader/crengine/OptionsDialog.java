@@ -160,12 +160,12 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 	
 	int[] mStatusPositions = new int[] {
 			Settings.VIEWER_STATUS_NONE, 
-			//Settings.VIEWER_STATUS_TOP, Settings.VIEWER_STATUS_BOTTOM, 
+			//Settings.VIEWER_STATUS_TOP, Settings.VIEWER_STATUS_BOTTOM,
 			Settings.VIEWER_STATUS_PAGE
 		};
 	int[] mStatusPositionsTitles = new int[] {
 			R.string.options_page_show_titlebar_hidden, 
-			//R.string.options_page_show_titlebar_top, R.string.options_page_show_titlebar_bottom, 
+			//R.string.options_page_show_titlebar_top, R.string.options_page_show_titlebar_bottom,
 			R.string.options_page_show_titlebar_page_header
 		};
 	
@@ -2050,6 +2050,9 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 		mOptionsApplication.add(new DictOptions(this, getString(R.string.options_app_dictionary)).noIcon());
 		mOptionsApplication.add(new DictOptions2(this, getString(R.string.options_app_dictionary2)).noIcon());
 		mOptionsApplication.add(new BoolOption(this, getString(R.string.options_app_dict_word_correction), PROP_APP_DICT_WORD_CORRECTION).noIcon());
+        mOptionsApplication.add(new BoolOption(this, getString(R.string.options_app_dict_longtap_change), PROP_APP_DICT_LONGTAP_CHANGE).noIcon());
+		mOptionsApplication.add(new BoolOption(this, getString(R.string.options_app_dict_word_correction), PROP_APP_DICT_WORD_CORRECTION).noIcon());
+		mOptionsApplication.add(new BoolOption(this, getString(R.string.options_app_show_user_dic_panel), PROP_APP_SHOW_USER_DIC_PANEL).noIcon());
 		mOptionsApplication.add(new BoolOption(this, getString(R.string.options_app_show_cover_pages), PROP_APP_SHOW_COVERPAGES).noIcon());
 		mOptionsApplication.add(new ListOption(this, getString(R.string.options_app_cover_page_size), PROP_APP_COVERPAGE_SIZE).add(mCoverPageSizes, mCoverPageSizeTitles).setDefaultValue("1").noIcon());
 		mOptionsApplication.add(new BoolOption(this, getString(R.string.options_app_scan_book_props), PROP_APP_BOOK_PROPERTY_SCAN_ENABLED).setDefaultValue("1").noIcon());
@@ -2174,6 +2177,8 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 			}
 		}
 		mActivity.setSettings(mProperties, 0, true);
+		if (mActivity instanceof CoolReader)
+			((CoolReader)mActivity).getmReaderFrame().updateCRToolbar(((CoolReader)mActivity));
         //mReaderView.setSettings(mProperties, mOldProperties);
 	}
 	

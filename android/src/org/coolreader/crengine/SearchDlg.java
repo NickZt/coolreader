@@ -167,7 +167,7 @@ public class SearchDlg extends BaseDialog {
     	mReverse = (CheckBox)mDialogView.findViewById(R.id.search_reverse);
 
 		ImageButton btnMinus1 = (ImageButton)mDialogView.findViewById(R.id.search_dlg_clear_hist_btn);
-		btnMinus1.setImageResource(R.drawable.cr3_button_remove);
+		//btnMinus1.setImageResource(R.drawable.cr3_button_remove);
 
 		btnMinus1.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View v) {

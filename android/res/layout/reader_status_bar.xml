@@ -9,16 +9,16 @@
   android:orientation="vertical"
   android:layout_width="fill_parent"
   android:layout_height="wrap_content">
-    
+
 	<LinearLayout
 	  android:orientation="horizontal"
 	  android:layout_width="fill_parent"
 	  android:layout_height="wrap_content">
-	  
-    <TextView 
+
+    <TextView
       android:id="@+id/title"
         style="@style/TextAppearance.Small"
-        android:text="Book Title - Book Author (series name #1)" 
+        android:text="Book Title - Book Author (series name #1)"
         android:singleLine="true"
         android:layout_marginLeft="3dip"
         android:layout_marginRight="3dip"
@@ -27,7 +27,7 @@
         android:layout_gravity="left"
         android:layout_width="0dip"
         android:layout_height="wrap_content"/>
-    <TextView 
+    <TextView
       android:id="@+id/position"
         style="@style/TextAppearance.Small"
         android:text="26 / 101 25.5%"
@@ -40,8 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         />
-    
-    </LinearLayout>
-    
+	</LinearLayout>
+
 </LinearLayout>
 <!-- /LinearLayout-->

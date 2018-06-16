@@ -141,131 +141,35 @@ public class DictsDlg extends BaseDialog {
 		
 	}
 
-	public String updateSearchText(String s){
-		String str = s;
-		if(str != null){
-			if (str.length()>2) {
-				if ((str.startsWith("\"")) && (str.endsWith("\""))) {
-					str = str.substring(1,str.length()-1);
-				}
-				if ((str.startsWith("(")) && (str.endsWith(")"))) {
-					str = str.substring(1,str.length()-1);
-				}
-				if ((str.startsWith("[")) && (str.endsWith("]"))) {
-					str = str.substring(1,str.length()-1);
-				}
-				if ((str.startsWith("{")) && (str.endsWith("}"))) {
-					str = str.substring(1,str.length()-1);
-				}
-				if ((str.startsWith("<")) && (str.endsWith(">"))) {
-					str = str.substring(1,str.length()-1);
-				}
-				if ((str.startsWith("'")) && (str.endsWith("'"))) {
-					str = str.substring(1,str.length()-1);
-				}
-				if (
-						(str.startsWith(",")) ||
-						(str.startsWith(".")) ||
-						(str.startsWith(":")) ||
-						(str.startsWith(";")) ||
-						(str.startsWith("/")) ||
-						(str.startsWith("\\")) ||
-						(str.startsWith("-"))
-					) {
-					str = str.substring(1, str.length());
-				}
-				if (
-						(str.endsWith(",")) ||
-						(str.endsWith(".")) ||
-						(str.endsWith(":")) ||
-						(str.endsWith(";")) ||
-						(str.endsWith("/")) ||
-						(str.endsWith("\\")) ||
-						(str.endsWith("-"))
-					) {
-					str = str.substring(0,str.length()-1);
-				}
-			}
-		}
-		return str.trim();
-	}
-
 	public DictsDlg( CoolReader activity, ReaderView readerView, String search_text )
 	{
 		super(activity, activity.getResources().getString(R.string.win_title_dicts), false, true);
 		mInflater = LayoutInflater.from(getContext());
-		mSearchText = updateSearchText(search_text.trim());
-		
+		mSearchText = StrUtils.updateText(search_text.trim(),false);
 		mCoolReader = activity;
 		mReaderView = readerView;
 		View frame = mInflater.inflate(R.layout.dict_dialog, null);
 		ImageButton btnMinus1 = (ImageButton)frame.findViewById(R.id.dict_dlg_minus1_btn);
-		btnMinus1.setImageResource(R.drawable.cr3_button_remove);
+		//btnMinus1.setImageResource(R.drawable.cr3_button_remove);
 		ImageButton btnMinus2 = (ImageButton)frame.findViewById(R.id.dict_dlg_minus2_btn);
-		btnMinus2.setImageResource(R.drawable.cr3_button_remove);
+		//btnMinus2.setImageResource(R.drawable.cr3_button_remove);
 		Button btnPronoun = (Button)frame.findViewById(R.id.dict_dlg_btn_pronoun);
 		selEdit = (EditText)frame.findViewById(R.id.selection_text);
 		selEdit.setText(mSearchText);
 		btnPronoun.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View v) {
-				String s = selEdit.getText().toString()
-						.replace(",",", ")
-						.replace(".",". ")
-						.replace(";","; ")
-						.replace(":",": ")
-						.replace("-","- ")
-						.replace("/","/ ")
-						.replace("\\","\\ ");
-				String res = "";
-				String [] arrS = s.split(" ");
-				for (String ss: arrS) {
-					String repl = ss.trim().toLowerCase()
-							.replace("me","smb")
-							.replace("you","smb")
-							.replace("him","smb")
-							.replace("her","smb")
-							.replace("thee","smb")
-							.replace("my","smb's")
-							.replace("mine","smb's")
-							.replace("yours","smb's")
-							.replace("your","smb's")
-							.replace("thy","smb's")
-							.replace("his","smb's")
-							.replace("hers","smb's");
-					if (repl.equals("smb")||repl.equals("smb's")||
-						repl.equals("smb.")||repl.equals("smb's.")||
-						repl.equals("smb,")||repl.equals("smb's,")||
-						repl.equals("smb:")||repl.equals("smb's:")||
-						repl.equals("smb;")||repl.equals("smb's;")||
-						repl.equals("smb;")||repl.equals("smb's;")||
-						repl.equals("smb/")||repl.equals("smb's/")||
-						repl.equals("smb\\")||repl.equals("smb's\\")) res=res+" "+repl; else res=res.trim()+" "+ss.trim();
-				}
-				selEdit.setText(res.trim());
+				String s = StrUtils.updateDictSelText(selEdit.getText().toString());
+				selEdit.setText(s.trim());
 			}
 		});
 		btnMinus1.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View v) {
-				String s = selEdit.getText().toString()
-						.replace(",",", ")
-						.replace(".",". ")
-						.replace(";","; ")
-						.replace(":",": ")
-						.replace("-","- ")
-						.replace("/","/ ")
-						.replace("\\","\\ ");
+				String s = StrUtils.replacePuncts(selEdit.getText().toString(),true);
 				String res = "";
 				String [] arrS = s.split(" ");
 				boolean bFirst = true;
 				for (String ss: arrS) {
-					String repl = ss.trim().toLowerCase()
-							.replace(",","")
-							.replace(".","")
-							.replace(";","")
-							.replace(":","")
-							.replace("-","")
-							.replace("/","")
-							.replace("\\","");
+					String repl = StrUtils.replacePuncts(ss.trim().toLowerCase(), false);
 					if (!repl.trim().equals("")) {
 						if (bFirst) {
 							bFirst = false;
@@ -279,14 +183,7 @@ public class DictsDlg extends BaseDialog {
 		});
 		btnMinus2.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View v) {
-				String s = selEdit.getText().toString()
-						.replace(",",", ")
-						.replace(".",". ")
-						.replace(";","; ")
-						.replace(":",": ")
-						.replace("-","- ")
-						.replace("/","/ ")
-						.replace("\\","\\ ");
+				String s = StrUtils.replacePuncts(selEdit.getText().toString(),true);
 				String res = "";
 				String [] arrS = s.split(" ");
 				List<String> list = Arrays.asList(arrS);
@@ -294,14 +191,7 @@ public class DictsDlg extends BaseDialog {
 				arrS = (String[]) list.toArray();
 				boolean bFirst = true;
 				for (String ss: arrS) {
-					String repl = ss.trim().toLowerCase()
-							.replace(",","")
-							.replace(".","")
-							.replace(";","")
-							.replace(":","")
-							.replace("-","")
-							.replace("/","")
-							.replace("\\","");
+					String repl = StrUtils.replacePuncts(ss.trim().toLowerCase(),false);
 					if (!repl.trim().equals("")) {
 						if (bFirst) {
 							bFirst = false;

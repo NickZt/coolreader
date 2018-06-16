@@ -220,11 +220,14 @@
     <string name="book_info_position_percent">Percent</string>
     <string name="dlg_bookmark_edit_correction">Corrected text</string>
     <string name="dlg_bookmark_edit_comment">Comment</string>
+    <string name="dlg_bookmark_edit_translation">Translation (*)</string>
     <string name="dlg_bookmark_type_correction">Correction</string>
     <string name="dlg_bookmark_create">New bookmark</string>
     <string name="dlg_bookmark_edit">Edit bookmark</string>
     <string name="dlg_bookmark_edit_range_text">Selection text</string>
     <string name="dlg_bookmark_type_comment">Comment</string>
+    <string name="dlg_bookmark_internal_link">Internal link</string>
+    <string name="dlg_bookmark_user_dic">User dictionary</string>
     <string name="toast_shortcut_bookmark_is_set">Bookmark $1 is set</string>
     <string name="toast_position_bookmark_is_set">Added bookmark for page</string>
     <string name="mi_bookmark_add">Add</string>
@@ -482,7 +485,7 @@
     <string name="options_view_toolbar_position_none">None</string>
     <string name="options_view_toolbar_hide_in_fullscreen">Hide toolbar in fullscreen</string>
     <string name="options_view_toolbar_position_right">Right</string>
-    <string name="options_view_toolbar_appearance">Toolbar appearance (restart required)</string>
+    <string name="options_view_toolbar_appearance">Toolbar appearance</string>
     <string name="options_view_toolbar_appear_100">100% size</string>
     <string name="options_view_toolbar_appear_100_gray">100% size, grayscale</string>
     <string name="options_view_toolbar_appear_75">75% size</string>
@@ -614,9 +617,18 @@
     <string name="load_bookmarks_from_gd">Load bookmarks from Google One</string>
     <string name="gd_menu">Google One menu</string>
     <string name="save_current_book_to_gd">Save current book to Google One</string>
-    <string name="set_comment_from_cb">Set comment, then save</string>
+    <string name="set_comment_from_cb_capt">Set comment (then save):</string>
+    <string name="set_comment_from_cb">Set comment ...</string>
     <string name="fonts_menu">Fonts menu</string>
     <string name="copied_to_cb">Selection text copied to clipboard</string>
     <string name="options_app_dict_word_correction">Word correction before dictionary</string>
     <string name="save_bookmark_last_sel">Save bookmark (last selection)</string>
+    <string name="options_app_dict_longtap_change">Toggle dictionary button action - short/long tap</string>
+    <string name="win_title_user_dic">User dictionary</string>
+    <string name="dlg_userdic_page">Page</string>
+    <string name="dlg_userdic_book">Book</string>
+    <string name="dlg_userdic_all">All</string>
+    <string name="win_title_confirm_ude_delete">Delete this dictionary entry?</string>
+    <string name="options_app_show_user_dic_panel">Show user dictionary panel</string>
+    <string name="dlg_bookmark_info">Use | for unnessary ending, ~ for split variants of the word</string>
 </resources>

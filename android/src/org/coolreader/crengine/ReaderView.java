@@ -48,12 +48,25 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 	private final BookView bookView;
 	public SurfaceView getSurface() { return surface; }
 
+	private ArrayList<ResizeHistory> resizeHist = new ArrayList<ResizeHistory>();
+	private int wasX = 0;
+	private int wasY = 0;
+
 	public interface BookView {
-		void draw();
-		void draw(boolean isPartially);
-		void invalidate();
+        void draw();
+        void draw(boolean isPartially);
+        void invalidate();
 		void onPause();
 		void onResume();
+	}
+
+	public class ResizeHistory {
+		public int X;
+		public int Y;
+		public long lastSet;
+		public int wasX;
+		public int wasY;
+		public int cnt;
 	}
 
 	public class ReaderSurface extends SurfaceView implements BookView {
@@ -197,7 +210,11 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 
 	}
 
-	private DocView doc;
+    public DocView getDoc() {
+        return doc;
+    }
+
+    private DocView doc;
 
 	// additional key codes for Nook
 	public static final int NOOK_KEY_PREV_LEFT = 96;
@@ -494,7 +511,6 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 		return false;
 	}
 
-
 	private KeyEvent trackedKeyEvent = null;
 	private ReaderAction actionToRepeat = null;
 	private boolean repeatActionActive = false;
@@ -559,25 +575,15 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 		return false;
 	}
 
-	public String dictWordCorrection(String s){
-		String str = s;
-        if(str != null){
-			if (str.length()>2) {
-				if (
-						((str.substring(1,2).equals("'")) || (str.substring(1,2).equals("’")))
-								&&
-						(!str.toLowerCase().substring(0,1).equals("i"))
-						) {
-					str = str.substring(2,str.length());
-				}
-            }
-		}
-		return str;
-	}
-
 	private int mSelectionAction = SELECTION_ACTION_TOOLBAR;
 	private int mMultiSelectionAction = SELECTION_ACTION_TOOLBAR;
 	private void onSelectionComplete( Selection sel ) {
+
+		//mActivity.showToast("startPos: "+sel.startPos+"; endPos: "+sel.endPos+
+		//		"startX: "+sel.startX+"; startY: "+sel.startY+"; chapter: "+sel.chapter);
+
+		boolean bSkipDic = mActivity.skipFindInDic;
+		mActivity.skipFindInDic = false;
 		lastSelection = sel;
 		int iSelectionAction;
 		iSelectionAction = isMultiSelection(sel) ? mMultiSelectionAction : mSelectionAction;
@@ -592,9 +598,15 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 				break;
 			case SELECTION_ACTION_DICTIONARY:
 				if ((!isMultiSelection(sel))&&(mActivity.ismDictWordCorrrection())) {
-					mActivity.findInDictionary(dictWordCorrection(sel.text));
+					if (!bSkipDic)
+						mActivity.findInDictionary(StrUtils.dictWordCorrection(sel.text));
 				} else {
-					mActivity.findInDictionary(sel.text);
+					if (
+							((!isMultiSelection(sel))&&(!bSkipDic))
+							||
+							(isMultiSelection(sel))
+						)
+						mActivity.findInDictionary(sel.text);
 				}
 				if (!getSettings().getBool(PROP_APP_SELECTION_PERSIST, false))
 					clearSelection();
@@ -1132,10 +1144,12 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 					} else if (bookmark != null) {
 						cancel();
 						if (bookmark.getCommentText().trim().equals("")) {
+							mActivity.skipFindInDic = true;
 							BookmarkEditDialog dlg = new BookmarkEditDialog(mActivity, ReaderView.this, bookmark, false);
 							dlg.show();
 						} else {
-							mActivity.showToast(bookmark.getCommentText());
+							mActivity.showToast(StrUtils.updateText(bookmark.getCommentText(),true));
+							mActivity.skipFindInDic = true;
 						}
 					} else {
 						updateSelection( start_x, start_y, start_x, start_y, false );
@@ -2509,6 +2523,10 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 					}
 				}
 				break;
+			case DCMD_SHOW_USER_DIC:
+				UserDicDlg dlg = new UserDicDlg(((CoolReader)mActivity));
+				dlg.show();
+				break;
 		}
 	}
 	boolean firstShowBrowserCall = true;
@@ -3052,6 +3070,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 
 	public boolean loadDocument( String fileName, final Runnable errorHandler )
 	{
+		lastSelection = null;
 		BackgroundThread.ensureGUI();
 		save();
 		log.i("loadDocument(" + fileName + ")");
@@ -4699,8 +4718,59 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 		if ( !mInitialized || !mOpened )
 			return;
 		log.v("drawPage() : submitting DrawPageTask");
+		// evaluate if we need to redraw page on this resolution
+		boolean bNeedRedraw = true;
+		if (((wasX==0)&&(wasY==0))||((wasX==internalDX)&&(wasY==internalDY))) {
+			wasX = internalDX;
+			wasY = internalDY;
+		} else {
+			boolean bFound = false;
+			for (ResizeHistory rh: resizeHist) {
+				// if we switch back to prev resolution
+				if (
+						(rh.X == internalDX) && (rh.Y == internalDY)
+						) {
+					rh.lastSet=System.currentTimeMillis();
+					bFound = true;
+				}
+			}
+			if (!bFound) {
+				ResizeHistory rh = new ResizeHistory();
+				rh.X=internalDX;
+				rh.Y=internalDY;
+				rh.wasX=wasX;
+				rh.wasY=wasY;
+				rh.cnt=0;
+				rh.lastSet=System.currentTimeMillis();
+				resizeHist.add(rh);
+			}
+			for (ResizeHistory rh: resizeHist) {
+				if (
+						(rh.X != internalDX) || (rh.Y != internalDY)
+					) {
+					if (
+							((System.currentTimeMillis() - rh.lastSet) < 5000)&&
+									(rh.lastSet!=0L)
+						)			{
+						rh.cnt = rh.cnt + 1;
+						rh.lastSet=0L;
+					}
+				}
+			}
+			for (ResizeHistory rh: resizeHist) {
+				if (
+						(rh.X == internalDX) && (rh.Y == internalDY)
+					) {
+					if (rh.cnt > 1) {
+						bNeedRedraw = false;
+					}
+				}
+			}
+			wasX = internalDX;
+			wasY = internalDY;
+		}
 		scheduleSaveCurrentPositionBookmark(DEF_SAVE_POSITION_INTERVAL);
-		post( new DrawPageTask(doneHandler, isPartially) );
+		if (bNeedRedraw) post( new DrawPageTask(doneHandler, isPartially) );
 	}
 
 	private int internalDX = 0;

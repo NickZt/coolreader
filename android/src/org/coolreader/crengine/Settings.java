@@ -116,6 +116,8 @@ public interface Settings {
     public static final String PROP_APP_DICTIONARY = "app.dictionary.current";
     public static final String PROP_APP_DICTIONARY_2 = "app.dictionary2.current";
     public static final String PROP_APP_DICT_WORD_CORRECTION = "app.dictionary.word.correction";
+    public static final String PROP_APP_SHOW_USER_DIC_PANEL = "app.dictionary.show.user.dic.panel";
+    public static final String PROP_APP_DICT_LONGTAP_CHANGE = "app.dictionary.longtap.change";
     public static final String PROP_APP_SELECTION_ACTION = "app.selection.action";
     public static final String PROP_APP_MULTI_SELECTION_ACTION = "app.multiselection.action";
     public static final String PROP_APP_SELECTION_PERSIST = "app.selection.persist";

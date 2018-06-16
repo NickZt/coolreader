@@ -13,9 +13,11 @@ public class ReaderViewLayout extends ViewGroup implements Settings {
 		private CoolReader activity;
 		private ReaderView contentView;
 		private StatusBar statusView;
+		private UserDicPanel userDicView;
 		private CRToolBar toolbarView;
 		private int statusBarLocation;
 		private int toolbarLocation;
+		private int userDicLocation;
 		private boolean hideToolbarInFullscren;
 		private boolean fullscreen;
 		private boolean nightMode;
@@ -29,12 +31,17 @@ public class ReaderViewLayout extends ViewGroup implements Settings {
 		public StatusBar getStatusBar() {
 			return statusView;
 		}
+
+		public UserDicPanel getUserDicPanel() {
+		return userDicView;
+	}
 		
 		public void updateFullscreen(boolean fullscreen) {
 			if (this.fullscreen == fullscreen)
 				return;
 			this.fullscreen = fullscreen;
 			statusView.updateFullscreen(fullscreen);
+			userDicView.updateFullscreen(fullscreen);
 			requestLayout();
 		}
 		
@@ -45,6 +52,10 @@ public class ReaderViewLayout extends ViewGroup implements Settings {
 		public boolean isStatusbarVisible() {
 			return statusBarLocation == VIEWER_STATUS_BOTTOM || statusBarLocation == VIEWER_STATUS_TOP;
 		}
+
+		public boolean isUserDicVisible() {
+			return activity.ismShowUserDicPanel();
+		}
 		
 		public void updateSettings(Properties settings) {
 			log.d("ReaderViewLayout.updateSettings()");
@@ -54,6 +65,8 @@ public class ReaderViewLayout extends ViewGroup implements Settings {
 			hideToolbarInFullscren = settings.getBool(PROP_TOOLBAR_HIDE_IN_FULLSCREEN, true);
 			statusView.setVisibility(isStatusbarVisible() ? VISIBLE : GONE);
 			statusView.updateSettings(settings);
+			userDicView.setVisibility(isUserDicVisible() ? VISIBLE : GONE);
+			userDicView.updateSettings(settings);
 			toolbarView.updateNightMode(nightMode);
 			toolbarView.setVisibility(isToolbarVisible() ? VISIBLE : GONE);
 			requestLayout();
@@ -93,10 +106,13 @@ public class ReaderViewLayout extends ViewGroup implements Settings {
 			this.statusView = new StatusBar(context);
 			statusBackground = contentView.createToolbarBackgroundDrawable();
 			this.statusView.setBackgroundDrawable(statusBackground);
+			this.userDicView = new UserDicPanel(context);
+			this.userDicView.setBackgroundDrawable(statusBackground);
 			toolbarBackground = contentView.createToolbarBackgroundDrawable();
 			this.toolbarView = new CRToolBar(context, ReaderAction.createList(new ReaderAction[] {
 				ReaderAction.GO_BACK,
 				ReaderAction.TOC,
+				ReaderAction.FONTS_MENU,
 				ReaderAction.SEARCH,
 				ReaderAction.OPTIONS,
 				ReaderAction.BOOKMARKS,
@@ -119,15 +135,22 @@ public class ReaderViewLayout extends ViewGroup implements Settings {
 			this.addView(toolbarView);
 			this.addView(contentView.getSurface());
 			this.addView(statusView);
+			this.addView(userDicView);
 			toolbarView.setFocusable(false);
 			statusView.setFocusable(false);
 			toolbarView.setFocusableInTouchMode(false);
 			statusView.setFocusableInTouchMode(false);
+			userDicView.setFocusable(false);
+			userDicView.setFocusableInTouchMode(false);
 			contentView.getSurface().setFocusable(true);
 			contentView.getSurface().setFocusableInTouchMode(true);
 			updateFullscreen(activity.isFullscreen());
 			updateSettings(context.settings());
 			onThemeChanged(activity.getCurrentTheme());
+		}
+
+		public void updateCRToolbar(CoolReader context) {
+			this.toolbarView.calcLayout();
 		}
 
 		public void onThemeChanged(InterfaceTheme theme) {
@@ -145,6 +168,7 @@ public class ReaderViewLayout extends ViewGroup implements Settings {
 			toolbarView.setButtonAlpha(theme.getToolbarButtonAlpha());
 			toolbarView.onThemeChanged(theme);
 			statusView.onThemeChanged(theme);
+			userDicView.onThemeChanged(theme);
 		}
 
 		
@@ -157,6 +181,7 @@ public class ReaderViewLayout extends ViewGroup implements Settings {
 			l = 0;
 
 			statusView.setVisibility(isStatusbarVisible() ? VISIBLE : GONE);
+			userDicView.setVisibility(isUserDicVisible() ? VISIBLE : GONE);
 			toolbarView.setVisibility(isToolbarVisible() ? VISIBLE : GONE);
 			
 			boolean toolbarVisible = toolbarLocation != VIEWER_TOOLBAR_NONE && (!fullscreen || !hideToolbarInFullscren);
@@ -206,10 +231,18 @@ public class ReaderViewLayout extends ViewGroup implements Settings {
 				//statusView.layout(l, b - statusView.getMeasuredHeight(), r, b);
 				b -= statusView.getMeasuredHeight();
 			}
+
+			Rect userDicRc = new Rect(l, t, r, b);
+			if (isUserDicVisible()) {
+				userDicRc.top = b - userDicView.getMeasuredHeight();
+				b -= userDicView.getMeasuredHeight();
+			}
+
 			statusBackground.setLocation(statusBarLocation);
 			contentView.getSurface().layout(l, t, r, b);
 			toolbarView.layout(toolbarRc.left, toolbarRc.top, toolbarRc.right, toolbarRc.bottom);
 			statusView.layout(statusRc.left, statusRc.top, statusRc.right, statusRc.bottom);
+			userDicView.layout(userDicRc.left, userDicRc.top, userDicRc.right, userDicRc.bottom);
 			
 			if (activity.isFullscreen()) {
 				BackgroundThread.instance().postGUI(new Runnable() {
@@ -235,6 +268,7 @@ public class ReaderViewLayout extends ViewGroup implements Settings {
 	        setMeasuredDimension(w, h);
 
 			boolean statusVisible = statusBarLocation == VIEWER_STATUS_BOTTOM || statusBarLocation == VIEWER_STATUS_TOP;
+			boolean userDicVisible = true;
 			boolean toolbarVisible = toolbarLocation != VIEWER_TOOLBAR_NONE && (!fullscreen || !hideToolbarInFullscren);
 			boolean landscape = w > h;
 			if (toolbarVisible) {
@@ -264,6 +298,12 @@ public class ReaderViewLayout extends ViewGroup implements Settings {
 				statusView.measure(MeasureSpec.makeMeasureSpec(w, MeasureSpec.AT_MOST),
 						MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
 				h -= statusView.getMeasuredHeight();
+			}
+
+			if (userDicVisible) {
+				userDicView.measure(MeasureSpec.makeMeasureSpec(w, MeasureSpec.AT_MOST),
+						MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+				h -= userDicView.getMeasuredHeight();
 			}
 			
 			contentView.getSurface().measure(MeasureSpec.makeMeasureSpec(w, MeasureSpec.AT_MOST),

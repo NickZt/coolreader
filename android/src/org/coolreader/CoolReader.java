@@ -3,6 +3,7 @@ package org.coolreader;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.coolreader.Dictionaries.DictionaryException;
@@ -38,6 +39,8 @@ import org.coolreader.crengine.ReaderViewLayout;
 import org.coolreader.crengine.Services;
 import org.coolreader.crengine.TTS;
 import org.coolreader.crengine.TTS.OnTTSCreatedListener;
+import org.coolreader.crengine.UserDicEntry;
+import org.coolreader.db.CRDBService;
 import org.coolreader.donations.CRDonationService;
 import org.koekak.android.ebookdownloader.SonyBookSelector;
 
@@ -68,6 +71,11 @@ public class CoolReader extends BaseActivity
 	public static final Logger log = L.create("cr");
 	
 	private ReaderView mReaderView;
+
+	public ReaderViewLayout getmReaderFrame() {
+		return mReaderFrame;
+	}
+
 	private ReaderViewLayout mReaderFrame;
 	private FileBrowser mBrowser;
 	private View mBrowserTitleBar;
@@ -76,11 +84,29 @@ public class CoolReader extends BaseActivity
 	CRRootView mHomeFrame;
 	private Engine mEngine;
 
+	public HashMap<String, UserDicEntry> getmUserDic() {
+		return mUserDic;
+	}
+
+	private HashMap<String, UserDicEntry> mUserDic;
+
     public boolean ismDictWordCorrrection() {
         return mDictWordCorrrection;
     }
 
     private boolean mDictWordCorrrection = false;
+
+	public boolean ismShowUserDicPanel() {
+		return mShowUserDicPanel;
+	}
+
+	private boolean mShowUserDicPanel = false;
+
+	public boolean ismDictLongtapChange() {
+		return mDictLongtapChange;
+	}
+
+	private boolean mDictLongtapChange = false;
 
 	//View startupView;
 	//CRDB mDB;
@@ -114,6 +140,8 @@ public class CoolReader extends BaseActivity
 	}
 
 	private String mModel = "";
+
+	public boolean skipFindInDic = false; // skip find in dic when bookmark toast is shown
 
 	/** Called when the activity is first created. */
     @Override
@@ -188,6 +216,7 @@ public class CoolReader extends BaseActivity
 		} else {
 			mModel = Strings.capitalize(manufacturer) + " " + model;
 		}
+
 		showRootWindow();
 		
         log.i("CoolReader.onCreate() exiting");
@@ -264,6 +293,10 @@ public class CoolReader extends BaseActivity
 			setDict2(value);
 		} else if ( key.equals(PROP_APP_DICT_WORD_CORRECTION) ) {
 			setDictWordCorrection(value);
+		} else if ( key.equals(PROP_APP_SHOW_USER_DIC_PANEL) ) {
+			setShowUserDicPanel(value);
+		} else if ( key.equals(PROP_APP_DICT_LONGTAP_CHANGE) ) {
+			setDictLongtapChange(value);
 		} else if ( key.equals(PROP_TOOLBAR_APPEARANCE) ) {
 			setToolbarAppearance(value);
 	    } else if (key.equals(PROP_APP_BOOK_SORT_ORDER)) {
@@ -479,8 +512,21 @@ public class CoolReader extends BaseActivity
 				}
 			});
 		}
-		
-		
+
+		if (mUserDic == null) {
+			waitForCRDBService(new Runnable() {
+				@Override
+				public void run() {
+					getDB().loadUserDic(new CRDBService.UserDicLoadingCallback() {
+							@Override
+							public void onUserDicLoaded(HashMap<String, UserDicEntry> list) {
+								mUserDic = list;
+							}
+						});
+				}
+			});
+		}
+
 		if ( isBookOpened() ) {
 			showOpenedBook();
 			return;
@@ -1046,6 +1092,18 @@ public class CoolReader extends BaseActivity
 			mDictWordCorrrection = true;
 	}
 
+    public void setShowUserDicPanel (String id) {
+        mShowUserDicPanel = false;
+        if (id.equals("1"))
+			mShowUserDicPanel = true;
+    }
+
+	public void setDictLongtapChange (String id) {
+		mDictLongtapChange = false;
+		if (id.equals("1"))
+			mDictLongtapChange = true;
+	}
+
 	public void setToolbarAppearance( String id ) {
 		mOptionAppearance = id;
 	}
@@ -1251,6 +1309,7 @@ public class CoolReader extends BaseActivity
 	
 	public void updateCurrentPositionStatus(FileInfo book, Bookmark position, PositionProperties props) {
 		mReaderFrame.getStatusBar().updateCurrentPositionStatus(book, position, props);
+		mReaderFrame.getUserDicPanel().updateCurrentPositionStatus(book, position, props);
 	}
 
 

@@ -3,17 +3,68 @@
    Comment bookmark item
 -->
 
- <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/bookmark_list"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_weight="8"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:baselineAligned="false"
-    android:layout_marginTop="0dip"
-    android:layout_marginBottom="0dip"
-    android:layout_marginLeft="0dip"
-    android:layout_marginRight="0dip"
-    >
+    android:layout_height="wrap_content">
 
+    <RadioGroup
+        android:id="@+id/rg_scope"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rb_page"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:layout_weight="1"
+            android:text="@string/dlg_userdic_page" />
+        <RadioButton
+            android:id="@+id/rb_book"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:layout_weight="1"
+            android:text="@string/dlg_userdic_book" />
+        <RadioButton
+            android:id="@+id/rb_userdic_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:layout_weight="1"
+            android:text="@string/dlg_userdic_all" />
+
+    </RadioGroup>
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layout_clear_hist"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:layout_marginTop="3dip"
+        android:layout_marginBottom="3dip"
+        android:layout_marginLeft="2dip"
+        android:layout_marginRight="2dip"
+        >
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/userdic_list"
+                android:orientation="vertical"
+                android:layout_weight="8"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:baselineAligned="false"
+                android:layout_marginTop="0dip"
+                android:layout_marginBottom="0dip"
+                android:layout_marginLeft="0dip"
+                android:layout_marginRight="0dip"
+                >
+
+            </LinearLayout>
+        </LinearLayout>
 </LinearLayout>

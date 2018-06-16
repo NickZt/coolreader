@@ -112,6 +112,7 @@ public enum ReaderCommand
 	DCMD_SAVE_CURRENT_BOOK_TO_GD(2065),
 	DCMD_FONTS_MENU(2066),
 	DCMD_SAVE_BOOKMARK_LAST_SEL(2067),
+	DCMD_SHOW_USER_DIC(2068)
 	;
 	
 	final int nativeId;

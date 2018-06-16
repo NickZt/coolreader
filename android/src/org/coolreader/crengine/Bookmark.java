@@ -224,6 +224,9 @@ public class Bookmark {
 	public static final int TYPE_POSITION = 1;
 	public static final int TYPE_COMMENT = 2;
 	public static final int TYPE_CORRECTION = 3;
+	public static final int TYPE_USER_DIC = 4;
+	public static final int TYPE_INTERNAL_LINK = 5;
+
 	private Long id;
 	private int type;
 	private int percent;

@@ -7,39 +7,91 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginTop="3dip"
+    android:layout_marginBottom="3dip"
+    android:layout_marginLeft="2dip"
+    android:layout_marginRight="2dip"
+    >
 
+    <TextView
+        android:id="@+id/lbl_folder_text"
+        style="@style/TextAppearance.Medium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:ellipsize="middle"
+        android:text="folder text text text text text text text text text text text" />
+
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/lbl_find_text"
+            style="@style/TextAppearance.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="3"
+            android:singleLine="false"
+            android:text="@string/lbl_find" />
+
+        <EditText
+            android:id="@+id/find_text"
+            style="@style/TextAppearance.Widget.EditText"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:singleLine="false"
+            android:text="find text" />
+    </LinearLayout>
     <RadioGroup
         android:id="@+id/rg_scope"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-
+        <ImageButton android:id="@+id/goto_root"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dip"
+            android:layout_marginBottom="5dip"
+            android:layout_marginLeft="5dip"
+            android:layout_marginRight="5dip"
+            android:src="?attr/cr3_browser_folder_root_drawable"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:background="@null"
+            android:contentDescription="root"/>
         <RadioButton
-            android:id="@+id/rb_page"
+            android:id="@+id/rb_whole"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
             android:layout_weight="1"
-            android:text="@string/dlg_userdic_page" />
+            android:text="@string/dlg_whole_gd" />
         <RadioButton
-            android:id="@+id/rb_book"
+            android:id="@+id/rb_folder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="false"
             android:layout_weight="1"
-            android:text="@string/dlg_userdic_book" />
-        <RadioButton
-            android:id="@+id/rb_userdic_all"
+            android:text="@string/dlg_folder_gd" />
+        <ImageButton android:id="@+id/do_find"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="false"
-            android:layout_weight="1"
-            android:text="@string/dlg_userdic_all" />
+            android:layout_marginTop="5dip"
+            android:layout_marginBottom="5dip"
+            android:layout_marginLeft="5dip"
+            android:layout_marginRight="5dip"
+            android:src="?attr/cr3_button_ok_drawable"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:background="@null"
+            android:contentDescription="@string/lbl_find"/>
 
     </RadioGroup>
-
-
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/layout_clear_hist"
         android:orientation="horizontal"
@@ -53,7 +105,7 @@
         >
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/userdic_list"
+                android:id="@+id/book_list"
                 android:orientation="vertical"
                 android:layout_weight="8"
                 android:layout_width="fill_parent"

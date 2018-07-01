@@ -34,14 +34,23 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:maxLines="3"
             />
+        <TextView android:id="@+id/option_label2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="false"
+            android:layout_below="@id/option_label"
+            android:layout_alignLeft="@id/option_label"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:maxLines="3"
+            />
         <!--android:ellipsize="marquee"
             android:fadingEdge="horizontal"
          -->
         <TextView android:id="@+id/option_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/option_label"
-            android:layout_alignLeft="@id/option_label"
+            android:layout_below="@id/option_label2"
+            android:layout_alignLeft="@id/option_label2"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="?android:attr/textColorSecondary"
             android:maxLines="4" />

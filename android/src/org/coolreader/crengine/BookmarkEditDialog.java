@@ -25,6 +25,7 @@ public class BookmarkEditDialog extends BaseDialog {
 	private final Bookmark mOriginalBookmark;
 	private final Bookmark mBookmark;
 	private final boolean mIsNew;
+	final TextView lblBookmarkLink;
 	BookInfo mBookInfo;
 	final EditText commentEdit;
 	final EditText posEdit;
@@ -52,6 +53,8 @@ public class BookmarkEditDialog extends BaseDialog {
 		} else {
 			if (mIsNew) {
 				mBookmark.setCommentText(commentEdit.getText().toString());
+				if (mBookmark.getType() == Bookmark.TYPE_INTERNAL_LINK)
+					mBookmark.setType(Bookmark.TYPE_COMMENT);
 				mReaderView.addBookmark(mBookmark);
 			} else {
 				if (mOriginalBookmark.setCommentText(commentEdit.getText().toString())) {
@@ -63,7 +66,23 @@ public class BookmarkEditDialog extends BaseDialog {
 		super.onPositiveButtonClick();
 	}
 
-	public BookmarkEditDialog( CoolReader activity, ReaderView readerView, Bookmark bookmark, boolean isNew)
+	public void BookmarkChooseCallback(Bookmark bm) {
+		if (bm!=null) {
+			String s1 = bm.getTitleText();
+			String s2 = bm.getPosText();
+			String s3 = bm.getCommentText();
+			lblBookmarkLink.setText("");
+			if (!StrUtils.isEmptyStr(s1)) lblBookmarkLink.setText(activity.getString(R.string.dlg_bookmark_link) +": " +s1);
+			else if (!StrUtils.isEmptyStr(s2)) lblBookmarkLink.setText(activity.getString(R.string.dlg_bookmark_link) +": " +s2);
+			else if (!StrUtils.isEmptyStr(s3)) lblBookmarkLink.setText(activity.getString(R.string.dlg_bookmark_link) +": " + s3);
+			mBookmark.setLinkPos(bm.getStartPos());
+		} else {
+			mBookmark.setLinkPos("");
+			lblBookmarkLink.setText("");
+		}
+	}
+
+	public BookmarkEditDialog(final CoolReader activity, ReaderView readerView, Bookmark bookmark, boolean isNew, int chosenType)
 	{
 		super(activity, "", true, false);
 		mCoolReader = activity;
@@ -89,7 +108,8 @@ public class BookmarkEditDialog extends BaseDialog {
 		final RadioButton btnCorrection = (RadioButton)view.findViewById(R.id.rb_correction);
 		final RadioButton btnUserDic = (RadioButton)view.findViewById(R.id.rb_user_dic);
 		final RadioButton btnInternalLink = (RadioButton)view.findViewById(R.id.rb_internal_link);
-		btnInternalLink.setEnabled(false);
+
+		//btnInternalLink.setEnabled(false);
 		final TextView posLabel = (TextView)view.findViewById(R.id.lbl_position);
 		final TextView commentLabel = (TextView)view.findViewById(R.id.lbl_comment_text);
 
@@ -111,7 +131,18 @@ public class BookmarkEditDialog extends BaseDialog {
 
 		final ImageButton btnSetComment = (ImageButton)view.findViewById(R.id.set_comment_from_cb);
 		final TextView lblSetComment = (TextView)view.findViewById(R.id.lbl_comment_from_cb);
-
+		lblBookmarkLink = (TextView)view.findViewById(R.id.lbl_bookmark_link);
+		String sL = mBookmark.getLinkPos();
+		if (StrUtils.isEmptyStr(sL)) lblBookmarkLink.setText(""); else
+			lblBookmarkLink.setText(activity.getString(R.string.dlg_bookmark_link) +": " +sL);
+		if (!StrUtils.isEmptyStr(sL)) {
+			for (Bookmark b: mBookInfo.getAllBookmarks()) {
+				if (b.getStartPos().equals(sL)) {
+					BookmarkChooseCallback(b);
+					break;
+				}
+			}
+		}
 		String sClpb = "<empty>";
 		try {
 			android.text.ClipboardManager cm = mCoolReader.getClipboardmanager();
@@ -127,7 +158,9 @@ public class BookmarkEditDialog extends BaseDialog {
 			cbtext = "<empty>";
 		}
 		final String cbtextFull = StrUtils.textShrinkLines(sClpb.trim(),false);
-		lblSetComment.setText(cbtext.trim());
+		lblSetComment.setText("");
+		if (!cbtext.trim().equals(""))
+			lblSetComment.setText(activity.getString(R.string.clipb_contents) +" "+cbtext.trim());
 		if (cbtext.trim().equals("")) {
 			btnSetComment.setEnabled(false);
 		}
@@ -142,6 +175,20 @@ public class BookmarkEditDialog extends BaseDialog {
 			public void onClick(View v) {
 				commentEdit.setText(cbtextFull);
 				onPositiveButtonClick();
+			}
+		});
+		lblBookmarkLink.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (mIsNew)
+					activity.showBookmarksDialog(true, BookmarkEditDialog.this);
+			}
+		});
+		btnInternalLink.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (mIsNew)
+					activity.showBookmarksDialog(true, BookmarkEditDialog.this);
 			}
 		});
 		commentEdit = (EditText)view.findViewById(R.id.comment_edit);
@@ -224,6 +271,11 @@ public class BookmarkEditDialog extends BaseDialog {
 			btnInternalLink.setClickable(false);
 			btnUserDic.setClickable(false);
 		}
+		btnComment.setChecked(chosenType==Bookmark.TYPE_COMMENT);
+		btnCorrection.setChecked(chosenType==Bookmark.TYPE_CORRECTION);
+		btnInternalLink.setChecked(chosenType==Bookmark.TYPE_INTERNAL_LINK);
+		btnUserDic.setChecked(chosenType==Bookmark.TYPE_USER_DIC);
+
 		setView( view );
 	}
 

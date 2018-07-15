@@ -69,7 +69,17 @@
         android:layout_marginLeft="2dip"
         android:layout_marginRight="5dip"
         android:baselineAligned="false">
-	
+
+        <TextView android:id="@+id/browser_item_field_state"
+            style="@style/TextAppearance.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="0dip"
+            android:layout_marginRight="2dip"
+            android:text="field_state"
+            android:singleLine="true"
+            android:layout_gravity="left" />
+
         <TextView android:id="@+id/browser_item_field1"
             style="@style/TextAppearance.Small"
             android:layout_width="wrap_content"

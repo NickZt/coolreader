@@ -590,13 +590,16 @@
     <string name="save_bookmarks_to_gd">Сохранить закладки на диск Google One</string>
     <string name="load_bookmarks_from_gd">Загрузить закладки с диска Google One</string>
     <string name="gd_menu">Меню Google One</string>
-    <string name="save_current_book_to_gd">Сохранить текущую книгу на диск Google One</string>
-    <string name="set_comment_from_cb_capt">Сохранить с комментарием:</string>
+    <string name="save_current_book_to_gd">Сохранить на диск Google One</string>
+    <string name="open_book_from_gd">Открыть книгу с диска Google One</string>
+    <string name="set_comment_from_cb_capt">Сохранить с комментарием из буфера обмена</string>
     <string name="set_comment_from_cb">Сохранить с комментарием</string>
+    <string name="clipb_contents">Буфер обмена:</string>
     <string name="fonts_menu">Меню шрифтов</string>
     <string name="copied_to_cb">Скопировано в буфер обмена</string>
     <string name="options_app_dict_word_correction">Обработка слова перед словарем</string>
     <string name="save_bookmark_last_sel">Сохранить закладку (последнее выделение)</string>
+    <string name="save_bookmark_last_sel_user_dic">Сохранить в пользовательский словарь (последнее выделение)</string>
     <string name="options_app_dict_longtap_change">Кнопка словаря - поменять короткий/длинный тап</string>
     <string name="win_title_user_dic">Пользовательский словарь</string>
     <string name="dlg_userdic_page">Страница</string>
@@ -605,5 +608,16 @@
     <string name="win_title_confirm_ude_delete">Удалить значение из словаря?</string>
     <string name="options_app_show_user_dic_panel">Показывать панель словаря пользователя</string>
     <string name="dlg_bookmark_info">Подстановка: | необязательное окончание, ~ разделитель вариантов слова</string>
+    <string name="options_reader_toolbar_buttons">Кнопки панели инструментов</string>
+    <string name="lbl_find">Поиск: </string>
+    <string name="dlg_whole_gd">По всему диску</string>
+    <string name="dlg_folder_gd">В этой папке</string>
+    <string name="win_title_open_book_from_gd">Открыть книгу с диска Google One</string>
+    <string name="dlg_bookmark_link">Ссылка на закладку</string>
+    <string name="docx_is_not_installed">Расширение org.coolreader.docx не установлено (установите, чтобы открывать docx формат)</string>
+    <string name="docx_open_converted">Открыта предварительно сохраненная преобразованная копия документа</string>
+    <string name="docx_convert">CoolReader может попробовать преобразовать документ в формат html, а затем открыть его. Продолжить?</string>
+    <string name="btn_edit_info">Редактировать информацию о книге</string>
+    <string name="mark_book_as_read">Отметить книгу как прочитанную?</string>
 </resources>
 

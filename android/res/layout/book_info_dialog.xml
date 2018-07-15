@@ -1,12 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
 	android:stretchColumns="*">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="vertical">
+
+	<Button android:id="@+id/btn_edit_info"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="5dip"
+		android:layout_marginBottom="5dip"
+		android:layout_marginLeft="5dip"
+		android:layout_marginRight="5dip"
+		android:focusable="false"
+		android:focusableInTouchMode="false"
+		android:text="@string/btn_edit_info"
+		android:contentDescription="@string/btn_edit_info"/>
 
 	<TableLayout
 		android:id="@+id/table"
 		style="@style/TextAppearance.Small"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"></TableLayout>
+	</LinearLayout>
 </ScrollView>

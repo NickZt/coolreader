@@ -33,6 +33,9 @@ public class BookmarksDlg  extends BaseDialog {
 	BookInfo mBookInfo;
 	BookmarkList mList;
 	BookmarksDlg mThis;
+	boolean mOnlyChoose;
+	Object mObj;
+	public Bookmark chosenBmk = null;
 
 	public final static int ITEM_POSITION=0;
 	public final static int ITEM_COMMENT=1;
@@ -209,7 +212,7 @@ public class BookmarksDlg  extends BaseDialog {
 			super(context, true);
 			setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 			setShortcutMode(shortcutMode);
-			setLongClickable(true);
+			setLongClickable(!mOnlyChoose);
 			setOnItemLongClickListener(new OnItemLongClickListener() {
 				@Override
 				public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
@@ -239,7 +242,16 @@ public class BookmarksDlg  extends BaseDialog {
 			} else {
 				Bookmark bm = (Bookmark)mAdapter.getItem(position);
 				if ( bm!=null ) {
-					mReaderView.goToBookmark(bm);
+					chosenBmk = bm;
+					if (!mOnlyChoose) mReaderView.goToBookmark(bm);
+					if (mObj != null) {
+						if (mObj instanceof BookmarkEditDialog) {
+						    BookmarkEditDialog bed = ((BookmarkEditDialog) mObj);
+                            if (bed.isShowing()) {
+						        bed.BookmarkChooseCallback(bm);
+                            }
+                        }
+                    }
 					dismiss();
 				}
 			}
@@ -251,7 +263,7 @@ public class BookmarksDlg  extends BaseDialog {
 	
 	final static int SHORTCUT_COUNT = 10;
 	
-	public BookmarksDlg( CoolReader activity, ReaderView readerView )
+	public BookmarksDlg( CoolReader activity, ReaderView readerView, final boolean bOnlyChoose, final Object obj )
 	{
 		super(activity, activity.getResources().getString(R.string.win_title_bookmarks), true, false);
 		mThis = this; // for inner classes
@@ -259,6 +271,8 @@ public class BookmarksDlg  extends BaseDialog {
 		mCoolReader = activity;
 		mReaderView = readerView;
 		mBookInfo = mReaderView.getBookInfo();
+		mOnlyChoose = bOnlyChoose;
+		mObj = obj;
 		setPositiveButtonImage(Utils.resolveResourceIdByAttr(activity, R.attr.cr3_button_add_drawable, R.drawable.cr3_button_add), R.string.mi_bookmark_add);
 		View frame = mInflater.inflate(R.layout.bookmark_list_dialog, null);
 		ViewGroup body = (ViewGroup)frame.findViewById(R.id.bookmark_list);
@@ -271,12 +285,25 @@ public class BookmarksDlg  extends BaseDialog {
 	@Override
 	protected void onPositiveButtonClick() {
 		// add bookmark
-		mReaderView.addBookmark(0);
-		BookmarksDlg.this.dismiss();
+        if (!mOnlyChoose) {
+            mReaderView.addBookmark(0);
+            BookmarksDlg.this.dismiss();
+        } else {
+            activity.showToast("Not in selection mode");
+        }
 	}
 
 	@Override
 	protected void onNegativeButtonClick() {
+		chosenBmk = null;
+		if (mObj != null) {
+			if (mObj instanceof BookmarkEditDialog) {
+				BookmarkEditDialog bed = ((BookmarkEditDialog) mObj);
+				if (bed.isShowing()) {
+					bed.BookmarkChooseCallback(null);
+				}
+			}
+		}
 		BookmarksDlg.this.dismiss();
 	}
 
@@ -288,7 +315,8 @@ public class BookmarksDlg  extends BaseDialog {
 		//setTitle(mCoolReader.getResources().getString(R.string.win_title_bookmarks));
         setCancelable(true);
 		super.onCreate(savedInstanceState);
-		registerForContextMenu(mList);
+		if (!mOnlyChoose)
+			registerForContextMenu(mList);
 	}
 	
 	private void listUpdated() {
@@ -337,7 +365,7 @@ public class BookmarksDlg  extends BaseDialog {
 			return true;
 		case R.id.bookmark_edit:
 			if ( bm!=null && (bm.getType()==Bookmark.TYPE_COMMENT || bm.getType()==Bookmark.TYPE_CORRECTION)) {
-				BookmarkEditDialog dlg = new BookmarkEditDialog(mCoolReader, mReaderView, bm, false);
+				BookmarkEditDialog dlg = new BookmarkEditDialog(mCoolReader, mReaderView, bm, false, Bookmark.TYPE_COMMENT);
 				dlg.show();
 			}
 			dismiss();

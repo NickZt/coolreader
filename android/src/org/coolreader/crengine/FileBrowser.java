@@ -1,8 +1,15 @@
 package org.coolreader.crengine;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
+import android.graphics.Color;
+import android.util.TypedValue;
 import android.view.*;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MenuItem.OnMenuItemClickListener;
@@ -127,8 +134,51 @@ public class FileBrowser extends LinearLayout implements FileInfoChangeListener 
 				showOPDSDir(item, null);
 			else if (item.isOnlineCatalogPluginBook())
 				showOnlineCatalogBookDialog(item);
-			else
-				mActivity.loadDocument(item);
+			else {
+				if (item.format.name().equals("DOCX")) {
+					final FileInfo downloadDir = Services.getScanner().getDownloadDirectory();
+					File f = new File(downloadDir.pathname+"/converted/"+item.filename+".html");
+					if (f.exists()) {
+						FileInfo fi = new FileInfo(f);
+						mActivity.showToast(mActivity.getString(R.string.docx_open_converted));
+						mActivity.loadDocument(fi);
+					} else {
+						PackageManager pm = mActivity.getPackageManager();
+						boolean binst = false;
+						try {
+							pm.getPackageInfo("org.coolreader.docx", 0); //PackageManager.GET_ACTIVITIES);
+							binst = true;
+						} catch (PackageManager.NameNotFoundException e) {
+							binst = false;
+						}
+						if (!binst) {
+							mActivity.showToast(mActivity.getString(R.string.docx_is_not_installed));
+						} else {
+							final FileInfo item1 = item;
+							mActivity.askConfirmation(R.string.docx_convert, new Runnable() {
+								@Override
+								public void run() {
+								Intent intent = new Intent(Intent.ACTION_SEND);
+								intent.setPackage("org.coolreader.docx");
+								intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+								intent.setType("text/plain");
+								final String fName = downloadDir.pathname + "/converted/";
+								intent.putExtra(android.content.Intent.EXTRA_SUBJECT, fName);
+								intent.putExtra(android.content.Intent.EXTRA_TEXT, item1.pathname);
+								try {
+									log.i("start docx intent");
+									mActivity.startActivity(intent);
+								} catch (ActivityNotFoundException e) {
+									mActivity.showToast(mActivity.getString(R.string.docx_is_not_installed));
+								} catch (Exception e) {
+									mActivity.showToast("exception while working with org.coolreader.docx");
+								}
+								}
+							});
+						}
+					}
+				} else mActivity.loadDocument(item);
+			}
 			return true;
 		}
 
@@ -1010,6 +1060,7 @@ public class FileBrowser extends LinearLayout implements FileInfoChangeListener 
 			TextView filename;
 			TextView field1;
 			TextView field2;
+			TextView fieldState;
 			//TextView field3;
 			void setText( TextView view, String text )
 			{
@@ -1077,6 +1128,7 @@ public class FileBrowser extends LinearLayout implements FileInfoChangeListener 
 							bookCount = (Integer)item.tag;
 						setText(field1, "books: " + String.valueOf(bookCount));
 						setText(field2, "folders: 0");
+						setText(fieldState, "");
 					} else if ( item.isBooksBySeriesDir() ) {
 						int bookCount = 0;
 						if (item.fileCount() > 0)
@@ -1085,15 +1137,19 @@ public class FileBrowser extends LinearLayout implements FileInfoChangeListener 
 							bookCount = (Integer)item.tag;
 						setText(field1, "books: " + String.valueOf(bookCount));
 						setText(field2, "folders: 0");
+						setText(fieldState, "");
 					} else  if (item.isOPDSDir()) {
 						setText(field1, item.title);
 						setText(field2, "");
+						setText(fieldState, "");
 					} else  if ( !item.isOPDSDir() && !item.isSearchShortcut() && ((!item.isOPDSRoot() && !item.isBooksByAuthorRoot() && !item.isBooksBySeriesRoot() && !item.isBooksByTitleRoot()) || item.dirCount()>0) && !item.isOnlineCatalogPluginDir()) {
 						setText(field1, "books: " + String.valueOf(item.fileCount()));
 						setText(field2, "folders: " + String.valueOf(item.dirCount()));
+						setText(fieldState, "");
 					} else {
 						setText(field1, "");
 						setText(field2, "");
+						setText(fieldState, "");
 					}
 				} else {
 					boolean isSimple = (viewType == VIEW_TYPE_FILE_SIMPLE);
@@ -1152,8 +1208,37 @@ public class FileBrowser extends LinearLayout implements FileInfoChangeListener 
 //						field2.setVisibility(VISIBLE);
 //						field3.setVisibility(VISIBLE);
 						String state = Utils.formatReadingState(mActivity, item);
-						if (field1 != null)
-							field1.setText(onlineBookInfo + "  " + state + " " + Utils.formatFileInfo(mActivity, item));
+						if (field1 != null) {
+							if (fieldState == null)	{
+								field1.setText(onlineBookInfo + "  " + state + " " + Utils.formatFileInfo(mActivity, item));
+							} else {
+								field1.setText(onlineBookInfo + " " + Utils.formatFileInfo(mActivity, item));
+							}
+						}
+						if (fieldState != null) {
+							fieldState.setText(state);
+							int colorBlue = Utils.resolveResourceIdByAttr(mActivity, R.attr.colorThemeBlue, Color.BLUE);
+							int colorGreen = Utils.resolveResourceIdByAttr(mActivity, R.attr.colorThemeGreen, Color.GREEN);
+							int colorGray = Utils.resolveResourceIdByAttr(mActivity, R.attr.colorThemeGray, Color.GRAY);
+
+							TypedArray a = mActivity.getTheme().obtainStyledAttributes(new int[]
+									{R.attr.colorThemeBlue,
+									 R.attr.colorThemeGreen,
+									 R.attr.colorThemeGray});
+							colorBlue = a.getColor(0, Color.BLUE);
+							colorGreen = a.getColor(1, Color.GREEN);
+							colorGray = a.getColor(2, Color.GRAY);
+                            a.recycle();
+							if (state.contains(mActivity.getString(R.string.book_state_reading))) {
+								fieldState.setTextColor(colorGreen);
+							}
+							if (state.contains(mActivity.getString(R.string.book_state_toread))) {
+								fieldState.setTextColor(colorBlue);
+							}
+							if (state.contains(mActivity.getString(R.string.book_state_finished))) {
+								fieldState.setTextColor(colorGray);
+							}
+						}
 						//field2.setText(formatDate(pos!=null ? pos.getTimeStamp() : item.createTime));
 						if (field2 != null)
 							field2.setText(Utils.formatLastPosition(mActivity, mHistory.getLastPos(item)));
@@ -1189,6 +1274,7 @@ public class FileBrowser extends LinearLayout implements FileInfoChangeListener 
 				holder.filename = (TextView)view.findViewById(R.id.book_filename);
 				holder.field1 = (TextView)view.findViewById(R.id.browser_item_field1);
 				holder.field2 = (TextView)view.findViewById(R.id.browser_item_field2);
+				holder.fieldState = (TextView)view.findViewById(R.id.browser_item_field_state);
 				//holder.field3 = (TextView)view.findViewById(R.id.browser_item_field3);
 				view.setTag(holder);
 			} else {

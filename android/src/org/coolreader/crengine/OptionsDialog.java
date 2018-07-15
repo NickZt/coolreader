@@ -90,6 +90,12 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 			"Default", "1%", "2%", "3%", "4%", "5%", "6%", "7%", "8%", "9%", 
 			"10%", "12%", "15%", "20%", "25%", "30%", "35%", "40%", "45%", "50%", "55%", "60%", "65%", "70%", "75%", "80%", "85%", "90%", "95%", "100%",
 	};
+	public static final int[] mToolbarButtons = new int[] {
+			0, 1, 2, 3
+	};
+	public static final String[] mToolbarButtonsTitles = new String[] {
+			"None", "Toolbar", "More", "Both (toolbar and more)"
+	};
 	public static int[] mMotionTimeouts;
 	public static String[] mMotionTimeoutsTitles;
 	int[] mInterlineSpaces = new int[] {
@@ -811,6 +817,73 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 
 		public String getValueLabel() { return ">"; }
 	}
+
+	class ReaderToolbarOption extends SubmenuOption {
+		public ReaderToolbarOption( OptionOwner owner, String label ) {
+			super(owner, label, PROP_TOOLBAR_BUTTONS);
+		}
+
+		private void addAction( OptionsListView list, ReaderAction action) {
+
+			ReaderAction[] ReaderActionDef =
+			new ReaderAction[]{
+					ReaderAction.GO_BACK,
+					ReaderAction.TOC,
+					ReaderAction.SEARCH,
+					ReaderAction.OPTIONS,
+					ReaderAction.BOOKMARKS,
+					ReaderAction.FILE_BROWSER_ROOT,
+					ReaderAction.TOGGLE_DAY_NIGHT,
+					ReaderAction.TOGGLE_SELECTION_MODE,
+					ReaderAction.GO_PAGE,
+					ReaderAction.GO_PERCENT,
+					ReaderAction.FILE_BROWSER,
+					ReaderAction.TTS_PLAY,
+					ReaderAction.GO_FORWARD,
+					ReaderAction.RECENT_BOOKS,
+					ReaderAction.OPEN_PREVIOUS_BOOK,
+					ReaderAction.TOGGLE_AUTOSCROLL,
+					ReaderAction.ABOUT,
+					ReaderAction.EXIT
+			};
+
+			boolean bIsDef = false;
+
+			for (ReaderAction act: ReaderActionDef)
+				if (act.cmd.nativeId == action.cmd.nativeId) {
+					bIsDef = true;
+					break;
+				}
+
+			String lab1 = activity.getString(action.nameId);
+			if (action.getMirrorAction()!=null) {
+				lab1 = lab1 + "~long tap: " +activity.getString(action.getMirrorAction().nameId);
+			}
+			list.add(new ListOption2Text(mOwner,
+					lab1, PROP_TOOLBAR_BUTTONS+"."
+						+String.valueOf(action.cmd.nativeId)+"."+String.valueOf(action.param))
+					.add(mToolbarButtons, mToolbarButtonsTitles).setDefaultValue(
+							bIsDef ?  Integer.toString(mToolbarButtons[3]) : Integer.toString(mToolbarButtons[0])).noIcon());
+		}
+
+		public void onSelect() {
+			BaseDialog dlg = new BaseDialog(mActivity, label, false, false);
+			OptionsListView listView = new OptionsListView(getContext());
+
+			ReaderAction[] actions = ReaderAction.AVAILABLE_ACTIONS;
+
+			for ( ReaderAction a : actions )
+				if (
+						((a != ReaderAction.NONE) && (a != ReaderAction.EXIT) && (a != ReaderAction.ABOUT))
+						)
+					addAction(listView, a);
+
+			dlg.setView(listView);
+			dlg.show();
+		}
+
+		public String getValueLabel() { return ">"; }
+	}
 	
 	class StatusBarOption extends SubmenuOption {
 		public StatusBarOption( OptionOwner owner, String label ) {
@@ -1195,6 +1268,269 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 			dlg.show();
 		}
 		
+		public void onClick( Pair item ) {
+			mProperties.setProperty(property, item.value);
+			refreshList();
+			if ( onChangeHandler!=null )
+				onChangeHandler.run();
+			if ( optionsListView!=null )
+				optionsListView.refresh();
+		}
+	}
+
+	public static class ListOption2Text extends OptionBase {
+		private ArrayList<Pair> list = new ArrayList<Pair>();
+		public ListOption2Text( OptionOwner owner, String label, String property ) {
+			super(owner, label, property);
+		}
+		public void add(String value, String label) {
+			list.add( new Pair(value, label) );
+		}
+		public ListOption2Text add(String[]values) {
+			for ( String item : values ) {
+				add(item, item);
+			}
+			return this;
+		}
+		public ListOption2Text add(double[]values) {
+			for ( double item : values ) {
+				String s = String.valueOf(item);
+				add(s, s);
+			}
+			return this;
+		}
+		public ListOption2Text add(int[]values) {
+			for ( int item : values ) {
+				String s = String.valueOf(item);
+				add(s, s);
+			}
+			return this;
+		}
+		public ListOption2Text add(int[]values, int[]labelIDs) {
+			for ( int i=0; i<values.length; i++ ) {
+				String value = String.valueOf(values[i]);
+				String label = mActivity.getString(labelIDs[i]);
+				add(value, label);
+			}
+			return this;
+		}
+		public ListOption2Text add(String[]values, int[]labelIDs) {
+			for ( int i=0; i<values.length; i++ ) {
+				String value = values[i];
+				String label = mActivity.getString(labelIDs[i]);
+				add(value, label);
+			}
+			return this;
+		}
+		public ListOption2Text add(String[]values, String[]labels) {
+			for ( int i=0; i<values.length; i++ ) {
+				String value = values[i];
+				String label = labels[i];
+				add(value, label);
+			}
+			return this;
+		}
+		public ListOption2Text add(int[]values, String[]labels) {
+			for ( int i=0; i<values.length; i++ ) {
+				String value = String.valueOf(values[i]);
+				String label = labels[i];
+				add(value, label);
+			}
+			return this;
+		}
+		public ListOption2Text addPercents(int[]values) {
+			for ( int item : values ) {
+				String s = String.valueOf(item);
+				add(s, s + "%");
+			}
+			return this;
+		}
+		public String findValueLabel( String value ) {
+			for ( Pair pair : list ) {
+				if ( value!=null && pair.value.equals(value) )
+					return pair.label;
+			}
+			return null;
+		}
+		public int findValue( String value ) {
+			if ( value==null )
+				return -1;
+			for ( int i=0; i<list.size(); i++ ) {
+				if ( value.equals(list.get(i).value) )
+					return i;
+			}
+			return -1;
+		}
+
+		public int getSelectedItemIndex() {
+			return findValue(mProperties.getProperty(property));
+		}
+
+		protected void closed() {
+
+		}
+
+		protected int getItemLayoutId() {
+			return R.layout.option_value;
+		}
+
+		@Override
+		public View getView(View convertView, ViewGroup parent) {
+			View view;
+			convertView = myView;
+			if ( convertView==null ) {
+				//view = new TextView(getContext());
+				if (label.contains("~"))
+					view = mInflater.inflate(R.layout.option_item_2text, null);
+					else view = mInflater.inflate(R.layout.option_item, null);
+			} else {
+				view = (View)convertView;
+			}
+			myView = view;
+			TextView labelView = (TextView)view.findViewById(R.id.option_label);
+			TextView labelView2 = null;
+			if (label.contains("~")) {
+				labelView2 = (TextView) view.findViewById(R.id.option_label2);
+			}
+			TextView valueView = (TextView)view.findViewById(R.id.option_value);
+
+			String lab1 = label;
+			String lab2 = "";
+			if (lab1.contains("~")) {
+				lab2 = lab1.split("~")[1];
+				lab1 = lab1.split("~")[0];
+			}
+			labelView.setText(lab1);
+			if (label.contains("~")) labelView2.setText(lab2);
+			if (valueView != null) {
+				String valueLabel = getValueLabel();
+				if (valueLabel != null && valueLabel.length() > 0) {
+					valueView.setText(valueLabel);
+					valueView.setVisibility(View.VISIBLE);
+				} else {
+					valueView.setText("");
+					valueView.setVisibility(View.INVISIBLE);
+				}
+			}
+			setupIconView((ImageView)view.findViewById(R.id.option_icon));
+			return view;
+		}
+
+		protected void updateItemContents( final View layout, final Pair item, final ListView listView, final int position ) {
+			TextView view;
+			RadioButton cb;
+			view = (TextView)layout.findViewById(R.id.option_value_text);
+			cb = (RadioButton)layout.findViewById(R.id.option_value_check);
+			view.setText(item.label);
+			String currValue = mProperties.getProperty(property);
+			boolean isSelected = item.value!=null && currValue!=null && item.value.equals(currValue) ;//getSelectedItemIndex()==position;
+			cb.setChecked(isSelected);
+			cb.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					listView.getOnItemClickListener().onItemClick(listView, listView, position, 0);
+				}
+			});
+		}
+
+		public String getValueLabel() { return findValueLabel(mProperties.getProperty(property)); }
+
+		public void onSelect() {
+			final BaseDialog dlg = new BaseDialog(mActivity, label, false, false);
+
+			final ListView listView = new BaseListView(mActivity, false);
+
+
+			ListAdapter listAdapter = new BaseAdapter() {
+
+				public boolean areAllItemsEnabled() {
+					return true;
+				}
+
+				public boolean isEnabled(int position) {
+					return true;
+				}
+
+				public int getCount() {
+					return list.size();
+				}
+
+				public Object getItem(int position) {
+					return list.get(position);
+				}
+
+				public long getItemId(int position) {
+					return position;
+				}
+
+				public int getItemViewType(int position) {
+					return 0;
+				}
+
+				public View getView(final int position, View convertView,
+									ViewGroup parent) {
+					ViewGroup layout;
+					if ( convertView==null ) {
+						layout = (ViewGroup)mInflater.inflate(getItemLayoutId(), null);
+						//view = new TextView(getContext());
+					} else {
+						layout = (ViewGroup)convertView;
+					}
+					final Pair item = list.get(position);
+					updateItemContents( layout, item, listView, position );
+					//cb.setClickable(false);
+//					cb.setOnClickListener(new View.OnClickListener() {
+//						@Override
+//						public void onClick(View v) {
+//
+//						}
+//					});
+					return layout;
+				}
+
+				public int getViewTypeCount() {
+					return 1;
+				}
+
+				public boolean hasStableIds() {
+					return true;
+				}
+
+				public boolean isEmpty() {
+					return list.size()==0;
+				}
+
+				private ArrayList<DataSetObserver> observers = new ArrayList<DataSetObserver>();
+
+				public void registerDataSetObserver(DataSetObserver observer) {
+					observers.add(observer);
+				}
+
+				public void unregisterDataSetObserver(DataSetObserver observer) {
+					observers.remove(observer);
+				}
+
+			};
+			int selItem = getSelectedItemIndex();
+			if ( selItem<0 )
+				selItem = 0;
+			listView.setAdapter(listAdapter);
+			listView.setSelection(selItem);
+			dlg.setView(listView);
+			//final AlertDialog d = dlg.create();
+			listView.setOnItemClickListener(new OnItemClickListener() {
+
+				public void onItemClick(AdapterView<?> adapter, View listview,
+										int position, long id) {
+					Pair item = list.get(position);
+					onClick(item);
+					dlg.dismiss();
+					closed();
+				}
+			});
+			dlg.show();
+		}
+
 		public void onClick( Pair item ) {
 			mProperties.setProperty(property, item.value);
 			refreshList();
@@ -1904,7 +2240,8 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
         mOptionsBrowser = new OptionsListView(getContext());
 
 		final Properties properties = new Properties();
-		properties.setProperty(ReaderView.PROP_APP_BOOK_SORT_ORDER, mActivity.settings().getProperty(ReaderView.PROP_APP_BOOK_SORT_ORDER));
+		Properties sett = mActivity.settings();
+		properties.setProperty(ReaderView.PROP_APP_BOOK_SORT_ORDER, sett.getProperty(ReaderView.PROP_APP_BOOK_SORT_ORDER));
 		int[] sortOrderLabels = {
 			FileInfo.SortOrder.FILENAME.resourceId,	
 			FileInfo.SortOrder.FILENAME_DESC.resourceId,	
@@ -1984,6 +2321,7 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 		mOptionsPage.add(new BoolOption(this, getString(R.string.options_view_toolbar_hide_in_fullscreen), PROP_TOOLBAR_HIDE_IN_FULLSCREEN).setDefaultValue("0"));
 		mOptionsPage.add(new ListOption(this, getString(R.string.options_view_toolbar_appearance), PROP_TOOLBAR_APPEARANCE).
 				add(mToolbarApperance, mToolbarApperanceTitles).setDefaultValue("0"));
+		mOptionsPage.add(new ReaderToolbarOption(this, getString(R.string.options_reader_toolbar_buttons)).setIconIdByAttr(R.attr.cr3_option_controls_keys_drawable, R.drawable.cr3_option_controls_keys));
 		mOptionsPage.add(new ListOption(this, getString(R.string.options_view_mode), PROP_PAGE_VIEW_MODE).add(mViewModes, mViewModeTitles).setDefaultValue("1").setIconIdByAttr(R.attr.cr3_option_view_mode_scroll_drawable, R.drawable.cr3_option_view_mode_scroll));
 		//mOptionsPage.add(new ListOption(getString(R.string.options_page_orientation), PROP_ROTATE_ANGLE).add(mOrientations, mOrientationsTitles).setDefaultValue("0"));
 		if (DeviceInfo.getSDKLevel() >= 9)
@@ -2051,7 +2389,6 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 		mOptionsApplication.add(new DictOptions2(this, getString(R.string.options_app_dictionary2)).noIcon());
 		mOptionsApplication.add(new BoolOption(this, getString(R.string.options_app_dict_word_correction), PROP_APP_DICT_WORD_CORRECTION).noIcon());
         mOptionsApplication.add(new BoolOption(this, getString(R.string.options_app_dict_longtap_change), PROP_APP_DICT_LONGTAP_CHANGE).noIcon());
-		mOptionsApplication.add(new BoolOption(this, getString(R.string.options_app_dict_word_correction), PROP_APP_DICT_WORD_CORRECTION).noIcon());
 		mOptionsApplication.add(new BoolOption(this, getString(R.string.options_app_show_user_dic_panel), PROP_APP_SHOW_USER_DIC_PANEL).noIcon());
 		mOptionsApplication.add(new BoolOption(this, getString(R.string.options_app_show_cover_pages), PROP_APP_SHOW_COVERPAGES).noIcon());
 		mOptionsApplication.add(new ListOption(this, getString(R.string.options_app_cover_page_size), PROP_APP_COVERPAGE_SIZE).add(mCoverPageSizes, mCoverPageSizeTitles).setDefaultValue("1").noIcon());
@@ -2177,8 +2514,12 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 			}
 		}
 		mActivity.setSettings(mProperties, 0, true);
-		if (mActivity instanceof CoolReader)
-			((CoolReader)mActivity).getmReaderFrame().updateCRToolbar(((CoolReader)mActivity));
+		try {
+			if (mActivity instanceof CoolReader)
+				if (((CoolReader) mActivity).getmReaderFrame()!=null)
+					((CoolReader) mActivity).getmReaderFrame().updateCRToolbar(((CoolReader) mActivity));
+		} catch (Exception e) {
+		}
         //mReaderView.setSettings(mProperties, mOldProperties);
 	}
 	

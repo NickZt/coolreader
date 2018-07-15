@@ -59,6 +59,7 @@ public class FileInfo {
 	public boolean isScanned;
 	public FileInfo parent; // parent item
 	public Object tag; // some additional information
+	public boolean askedMarkRead = false; // did we ask to mark book as read
 	
 	private ArrayList<FileInfo> files;// files
 	private ArrayList<FileInfo> dirs; // directories

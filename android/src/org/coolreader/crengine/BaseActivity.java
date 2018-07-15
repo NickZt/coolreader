@@ -51,6 +51,10 @@ import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.Toast;
 
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
+import com.github.johnpersano.supertoasts.library.SuperToast;
+
 public class BaseActivity extends Activity implements Settings {
 
 	private static final Logger log = L.create("ba");
@@ -1055,6 +1059,12 @@ public class BaseActivity extends Activity implements Settings {
 			showToast(s, duration);
 	}
 
+	public void showSuperToast(int stringResourceId) {
+		String s = getString(stringResourceId);
+		if (s != null)
+			showSuperToast(s);
+	}
+
 	public void showToast(String msg) {
 		showToast(msg, Toast.LENGTH_LONG);
 	}
@@ -1070,6 +1080,12 @@ public class BaseActivity extends Activity implements Settings {
 		}
 	}
 
+	public void showSuperToast(String msg) {
+		log.v("showing super toast: " + msg);
+		final SuperToast superToast = new SuperActivityToast(this, Style.blueGrey());
+		superToast.setText(msg);
+		superToast.show();
+	}
 
 	protected View contentView;
 	public View getContentView() {

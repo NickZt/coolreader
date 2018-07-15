@@ -76,4 +76,15 @@
     <attr name="folder_big_drawable" format="reference" />
     <attr name="folder_big_bookmark_drawable" format="reference" />
     <attr name="media_flash_microsd_drawable" format="reference" />
+
+    <attr name="blueLight" format="reference" />
+    <attr name="greenLight" format="reference" />
+    <attr name="grayLight" format="reference" />
+    <attr name="blueDark" format="reference" />
+    <attr name="greenDark" format="reference" />
+    <attr name="grayDark" format="reference" />
+
+    <attr name="colorThemeBlue" format="reference" />
+    <attr name="colorThemeGreen" format="reference" />
+    <attr name="colorThemeGray" format="reference" />
 </resources>

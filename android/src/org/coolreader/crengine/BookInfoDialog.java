@@ -4,10 +4,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.coolreader.CoolReader;
 import org.coolreader.R;
 
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -73,7 +75,7 @@ public class BookInfoDialog extends BaseDialog {
 		table.addView(tableRow);
 	}
 	
-	public BookInfoDialog( BaseActivity activity, Collection<String> items)
+	public BookInfoDialog(final BaseActivity activity, Collection<String> items)
 	{
 		super(activity);
 		mCoolReader = activity;
@@ -82,6 +84,21 @@ public class BookInfoDialog extends BaseDialog {
 		mInflater = LayoutInflater.from(getContext());
 		View view = mInflater.inflate(R.layout.book_info_dialog, null);
 		TableLayout table = (TableLayout)view.findViewById(R.id.table);
+		Button btnInfo = (Button) view.findViewById(R.id.btn_edit_info);
+		btnInfo.setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View v) {
+				CoolReader cr = (CoolReader)mCoolReader;
+				FileInfo fi = cr.getReaderView().getBookInfo().getFileInfo();
+				FileInfo dfi = fi.parent;
+				if (dfi == null) {
+					dfi = Services.getScanner().findParent(fi, Services.getScanner().getRoot());
+				}
+				if (dfi!=null) {
+					cr.editBookInfo(dfi, fi);
+					dismiss();
+				}
+			}
+		});
 		for ( String item : items ) {
 			addItem(table, item);
 		}

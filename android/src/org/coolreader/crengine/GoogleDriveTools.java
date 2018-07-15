@@ -12,6 +12,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveFolder;
+import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataBuffer;
@@ -43,6 +44,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -72,6 +74,13 @@ public class GoogleDriveTools {
     public static final int REQUEST_CODE_LOAD_BOOKMARKS_LIST = 100013;
     public static final int REQUEST_CODE_LOAD_BOOKMARKS = 100014;
     public static final int REQUEST_CODE_SAVE_CURRENT_BOOK_TO_GD = 100015;
+    public static final int REQUEST_CODE_LOAD_BOOKS_FOLDER_CONTENTS = 100016;
+    public static final int REQUEST_CODE_LOAD_FOLDER_CONTENTS = 100017;
+    public static final int REQUEST_CODE_LOAD_BOOK_FILE = 100018;
+
+    public DriveClient getmDriveClient() {
+        return mDriveClient;
+    }
 
     private DriveClient mDriveClient = null;
     private DriveResourceClient mDriveResourceClient = null;
@@ -80,8 +89,10 @@ public class GoogleDriveTools {
 
     private GoogleSignInClient mGoogleSignInClient;
     private GoogleSignInAccount mSignInAccount;
-    //private DriveClient mDriveClient;
-    //private DriveResourceClient mDriveResourceClient;
+
+    private DriveId mRootFolder;
+    private DriveId mCRFolder;
+    private DriveId mBooksFolder;
 
     public GoogleDriveTools(CoolReader mCR) {
         this.mCoolReader = mCR;
@@ -101,6 +112,7 @@ public class GoogleDriveTools {
         GoogleSignInOptions signInOptions =
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestScopes(Drive.SCOPE_FILE)
+                        .requestScopes(Drive.SCOPE_APPFOLDER)
                         .build();
         return GoogleSignIn.getClient(mCoolReader, signInOptions);
     }
@@ -219,11 +231,43 @@ public class GoogleDriveTools {
                         mCoolReader.showToast(mCoolReader.getString(R.string.gd_error) + " : sing in");
                 }
                 break;
+            case REQUEST_CODE_LOAD_BOOKS_FOLDER_CONTENTS:
+                if (resultCode == Activity.RESULT_OK) {
+                    mCoolReader.showToast(mCoolReader.getString(R.string.gd_begin) + " (get folder contents)");
+                    if (CheckSingIn())
+                        syncReq(requestCode, mActionObject, false);
+                    else
+                        mCoolReader.showToast(mCoolReader.getString(R.string.gd_error) + " : sing in");
+                }
+                break;
+            case REQUEST_CODE_LOAD_FOLDER_CONTENTS:
+                if (resultCode == Activity.RESULT_OK) {
+                    mCoolReader.showToast(mCoolReader.getString(R.string.gd_begin) + " (get folder contents)");
+                    if (CheckSingIn())
+                        if (mActionObject instanceof OpenBookFromGdDlg)
+                            loadBooksList(((OpenBookFromGdDlg)mActionObject).driveToGoTo.asDriveFolder(),
+                                    REQUEST_CODE_LOAD_FOLDER_CONTENTS, mActionObject, true);
+                    else
+                        mCoolReader.showToast(mCoolReader.getString(R.string.gd_error) + " : sing in");
+                }
+                break;
+            case REQUEST_CODE_LOAD_BOOK_FILE:
+                if (resultCode == Activity.RESULT_OK) {
+                    mCoolReader.showToast(mCoolReader.getString(R.string.gd_begin) + " (load book file)");
+                    if (CheckSingIn())
+                            loadBookFile(mActionObject, false);
+                        else
+                            mCoolReader.showToast(mCoolReader.getString(R.string.gd_error) + " : sing in");
+                }
+                break;
         }
     }
 
     private void syncReq(final int nextAction, final Object actionObject, final boolean bQuiet) {
         Log.d(TAG, "syncReq ...");
+        mRootFolder = null;
+        mCRFolder = null;
+        mBooksFolder = null;
         Task<Void> tskReq = mDriveClient.requestSync();
         tskReq.addOnSuccessListener(mCoolReader,
                 new OnSuccessListener<Void>() {
@@ -238,7 +282,10 @@ public class GoogleDriveTools {
                             (nextAction == REQUEST_CODE_SAVE_BOOKMARKS) ||
                             (nextAction == REQUEST_CODE_LOAD_BOOKMARKS_LIST) ||
                             (nextAction == REQUEST_CODE_LOAD_BOOKMARKS) ||
-                            (nextAction == REQUEST_CODE_SAVE_CURRENT_BOOK_TO_GD)
+                            (nextAction == REQUEST_CODE_SAVE_CURRENT_BOOK_TO_GD) ||
+                            (nextAction == REQUEST_CODE_LOAD_FOLDER_CONTENTS) ||
+                            (nextAction == REQUEST_CODE_LOAD_BOOKS_FOLDER_CONTENTS) ||
+                            (nextAction == REQUEST_CODE_LOAD_FOLDER_CONTENTS)
                            ) {
                                 searchCoolReaderFolder(nextAction, actionObject, bQuiet);
                            }
@@ -248,8 +295,14 @@ public class GoogleDriveTools {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.e(TAG, "Error syncReq", e);
-                        if (!bQuiet)
-                            mCoolReader.showToast(mCoolReader.getString(R.string.gd_error) + ": search CoolReader folder");
+                        // this fill skip
+                        if (e.getMessage().contains("Sync request rate limit")) {
+                            searchCoolReaderFolder(nextAction, actionObject, bQuiet);
+                        }
+                        {
+                            if (!bQuiet)
+                                mCoolReader.showToast(mCoolReader.getString(R.string.gd_error) + ": search CoolReader folder");
+                        }
                     }
                 });
 
@@ -261,6 +314,7 @@ public class GoogleDriveTools {
             @Override
             public Task<MetadataBuffer> then(@NonNull Task<DriveFolder> task) throws Exception {
                 DriveFolder parentFolder = task.getResult();
+                mRootFolder = parentFolder.getDriveId();
                 final Query query = new Query.Builder()
                         .addFilter(Filters.and(Filters.eq(SearchableField.TITLE, "CoolReader"),
                                 Filters.eq(SearchableField.MIME_TYPE, "application/vnd.google-apps.folder"),
@@ -279,7 +333,9 @@ public class GoogleDriveTools {
                                     (nextAction == REQUEST_CODE_SAVE_SETTINGS) ||
                                     (nextAction == REQUEST_CODE_SAVE_READING_POS) ||
                                     (nextAction == REQUEST_CODE_SAVE_BOOKMARKS) ||
-                                    (nextAction == REQUEST_CODE_SAVE_CURRENT_BOOK_TO_GD)
+                                    (nextAction == REQUEST_CODE_SAVE_CURRENT_BOOK_TO_GD) ||
+                                    (nextAction == REQUEST_CODE_LOAD_BOOKS_FOLDER_CONTENTS) ||
+                                    (nextAction == REQUEST_CODE_LOAD_FOLDER_CONTENTS)
                                )
                                 createCoolReaderFolder(nextAction, actionObject, bQuiet);
                             if (
@@ -295,6 +351,7 @@ public class GoogleDriveTools {
                             }
                         } else {
                             Metadata m = metadataBuffer.get(0);
+                            mCRFolder = m.getDriveId();
                             if (
                                     (nextAction == REQUEST_CODE_SAVE_SETTINGS) ||
                                     (nextAction == REQUEST_CODE_LOAD_SETTINGS_LIST) ||
@@ -317,10 +374,16 @@ public class GoogleDriveTools {
                                 searchBookmarksFolder(m.getDriveId().asDriveFolder(), nextAction, actionObject, bQuiet);
                             }
                             if (
-                                    (nextAction == REQUEST_CODE_SAVE_CURRENT_BOOK_TO_GD)
+                                    (nextAction == REQUEST_CODE_SAVE_CURRENT_BOOK_TO_GD) ||
+                                    (nextAction == REQUEST_CODE_LOAD_BOOKS_FOLDER_CONTENTS)
                                ) {
                                 searchBooksFolder(m.getDriveId().asDriveFolder(), nextAction, actionObject, bQuiet);
                             }
+//                            if (
+//                                    (nextAction == REQUEST_CODE_LOAD_FOLDER_CONTENTS)
+//                               ) {
+//                                searchBooksFolder(m.getDriveId().asDriveFolder(), nextAction, actionObject, bQuiet);
+//                            }
                         }
                     }
                 })
@@ -512,13 +575,21 @@ public class GoogleDriveTools {
                     @Override
                     public void onSuccess(MetadataBuffer metadataBuffer) {
                         if (metadataBuffer.getCount() == 0) {
-                            if (nextAction == REQUEST_CODE_SAVE_CURRENT_BOOK_TO_GD)
+                            if (
+                                  (nextAction == REQUEST_CODE_SAVE_CURRENT_BOOK_TO_GD) ||
+                                  (nextAction == REQUEST_CODE_LOAD_BOOKS_FOLDER_CONTENTS) 
+                               ) 
                                 createBooksFolder(parentFolder, nextAction, actionObject, bQuiet);
                         } else {
                             Metadata m = metadataBuffer.get(0);
+                            mBooksFolder = m.getDriveId();
                             if (nextAction == REQUEST_CODE_SAVE_CURRENT_BOOK_TO_GD) {
                                 DriveFolder df = m.getDriveId().asDriveFolder();
                                 searchBookFile(df, nextAction, actionObject, bQuiet);
+                            }
+                            if (nextAction == REQUEST_CODE_LOAD_BOOKS_FOLDER_CONTENTS) {
+                                DriveFolder df = m.getDriveId().asDriveFolder();
+                                loadBooksList(df, nextAction, actionObject, bQuiet);
                             }
                         }
                     }
@@ -665,6 +736,103 @@ public class GoogleDriveTools {
                 });
     }
 
+    private void loadBooksList(final DriveFolder parentFolder, final int nextAction, final Object actionObject, final boolean bQuiet) {
+        Log.d(TAG, "Load books list ...");
+
+        final SortOrder sortOrder = new SortOrder.Builder().addSortDescending(SortableField.TITLE).build();
+        Query query1;
+        Task<MetadataBuffer> queryTask = null;
+        String findText = "";
+        boolean bWholeS = false;
+        if (mActionObject instanceof OpenBookFromGdDlg) {
+            findText = ((OpenBookFromGdDlg) mActionObject).edtFind.getText().toString().trim();
+            bWholeS = ((OpenBookFromGdDlg)mActionObject).mWholeSearch;
+        }
+        if (findText.equals("")) {
+            if (parentFolder == mRootFolder) query1 = new Query.Builder()
+                    .addFilter(Filters.and(
+                            Filters.eq(SearchableField.TRASHED, false)
+                    )).setSortOrder(sortOrder)
+                    .build();
+            else
+                if (bWholeS) {
+                    query1 = new Query.Builder()
+                            .addFilter(Filters.and(
+                                    Filters.eq(SearchableField.TRASHED, false)
+                            )).setSortOrder(sortOrder)
+                            .build();
+                } else {
+                    query1 = new Query.Builder()
+                            .addFilter(Filters.and(
+                                    Filters.eq(SearchableField.TRASHED, false),
+                                    Filters.in(SearchableField.PARENTS, parentFolder.getDriveId())
+                            )).setSortOrder(sortOrder)
+                            .build();
+                }
+        } else {
+            if (parentFolder == mRootFolder) query1 = new Query.Builder()
+                    .addFilter(Filters.and(
+                            Filters.eq(SearchableField.TRASHED, false)
+                    )).addFilter(Filters.and(Filters.contains(SearchableField.TITLE, findText))).
+                        setSortOrder(sortOrder)
+                    .build();
+            else
+                if (bWholeS) {
+                    query1 = new Query.Builder()
+                            .addFilter(Filters.and(
+                                    Filters.eq(SearchableField.TRASHED, false)
+                            )).addFilter(Filters.and(Filters.contains(SearchableField.TITLE, findText))).setSortOrder(sortOrder)
+                            .build();
+                } else {
+                    query1 = new Query.Builder()
+                            .addFilter(Filters.and(
+                                    Filters.eq(SearchableField.TRASHED, false),
+                                    Filters.in(SearchableField.PARENTS, parentFolder.getDriveId())
+                            )).addFilter(Filters.and(Filters.contains(SearchableField.TITLE, findText))).setSortOrder(sortOrder)
+                            .build();
+                }
+        }
+        final Query query = query1;
+        if (bWholeS) {
+            queryTask = getDriveResourceClient().query(query);
+        } else {
+            queryTask = getDriveResourceClient().queryChildren(parentFolder, query);
+        }
+        final boolean bWholeS2 = bWholeS;
+        queryTask.addOnSuccessListener(mCoolReader,
+                new OnSuccessListener<MetadataBuffer>() {
+                    @Override
+                    public void onSuccess(MetadataBuffer metadataBuffer) {
+                        if (nextAction == REQUEST_CODE_LOAD_BOOKS_FOLDER_CONTENTS) {
+                                ArrayList<DriveId> adid = new ArrayList<DriveId>();
+                                adid.add(mRootFolder);
+                                adid.add(mCRFolder);
+                                adid.add(mBooksFolder);
+                                ArrayList<String> adidmd = new ArrayList<String>();
+                                adidmd.add("root");
+                                adidmd.add("CoolReader");
+                                adidmd.add("Books");
+                                OpenBookFromGdDlg dlg = new OpenBookFromGdDlg(mCoolReader, metadataBuffer, adid, adidmd);
+                                    dlg.show();
+                        }
+                        if (nextAction == REQUEST_CODE_LOAD_FOLDER_CONTENTS) {
+                            if (((OpenBookFromGdDlg)mActionObject).isShowing()) {
+                                ((OpenBookFromGdDlg) mActionObject).mBooksList = metadataBuffer;
+                                ((OpenBookFromGdDlg) mActionObject).mFoundWhole = bWholeS2;
+                                ((OpenBookFromGdDlg) mActionObject).listUpdated();
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(mCoolReader, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Error search files in folder", e);
+                        if (!bQuiet) mCoolReader.showToast(mCoolReader.getString(R.string.gd_error) + ": search files in folder");
+                    }
+                });
+    }
+
     private void copyFile(String sFin, String sFout) throws IOException {
         FileInputStream in = null;
         FileOutputStream out = null;
@@ -699,20 +867,16 @@ public class GoogleDriveTools {
                             final File fSett = mCoolReader.getSettingsFile(0);
                             String sFName = fSett.getPath();
                             String newName = sFName + ".fromGoogleDrive";
-                            BufferedReader reader = new BufferedReader(
-                                    new InputStreamReader(contents.getInputStream()));
-                            BufferedWriter bw = null;
-                            FileWriter fw = null;
-                            char[] bytesArray = new char[1000];
+                            InputStream is = contents.getInputStream();
+                            byte[] bytesArray = new byte[1000];
                             int bytesRead = 1000;
-                            fw = new FileWriter(newName);
-                            bw = new BufferedWriter(fw);
+                            OutputStream os = new FileOutputStream(newName);
                             while (bytesRead != -1) {
-                                bytesRead = reader.read(bytesArray, 0, 1000);
-                                if (bytesRead != -1) bw.write(bytesArray,0,bytesRead);
+                                bytesRead = is.read(bytesArray, 0, 1000);
+                                if (bytesRead != -1) os.write(bytesArray,0,bytesRead);
                             }
-                            bw.close();
-                            fw.close();
+                            os.close();
+                            is.close();
                             // first delete bk file if exists
                             File file = new File(sFName + ".bk");
                             boolean bWasErr = false;
@@ -767,6 +931,60 @@ public class GoogleDriveTools {
                 });
     }
 
+    private void loadBookFile(final Object actionObject, final boolean bQuiet) {
+        Log.d(TAG, "Load book file ...");
+        final Metadata md = (Metadata)actionObject;
+        final FileInfo downloadDir = Services.getScanner().getDownloadDirectory();
+        final String fName = downloadDir.pathname+"/GoogleOne/"+md.getTitle();
+        final File fPath = new File(downloadDir.pathname+"/GoogleOne/");
+        if (!fPath.exists()) fPath.mkdir();
+        final File fBook = new File(fName);
+        Task<DriveContents> openFileTask =
+                getDriveResourceClient().openFile(md.getDriveId().asDriveFile(), DriveFile.MODE_READ_ONLY);
+        openFileTask
+                .continueWithTask(new Continuation<DriveContents, Task<Void>>() {
+                    @Override
+                    public Task<Void> then(@NonNull Task<DriveContents> task) throws Exception {
+                        DriveContents contents = task.getResult();
+                        try {
+                            InputStream is = contents.getInputStream();
+                            byte[] bytesArray = new byte[1000];
+                            int bytesRead = 1000;
+                            OutputStream os = new FileOutputStream(fBook);
+                            while (bytesRead != -1) {
+                                bytesRead = is.read(bytesArray);
+                                if (bytesRead != -1) os.write(bytesArray,0, bytesRead);
+                            }
+                            os.close();
+                            is.close();
+                            mCoolReader.showToast(mCoolReader.getString(R.string.gd_ok) + ": successfully saved to "+fName);
+                            FileInfo fi = new FileInfo(fBook);
+                            FileInfo dir = Services.getScanner().findParent(fi, downloadDir);
+                            if ( dir==null )
+                                dir = downloadDir;
+                            Services.getScanner().listDirectory(dir);
+                            FileInfo item = dir.findItemByPathName(fBook.getAbsolutePath());
+                            if ( item!=null )
+                                mCoolReader.loadDocument(item);
+                            else
+                                mCoolReader.loadDocument(fi);
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error reading book file", e);
+                            if (!bQuiet) mCoolReader.showToast(mCoolReader.getString(R.string.gd_error) + ": reading book file");
+                        }
+                        Task<Void> discardTask = getDriveResourceClient().discardContents(contents);
+                        return discardTask;
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Error reading book file", e);
+                        if (!bQuiet) mCoolReader.showToast(mCoolReader.getString(R.string.gd_error) + ": reading book file");
+                    }
+                });
+    }
+
     private void loadReadingPosFile(final DriveFile dfl, final int nextAction, final Object actionObject, final boolean bQuiet) {
         Log.d(TAG, "Load reading pos file ...");
 
@@ -816,11 +1034,6 @@ public class GoogleDriveTools {
                 });
     }
 
-    public static <T> List<T> stringToArray(String s, Class<T[]> clazz) {
-        T[] arr = new Gson().fromJson(s, clazz);
-        return Arrays.asList(arr); //or return Arrays.asList(new Gson().fromJson(s, clazz)); for a one-liner
-    }
-
     private void loadBookmarksFile(final DriveFile dfl, final int nextAction, final Object actionObject, final boolean bQuiet) {
         Log.d(TAG, "Load bookmarks file ...");
 
@@ -852,7 +1065,7 @@ public class GoogleDriveTools {
                             }
                             Gson gson = new GsonBuilder().setPrettyPrinting().create();
                             ArrayList<Bookmark> abmkThis = rv.getBookInfo().getAllBookmarks();
-                            ArrayList<Bookmark> abmk = new ArrayList<Bookmark>(stringToArray(sFile, Bookmark[].class));
+                            ArrayList<Bookmark> abmk = new ArrayList<Bookmark>(StrUtils.stringToArray(sFile, Bookmark[].class));
                             int iCreated = 0;
                             for (Bookmark bmk: abmk) {
                                 boolean bFound = false;
@@ -902,10 +1115,15 @@ public class GoogleDriveTools {
                             @Override
                             public void onSuccess(DriveFolder driveFolder) {
                                 folderCR = driveFolder;
+                                mCRFolder = driveFolder.getDriveId();
                                 if (nextAction == REQUEST_CODE_SAVE_SETTINGS)
                                     createSettingsFolder(driveFolder, nextAction, bQuiet);
                                 if (nextAction == REQUEST_CODE_SAVE_READING_POS)
                                     createReadingPosFolder(driveFolder, nextAction, actionObject, bQuiet);
+                                if (nextAction == REQUEST_CODE_SAVE_CURRENT_BOOK_TO_GD)
+                                    createBooksFolder(driveFolder, nextAction, actionObject, bQuiet);
+                                if (nextAction == REQUEST_CODE_LOAD_BOOKS_FOLDER_CONTENTS)
+                                    createBooksFolder(driveFolder, nextAction, actionObject, bQuiet);
                             }
                         })
                 .addOnFailureListener(mCoolReader, new OnFailureListener() {
@@ -1015,8 +1233,12 @@ public class GoogleDriveTools {
                     @Override
                     public void onSuccess(DriveFolder driveFolder) {
                         folderSettings = driveFolder;
+                        mBooksFolder = driveFolder.getDriveId();
                         if (nextAction == REQUEST_CODE_SAVE_CURRENT_BOOK_TO_GD) {
                             saveBookFile(folderSettings, actionObject, bQuiet);
+                        }
+                        if (nextAction == REQUEST_CODE_LOAD_BOOKS_FOLDER_CONTENTS) {
+                            loadBooksList(folderSettings, nextAction, actionObject, bQuiet);
                         }
                     }
                 })
@@ -1217,19 +1439,27 @@ public class GoogleDriveTools {
     private void searchBookFile(final DriveFolder parentFolder, final int nextAction, final Object actionObject, final boolean bQuiet) {
         Log.d(TAG, "Searching for google drive book file ...");
 
-        final ReaderView rv = (ReaderView)actionObject;
-        if (rv == null) {
-            mCoolReader.showToast(mCoolReader.getString(R.string.gd_error)+": no reading book");
+        BookInfo bi = null;
+        if (actionObject instanceof ReaderView) {
+            final ReaderView rv = (ReaderView) actionObject;
+            if (rv == null) {
+                if (!bQuiet)
+                    mCoolReader.showToast(mCoolReader.getString(R.string.gd_error) + ": no reading book");
+                return;
+            }
+            bi = rv.getBookInfo();
+        }
+        if (actionObject instanceof BookInfoEditDialog) {
+            bi = ((BookInfoEditDialog)actionObject).getmBookInfo();
+        }
+        if (bi == null) {
+            if (!bQuiet)
+                mCoolReader.showToast(mCoolReader.getString(R.string.gd_error) + ": no reading book");
             return;
         }
-        if (rv.getBookInfo() == null) {
-            mCoolReader.showToast(mCoolReader.getString(R.string.gd_error)+": no reading book");
-            return;
-        }
-
-        FileInfo item = rv.getBookInfo().getFileInfo();
+        FileInfo item = bi.getFileInfo();
         final String sBookFName = item.filename;
-        final String sPathName = rv.getBookInfo().getFileInfo().pathname;
+        final String sPathName = item.pathname;
         final String sBookFName2 = item.isArchive && item.arcname != null
                 ? new File(item.arcname).getName() : null;
         final String sPathName2 = item.isArchive && item.arcname != null
@@ -1409,18 +1639,27 @@ public class GoogleDriveTools {
     public void saveBookFile(final DriveFolder df, final Object actionObject, final boolean bQuiet) {
         Log.d(TAG, "Starting save book to drive...");
 
-        final ReaderView rv = (ReaderView)actionObject;
-        if (rv == null) {
-            if (!bQuiet) mCoolReader.showToast(mCoolReader.getString(R.string.gd_error)+": book was not found");
+        BookInfo bi = null;
+        if (actionObject instanceof ReaderView) {
+            final ReaderView rv = (ReaderView) actionObject;
+            if (rv == null) {
+                if (!bQuiet)
+                    mCoolReader.showToast(mCoolReader.getString(R.string.gd_error) + ": book was not found");
+                return;
+            }
+            bi = rv.getBookInfo();
+        }
+        if (actionObject instanceof BookInfoEditDialog) {
+            bi = ((BookInfoEditDialog)actionObject).getmBookInfo();
+        }
+        if (bi == null) {
+            if (!bQuiet)
+                mCoolReader.showToast(mCoolReader.getString(R.string.gd_error) + ": book was not found");
             return;
         }
-        if (rv.getBookInfo() == null) {
-            if (!bQuiet) mCoolReader.showToast(mCoolReader.getString(R.string.gd_error)+": book was not found");
-            return;
-        }
-        FileInfo item = rv.getBookInfo().getFileInfo();
+        final FileInfo item = bi.getFileInfo();
+        final String sPathName = item.pathname;
         final String sBookFName = item.filename;
-        final String sPathName = rv.getBookInfo().getFileInfo().pathname;
         final String sBookFName2 = item.isArchive && item.arcname != null
                 ? new File(item.arcname).getName() : null;
         final String sPathName2 = item.isArchive && item.arcname != null
@@ -1456,8 +1695,8 @@ public class GoogleDriveTools {
                                     .setMimeType("application/octet-stream")
                                     .setStarred(false)
                                     .setDescription(
-                                            rv.getBookInfo().getFileInfo().getTitleOrFileName() + "\\n" +
-                                            "authors: " + rv.getBookInfo().getFileInfo().getAuthors() + "\\n"+
+                                            item.getTitleOrFileName() + "; " +
+                                            "authors: " + item.getAuthors() + "; "+
                                             "Saved from " + mCoolReader.getModel()+" ("+mCoolReader.getAndroid_id()+")")
                                     .build();
                             return getDriveResourceClient().createFile(parent, changeSet, contents);

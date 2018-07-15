@@ -383,45 +383,48 @@ public class CRRootView extends ViewGroup implements CoverpageReadyListener {
 
 	private void updateFilesystems(List<FileInfo> dirs) {
 
-		LayoutInflater inflater = LayoutInflater.from(mActivity);
-		mFilesystemScroll.removeAllViews();
-        int idx = 0;
-        for (final FileInfo item : dirs) {
-            if (item == null)
-                continue;
-            final View view = inflater.inflate(R.layout.root_item_dir, null);
-            ImageView icon = (ImageView) view.findViewById(R.id.item_icon);
-            TextView label = (TextView) view.findViewById(R.id.item_name);
-            if (item.getType() == FileInfo.TYPE_DOWNLOAD_DIR)
-                icon.setImageResource(Utils.resolveResourceIdByAttr(mActivity, R.attr.folder_big_bookmark_drawable, R.drawable.folder_bookmark));
-            else if (item.getType() == FileInfo.TYPE_FS_ROOT)
-                icon.setImageResource(Utils.resolveResourceIdByAttr(mActivity, R.attr.media_flash_microsd_drawable, R.drawable.media_flash_sd_mmc));
-            else
-                icon.setImageResource(Utils.resolveResourceIdByAttr(mActivity, R.attr.folder_big_drawable, R.drawable.folder_blue));
-            if (item.title != null)
-            	label.setText(item.title); //  filename
-            else if (item.getType() == FileInfo.TYPE_FS_ROOT || item.getType() == FileInfo.TYPE_DOWNLOAD_DIR)
-            	label.setText(item.filename); //  filename
-            else
-            	label.setText(item.pathname); //  filename
-            label.setMaxWidth(coverWidth * 25 / 10);
-            view.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mActivity.showDirectory(item);
-                }
-            });
-            view.setOnLongClickListener(new OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    registerFoldersContextMenu(item);
-                    return false;
-                }
-            });
-            mFilesystemScroll.addView(view);
-            ++idx;
-        }
-		mFilesystemScroll.invalidate();
+		//mActivity.showToast("cnt "+dirs.size());
+		if (dirs.size()!=0) {
+			LayoutInflater inflater = LayoutInflater.from(mActivity);
+			mFilesystemScroll.removeAllViews();
+			int idx = 0;
+			for (final FileInfo item : dirs) {
+				if (item == null)
+					continue;
+				final View view = inflater.inflate(R.layout.root_item_dir, null);
+				ImageView icon = (ImageView) view.findViewById(R.id.item_icon);
+				TextView label = (TextView) view.findViewById(R.id.item_name);
+				if (item.getType() == FileInfo.TYPE_DOWNLOAD_DIR)
+					icon.setImageResource(Utils.resolveResourceIdByAttr(mActivity, R.attr.folder_big_bookmark_drawable, R.drawable.folder_bookmark));
+				else if (item.getType() == FileInfo.TYPE_FS_ROOT)
+					icon.setImageResource(Utils.resolveResourceIdByAttr(mActivity, R.attr.media_flash_microsd_drawable, R.drawable.media_flash_sd_mmc));
+				else
+					icon.setImageResource(Utils.resolveResourceIdByAttr(mActivity, R.attr.folder_big_drawable, R.drawable.folder_blue));
+				if (item.title != null)
+					label.setText(item.title); //  filename
+				else if (item.getType() == FileInfo.TYPE_FS_ROOT || item.getType() == FileInfo.TYPE_DOWNLOAD_DIR)
+					label.setText(item.filename); //  filename
+				else
+					label.setText(item.pathname); //  filename
+				label.setMaxWidth(coverWidth * 25 / 10);
+				view.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						mActivity.showDirectory(item);
+					}
+				});
+				view.setOnLongClickListener(new OnLongClickListener() {
+					@Override
+					public boolean onLongClick(View view) {
+						registerFoldersContextMenu(item);
+						return false;
+					}
+				});
+				mFilesystemScroll.addView(view);
+				++idx;
+			}
+			mFilesystemScroll.invalidate();
+		}
 	}
 
     private void registerFoldersContextMenu(final FileInfo folder) {
@@ -725,6 +728,7 @@ public class CRRootView extends ViewGroup implements CoverpageReadyListener {
 			ReaderAction.RECENT_BOOKS,
 			ReaderAction.USER_MANUAL,
 			ReaderAction.OPTIONS,
+			ReaderAction.OPEN_BOOK_FROM_GD,
 			ReaderAction.EXIT,	
 		};
 		mActivity.showActionsPopupMenu(actions, new OnActionHandler() {
@@ -747,6 +751,10 @@ public class CRRootView extends ViewGroup implements CoverpageReadyListener {
 					return true;
 				} else if (item == ReaderAction.OPTIONS) {
 					mActivity.showBrowserOptionsDialog();
+					return true;
+				}
+				else if (item == ReaderAction.OPEN_BOOK_FROM_GD) {
+					mActivity.mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_LOAD_BOOKS_FOLDER_CONTENTS, this);
 					return true;
 				}
 				return false;

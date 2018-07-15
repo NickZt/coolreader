@@ -37,6 +37,8 @@ public class CRToolBar extends ViewGroup {
 	
 	final private BaseActivity activity;
 	private ArrayList<ReaderAction> actions = new ArrayList<ReaderAction>();
+	private ArrayList<ReaderAction> actionsToolbar = new ArrayList<ReaderAction>();
+	private ArrayList<ReaderAction> actionsMore = new ArrayList<ReaderAction>();
 	private ArrayList<ReaderAction> iconActions = new ArrayList<ReaderAction>();
 	private boolean showLabels;
 	private int buttonHeight;
@@ -108,11 +110,74 @@ public class CRToolBar extends ViewGroup {
 		view.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
 		return view;
 	}
+
+	public void createActionsLists(ArrayList<ReaderAction> actions, boolean ignoreSett) {
+		if (ignoreSett) {
+			this.actions = actions;
+			this.actionsToolbar = actions;
+			this.actionsMore = actions;
+		} else {
+			this.actions = new ArrayList<ReaderAction>();
+			this.actionsToolbar = new ArrayList<ReaderAction>();
+			this.actionsMore = new ArrayList<ReaderAction>();
+			ReaderAction[] actions_all = ReaderAction.AVAILABLE_ACTIONS;
+
+			for (ReaderAction a : actions_all)
+				if ((a != ReaderAction.NONE) && (a != ReaderAction.EXIT) && (a != ReaderAction.ABOUT)) {
+					int aVis = 0;
+					try {
+						aVis = a.getIsVisibleOnToolbar(((CoolReader) activity).getReaderView());
+					} catch (Exception e) {
+					}
+					this.actions.add(a);
+					if ((aVis == 1) || (aVis == 3)) this.actionsToolbar.add(a);
+					if ((aVis == 2) || (aVis == 3)) this.actionsMore.add(a);
+				}
+			if ((this.actionsToolbar.size() == 0) && (this.actionsMore.size() == 0)) {
+				ReaderAction[] ReaderActionDef =
+						new ReaderAction[]{
+								ReaderAction.GO_BACK,
+								ReaderAction.TOC,
+								ReaderAction.SEARCH,
+								ReaderAction.OPTIONS,
+								ReaderAction.BOOKMARKS,
+								ReaderAction.FILE_BROWSER_ROOT,
+								ReaderAction.TOGGLE_DAY_NIGHT,
+								ReaderAction.TOGGLE_SELECTION_MODE,
+								ReaderAction.GO_PAGE,
+								ReaderAction.GO_PERCENT,
+								ReaderAction.FILE_BROWSER,
+								ReaderAction.TTS_PLAY,
+								ReaderAction.GO_FORWARD,
+								ReaderAction.RECENT_BOOKS,
+								ReaderAction.OPEN_PREVIOUS_BOOK,
+								ReaderAction.TOGGLE_AUTOSCROLL,
+								ReaderAction.ABOUT,
+								ReaderAction.EXIT
+						};
+
+				for (ReaderAction act : ReaderActionDef) {
+					this.actionsToolbar.add(act);
+					this.actionsMore.add(act);
+				}
+			}
+			;
+			if (!this.actions.contains(ReaderAction.ABOUT)) this.actions.add(ReaderAction.ABOUT);
+			if (!this.actions.contains(ReaderAction.EXIT)) this.actions.add(ReaderAction.EXIT);
+			if (!this.actionsMore.contains(ReaderAction.ABOUT))
+				this.actionsMore.add(ReaderAction.ABOUT);
+			if (!this.actionsMore.contains(ReaderAction.EXIT))
+				this.actionsMore.add(ReaderAction.EXIT);
+		}
+	}
 	
-	public CRToolBar(BaseActivity context, ArrayList<ReaderAction> actions, boolean multiline) {
+	public CRToolBar(BaseActivity context, ArrayList<ReaderAction> actions, boolean multiline, boolean useActionsMore,
+					 boolean ignoreSett) {
 		super(context);
 		this.activity = context;
-		this.actions = actions;
+		//this.actions = actions;
+		createActionsLists(actions, ignoreSett);
+		if (useActionsMore) this.actionsToolbar = this.actionsMore;
 		this.showLabels = multiline;
 		this.isMultiline = multiline;
 		this.preferredItemHeight = activity.getPreferredItemHeight(); //context.getPreferredItemHeight();
@@ -175,8 +240,19 @@ public class CRToolBar extends ViewGroup {
 			if (iconId == 0) {
 				iconId = Utils.resolveResourceIdByAttr(activity, R.attr.cr3_option_other_drawable, R.drawable.cr3_option_other);
 			}
+			// more
+			if (actionsMore.contains(item)) {
+				if (!actionsToolbar.contains(item)) {
+					visibleNonButtonCount++;
+					itemsOverflow.add(item);
+					continue;
+				}
+			}
+			if (!actionsToolbar.contains(item))
+				continue;
 			//if (iconId == 0) {
-			//	itemsOverflow.add(item);
+			//if (0 == 0) {
+			//		itemsOverflow.add(item);
 			//	visibleNonButtonCount++;
 			//	continue;
 			//}
@@ -291,7 +367,7 @@ public class CRToolBar extends ViewGroup {
 				Paint paint = Utils.createSolidPaint(0xFF000000 | textColor);
 				//paint.setColor(0xFF000000);
 				paint.setTextAlign(Paint.Align.LEFT);
-				int newTextSize = 12;
+				int newTextSize = 10;
 				float textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
 						newTextSize, getResources().getDisplayMetrics());
 				paint.setTextSize(textSize);
@@ -320,9 +396,14 @@ public class CRToolBar extends ViewGroup {
 					}
 				}
 				String res = "";
+				int i=0;
 				for (String word: sTextR.split(" ")) {
 					if (word.length()>0)
-						res = res + word.substring(0,1);
+						if (!(word.substring(0,1).equals("(")||word.substring(0,1).equals(")"))) {
+							res = res + word.substring(0, 1);
+							i++;
+						}
+						//if (i==2) break;
 				}
 				res = res.toUpperCase();
 				//c.drawBitmap(bitmap, 0, 0, paintG);
@@ -369,6 +450,32 @@ public class CRToolBar extends ViewGroup {
 		if (rc.isEmpty())
 			return null;
 		ImageButton ib = new ImageButton(getContext());
+
+		ib.setOnLongClickListener(new OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				ImageButton ib =(ImageButton) v;
+				ReaderAction ra = null;
+				ReaderAction ram = null;
+				if (ib.getTag()!= null) {
+					if (ib.getTag() instanceof ReaderAction) {
+						ra = (ReaderAction) ib.getTag();
+						ram = ra.getMirrorAction();
+						if (ram != null) onButtonClick(ram);
+					}
+				} else {
+					int toolbarLocation =
+							(((CoolReader)activity).settings()).getInt(Settings.PROP_TOOLBAR_LOCATION, Settings.VIEWER_TOOLBAR_SHORT_SIDE);
+					if (toolbarLocation == Settings.VIEWER_TOOLBAR_LONG_SIDE)
+						toolbarLocation = Settings.VIEWER_TOOLBAR_TOP; else toolbarLocation++;
+					(((CoolReader)activity).settings()).setInt(Settings.PROP_TOOLBAR_LOCATION, toolbarLocation);
+					((CoolReader)activity).setSettings(((CoolReader)activity).settings(), 0,true);
+					calcLayout();
+				}
+				return true;
+			}
+		});
+
 		if (item != null) {
 			if (item.getIconIdWithDef(activity)!=0)	setButtonImageResource(item, ib,item.getIconIdWithDef(activity));
 			Utils.setContentDescription(ib, getContext().getString(item.nameId));
@@ -474,6 +581,14 @@ public class CRToolBar extends ViewGroup {
 								showOverflowMenu();
 						}
 					});
+        			// doesnt work...
+					//item.setOnLongClickListener(new OnLongClickListener() {
+					//	@Override
+					//	public boolean onLongClick(View v) {
+					//		if (action == null) activity.showToast("asdf");
+					//		return true;
+					//	}
+					//});
         		}
 //        		addView(scroll);
         	}
@@ -486,7 +601,8 @@ public class CRToolBar extends ViewGroup {
     		//popup.
     		if (lastButtonIndex > 0)
     			for (int i=lastButtonIndex + 1; i < actions.size(); i++)
-    				itemsOverflow.add(actions.get(i));
+    				if (actionsMore.contains(actions.get(i)))
+    					itemsOverflow.add(actions.get(i));
         	return;
 		}
 
@@ -503,6 +619,7 @@ public class CRToolBar extends ViewGroup {
 		visibleButtonCount = 0;
 		for (int i=0; i<actions.size(); i++) {
 			//if (actions.get(i).iconId != 0)
+			if (actionsToolbar.contains(actions.get(i)))
 				visibleButtonCount++;
 		}
 		
@@ -531,16 +648,22 @@ public class CRToolBar extends ViewGroup {
 		for (int i = 0; i < actions.size(); i++) {
 			ReaderAction item = actions.get(i);
 			if (count >= maxButtonCount) {
-				itemsOverflow.add(item);
+				if (actionsMore.contains(item))
+					itemsOverflow.add(item);
 				continue;
 			}
-			//if (item.iconId == 0) {
+			if (actionsMore.contains(item)) {
+				itemsOverflow.add(item);
+			}
+				//if (item.iconId == 0) {
 			//	itemsOverflow.add(item);
 			//	continue;
 			//}
-			itemsToShow.add(item);
-			count++;
-			addButton(rect, item, true);
+			if (actionsToolbar.contains(item)) {
+				itemsToShow.add(item);
+				count++;
+				addButton(rect, item, true);
+			}
 		}
 	}
 
@@ -610,16 +733,16 @@ public class CRToolBar extends ViewGroup {
 		super.onDraw(canvas);
 	}
 	public PopupWindow showAsPopup(View anchor, OnActionHandler onActionHandler, OnOverflowHandler onOverflowHandler) {
-		return showPopup(activity, anchor, actions, onActionHandler, onOverflowHandler, 3, Settings.VIEWER_TOOLBAR_BOTTOM);
+		return showPopup(activity, anchor, actionsMore, onActionHandler, onOverflowHandler, 3, Settings.VIEWER_TOOLBAR_BOTTOM);
 	}
 	
 	private void setMaxLines(int maxLines) {
 		this.maxMultilineLines = maxLines;
 	}
-	
+
 	public static PopupWindow showPopup(BaseActivity context, View anchor, ArrayList<ReaderAction> actions, final OnActionHandler onActionHandler, final OnOverflowHandler onOverflowHandler, int maxLines, int popupLocation) {
 		final ScrollView scroll = new ScrollView(context);
-		final CRToolBar tb = new CRToolBar(context, actions, true);
+		final CRToolBar tb = new CRToolBar(context, actions, true, true, true);
 		tb.setMaxLines(maxLines);
 		tb.setOnActionHandler(onActionHandler);
 		tb.setVertical(false);
@@ -668,7 +791,6 @@ public class CRToolBar extends ViewGroup {
 		// close on menu or back keys
 		tb.setFocusable(true);
 		tb.setFocusableInTouchMode(true);
-		//asdf
 		tb.setOnKeyListener(new OnKeyListener() {
 			@Override
 			public boolean onKey(View view, int keyCode, KeyEvent event) {

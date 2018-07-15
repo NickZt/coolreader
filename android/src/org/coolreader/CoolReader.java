@@ -1,6 +1,7 @@
 // Main Class
 package org.coolreader;
 
+import java.io.FileInputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,6 +47,7 @@ import org.koekak.android.ebookdownloader.SonyBookSelector;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -373,6 +375,10 @@ public class CoolReader extends BaseActivity
 //					fileToOpen = fileToOpen.substring("file://".length());
 			}
 		}
+		if (Intent.ACTION_SEND.equals(intent.getAction())) {
+			fileToOpen = intent.getStringExtra(Intent.EXTRA_SUBJECT);
+		}
+
 		if (fileToOpen == null && intent.getExtras() != null) {
 			log.d("extras=" + intent.getExtras());
 			fileToOpen = intent.getExtras().getString(OPEN_FILE_PARAM);
@@ -856,7 +862,7 @@ public class CoolReader extends BaseActivity
 			        		ReaderAction.SCAN_DIRECTORY_RECURSIVE,
 							ReaderAction.FILE_BROWSER_SORT_ORDER,
 							ReaderAction.EXIT
-			        		), false);
+			        		), false, false, true);
 			        mBrowserToolBar.setBackgroundResource(R.drawable.ui_status_background_browser_dark);
 			        mBrowserToolBar.setOnActionHandler(new OnActionHandler() {
 						@Override
@@ -1310,6 +1316,18 @@ public class CoolReader extends BaseActivity
 	public void updateCurrentPositionStatus(FileInfo book, Bookmark position, PositionProperties props) {
 		mReaderFrame.getStatusBar().updateCurrentPositionStatus(book, position, props);
 		mReaderFrame.getUserDicPanel().updateCurrentPositionStatus(book, position, props);
+		//showToast("sd "+props.pageNumber);
+		//showToast("sdc "+props.pageCount);
+		if ((!book.askedMarkRead)&&(book.getReadingState()!=FileInfo.STATE_FINISHED) && (props.pageNumber+1==props.pageCount)) {
+			book.askedMarkRead = true;
+			final FileInfo book1=book;
+			askConfirmation(R.string.mark_book_as_read, new Runnable() {
+				@Override
+				public void run() {
+					book1.setReadingState(FileInfo.STATE_FINISHED);
+				}
+			});
+		}
 	}
 
 
@@ -1338,12 +1356,12 @@ public class CoolReader extends BaseActivity
 		startActivity(Intent.createChooser(emailIntent, null));	
 	}
 
-	public void showBookmarksDialog()
+	public void showBookmarksDialog(final boolean bOnlyChoose, final Object obj)
 	{
 		BackgroundThread.instance().executeGUI(new Runnable() {
 			@Override
 			public void run() {
-				BookmarksDlg dlg = new BookmarksDlg(CoolReader.this, mReaderView);
+				BookmarksDlg dlg = new BookmarksDlg(CoolReader.this, mReaderView, bOnlyChoose, obj);
 				dlg.show();
 			}
 		});

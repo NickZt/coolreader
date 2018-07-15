@@ -616,13 +616,16 @@
     <string name="save_bookmarks_to_gd">Save bookmarks to Google One</string>
     <string name="load_bookmarks_from_gd">Load bookmarks from Google One</string>
     <string name="gd_menu">Google One menu</string>
-    <string name="save_current_book_to_gd">Save current book to Google One</string>
-    <string name="set_comment_from_cb_capt">Set comment (then save):</string>
+    <string name="save_current_book_to_gd">Save book to Google One</string>
+    <string name="open_book_from_gd">Open book from Google One</string>
+    <string name="set_comment_from_cb_capt">Save with comment from clipboard</string>
     <string name="set_comment_from_cb">Set comment ...</string>
+    <string name="clipb_contents">Clipboard contents:</string>
     <string name="fonts_menu">Fonts menu</string>
     <string name="copied_to_cb">Selection text copied to clipboard</string>
     <string name="options_app_dict_word_correction">Word correction before dictionary</string>
     <string name="save_bookmark_last_sel">Save bookmark (last selection)</string>
+    <string name="save_bookmark_last_sel_user_dic">Save user dictionary entry (last selection)</string>
     <string name="options_app_dict_longtap_change">Toggle dictionary button action - short/long tap</string>
     <string name="win_title_user_dic">User dictionary</string>
     <string name="dlg_userdic_page">Page</string>
@@ -631,4 +634,15 @@
     <string name="win_title_confirm_ude_delete">Delete this dictionary entry?</string>
     <string name="options_app_show_user_dic_panel">Show user dictionary panel</string>
     <string name="dlg_bookmark_info">Use | for unnessary ending, ~ for split variants of the word</string>
+    <string name="options_reader_toolbar_buttons">Reader toolbar buttons</string>
+    <string name="lbl_find">Find: </string>
+    <string name="dlg_whole_gd">Whole drive</string>
+    <string name="dlg_folder_gd">In current folder</string>
+    <string name="win_title_open_book_from_gd">Open book from Google One</string>
+    <string name="dlg_bookmark_link">Link to bookmark</string>
+    <string name="docx_is_not_installed">extension org.coolreader.docx is not installed, install it to open docx format</string>
+    <string name="docx_open_converted">Opened previously converted copy of document</string>
+    <string name="docx_convert">CoolReader could try to convert document in html format, then open it. Proceed?</string>
+    <string name="btn_edit_info">Edit book info</string>
+    <string name="mark_book_as_read">Mark this book as read?</string>
 </resources>

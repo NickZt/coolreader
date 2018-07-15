@@ -159,6 +159,7 @@ public class MainDB extends BaseDB {
 				")");
 		execSQL("CREATE INDEX IF NOT EXISTS " +
 				"user_dic_index ON user_dic (dic_word) ");
+		execSQLIgnoreErrors("ALTER TABLE bookmark ADD COLUMN link_pos VARCHAR DEFAULT NULL");
 		dumpStatistics();
 		
 		return true;
@@ -574,7 +575,7 @@ public class MainDB extends BaseDB {
 	private static final String READ_BOOKMARK_SQL = 
 		"SELECT " +
 		"id, type, percent, shortcut, time_stamp, " + 
-		"start_pos, end_pos, title_text, pos_text, comment_text, time_elapsed " +
+		"start_pos, end_pos, title_text, pos_text, comment_text, time_elapsed, link_pos " +
 		"FROM bookmark b ";
 	private void readBookmarkFromCursor( Bookmark v, Cursor rs )
 	{
@@ -590,6 +591,7 @@ public class MainDB extends BaseDB {
 		v.setPosText( rs.getString(i++) );
 		v.setCommentText( rs.getString(i++) );
 		v.setTimeElapsed( rs.getLong(i++) );
+		v.setLinkPos( rs.getString(i++) );
 	}
 
 	public boolean findBy( Bookmark v, String condition ) {
@@ -1493,6 +1495,7 @@ public class MainDB extends BaseDB {
 			add("comment_text", newValue.getCommentText(), oldValue.getCommentText());
 			add("time_stamp", newValue.getTimeStamp(), oldValue.getTimeStamp());
 			add("time_elapsed", newValue.getTimeElapsed(), oldValue.getTimeElapsed());
+			add("link_pos", newValue.getLinkPos(), oldValue.getLinkPos());
 		}
 	}
 

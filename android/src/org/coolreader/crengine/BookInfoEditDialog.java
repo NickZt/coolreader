@@ -32,6 +32,11 @@ import android.widget.RatingBar;
 
 public class BookInfoEditDialog extends BaseDialog {
 	private CoolReader mActivity;
+
+	public BookInfo getmBookInfo() {
+		return mBookInfo;
+	}
+
 	private BookInfo mBookInfo;
 	private FileInfo mParentDir;
 	private LayoutInflater mInflater;
@@ -260,7 +265,17 @@ public class BookInfoEditDialog extends BaseDialog {
 				dismiss();
 			}
 		});
-        
+
+		ImageButton btnSaveToGD = (ImageButton)view.findViewById(R.id.save_to_gd);
+
+		btnSaveToGD.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(
+						((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_SAVE_CURRENT_BOOK_TO_GD, BookInfoEditDialog.this);
+			}
+		});
+
         edTitle = (EditText)view.findViewById(R.id.book_title);
         edSeriesName = (EditText)view.findViewById(R.id.book_series_name);
         edSeriesNumber = (EditText)view.findViewById(R.id.book_series_number);

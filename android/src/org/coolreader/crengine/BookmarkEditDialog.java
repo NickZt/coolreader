@@ -48,7 +48,12 @@ public class BookmarkEditDialog extends BaseDialog {
 			activity.getDB().saveUserDic(ude, UserDicEntry.ACTION_NEW);
 			if (activity instanceof CoolReader) {
 				((CoolReader) activity).getmUserDic().put(ude.getDic_word(), ude);
-				((CoolReader) activity).getmReaderFrame().getUserDicPanel().updateUserDicWords();
+				BackgroundThread.instance().postGUI(new Runnable() {
+					@Override
+					public void run() {
+						((CoolReader) activity).getmReaderFrame().getUserDicPanel().updateUserDicWords();
+					}
+				}, 1000);
 			}
 		} else {
 			if (mIsNew) {
@@ -174,7 +179,7 @@ public class BookmarkEditDialog extends BaseDialog {
 		btnSetComment.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View v) {
 				commentEdit.setText(cbtextFull);
-				onPositiveButtonClick();
+			    onPositiveButtonClick();
 			}
 		});
 		lblBookmarkLink.setOnClickListener(new View.OnClickListener() {

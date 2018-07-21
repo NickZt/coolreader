@@ -112,7 +112,7 @@ public class ReaderViewLayout extends ViewGroup implements Settings {
 			this.toolbarView = new CRToolBar(context, ReaderAction.createList(new ReaderAction[] {
 				ReaderAction.GO_BACK,
 				ReaderAction.TOC,
-				ReaderAction.FONTS_MENU,
+				//ReaderAction.FONTS_MENU,
 				ReaderAction.SEARCH,
 				ReaderAction.OPTIONS,
 				ReaderAction.BOOKMARKS,
@@ -129,7 +129,7 @@ public class ReaderViewLayout extends ViewGroup implements Settings {
 				ReaderAction.TOGGLE_AUTOSCROLL,
 				ReaderAction.ABOUT,
 				ReaderAction.EXIT,
-			}), false);
+			}), false, false, false);
 			this.toolbarView.setBackgroundDrawable(toolbarBackground);
 			this.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 			this.addView(toolbarView);
@@ -150,6 +150,7 @@ public class ReaderViewLayout extends ViewGroup implements Settings {
 		}
 
 		public void updateCRToolbar(CoolReader context) {
+			this.toolbarView.createActionsLists(null,false);
 			this.toolbarView.calcLayout();
 		}
 

@@ -551,6 +551,7 @@ void LVDocView::Clear() {
 		m_cursorPos.clear();
 		m_filename.clear();
 		m_section_bounds_valid = false;
+        m_section_bounds_valid10 = false;
 	}
 	clearImageCache();
 	_navigationHistory.clear();
@@ -562,7 +563,8 @@ void LVDocView::clearImageCache() {
 	m_imageCache.clear();
 #endif
     m_section_bounds_valid = false;
-	if (m_callback != NULL)
+    m_section_bounds_valid10 = false;
+    if (m_callback != NULL)
 		m_callback->OnImageCacheClear();
 }
 
@@ -1426,12 +1428,12 @@ void LVDocView::drawBatteryState(LVDrawBuf * drawbuf, const lvRect & batteryRc,
 #endif
 }
 
-/// returns section bounds, in 1/100 of percent
-LVArray<int> & LVDocView::getSectionBounds() {
-	if (m_section_bounds_valid)
-		return m_section_bounds;
-	m_section_bounds.clear();
-	m_section_bounds.add(0);
+/// returns section bounds, in 1/100 of percent * 10
+LVArray<int> & LVDocView::getSectionBounds4Levels() {
+	if (m_section_bounds_valid10)
+		return m_section_bounds10;
+	m_section_bounds10.clear();
+	m_section_bounds10.add(0);
     // Get sections from FB2 books
     ldomNode * body = m_doc->nodeFromXPath(cs16("/FictionBook/body[1]"));
 	lUInt16 section_id = m_doc->getElementNameIndex(L"section");
@@ -1454,6 +1456,116 @@ LVArray<int> & LVDocView::getSectionBounds() {
             l1section->getAbsRect(rc);
             if (getViewMode() == DVM_SCROLL) {
                 int p = (int) (((lInt64) rc.top * 10000) / fh);
+                m_section_bounds10.add(p * 10);
+            } else {
+                int fh = m_pages.length();
+                if ( (pc==2 && (fh&1)) )
+                    fh++;
+                int p = m_pages.FindNearestPage(rc.top, 0);
+                if (fh > 1) {
+                    int pb = (int) (((lInt64) p * 10000) / fh);
+                    m_section_bounds10.add(pb * 10);
+                }
+            }
+            //plotn
+            int cnt2 = l1section->getChildCount();
+            for (int ii = 0; ii < cnt2; ii++) {
+                ldomNode *l2section = l1section->getChildElementNode(ii, section_id);
+                if (!l2section)
+                    continue;
+                lvRect rc;
+                l2section->getAbsRect(rc);
+                if (getViewMode() == DVM_SCROLL) {
+                    int p = (int) (((lInt64) rc.top * 10000) / fh);
+                    m_section_bounds10.add(p * 10 + 1);
+                } else {
+                    int fh = m_pages.length();
+                    if ((pc == 2 && (fh & 1)))
+                        fh++;
+                    int p = m_pages.FindNearestPage(rc.top, 0);
+                    if (fh > 1) {
+                        int pb = (int) (((lInt64) p * 10000) / fh);
+                        m_section_bounds10.add(pb * 10 + 1);
+                    }
+                }
+                int cnt3 = l2section->getChildCount();
+                for (int iii = 0; iii < cnt3; iii++) {
+                    ldomNode *l3section = l2section->getChildElementNode(iii, section_id);
+                    if (!l3section)
+                        continue;
+                    lvRect rc;
+                    l3section->getAbsRect(rc);
+                    if (getViewMode() == DVM_SCROLL) {
+                        int p = (int) (((lInt64) rc.top * 10000) / fh);
+                        m_section_bounds10.add(p * 10 + 2);
+                    } else {
+                        int fh = m_pages.length();
+                        if ((pc == 2 && (fh & 1)))
+                            fh++;
+                        int p = m_pages.FindNearestPage(rc.top, 0);
+                        if (fh > 1) {
+                            int pb = (int) (((lInt64) p * 10000) / fh);
+                            m_section_bounds10.add(pb * 10 + 2);
+                        }
+                    }
+                    int cnt4 = l3section->getChildCount();
+                    for (int iiii = 0; iiii < cnt4; iiii++) {
+                        ldomNode *l4section = l3section->getChildElementNode(iiii, section_id);
+                        if (!l4section)
+                            continue;
+                        lvRect rc;
+                        l4section->getAbsRect(rc);
+                        if (getViewMode() == DVM_SCROLL) {
+                            int p = (int) (((lInt64) rc.top * 10000) / fh);
+                            m_section_bounds10.add(p * 10 + 3);
+                        } else {
+                            int fh = m_pages.length();
+                            if ((pc == 2 && (fh & 1)))
+                                fh++;
+                            int p = m_pages.FindNearestPage(rc.top, 0);
+                            if (fh > 1) {
+                                int pb = (int) (((lInt64) p * 10000) / fh);
+                                m_section_bounds10.add(pb * 10 + 3);
+                            }
+                        }
+                    } // level4
+                } // level3
+            }
+		}
+	}
+	m_section_bounds10.add(10000 * 10);
+	m_section_bounds_valid10 = true;
+	return m_section_bounds10;
+}
+
+/// returns section bounds, in 1/100 of percent
+LVArray<int> & LVDocView::getSectionBounds() {
+    if (m_section_bounds_valid)
+        return m_section_bounds;
+    m_section_bounds.clear();
+    m_section_bounds.add(0);
+    // Get sections from FB2 books
+    ldomNode * body = m_doc->nodeFromXPath(cs16("/FictionBook/body[1]"));
+    lUInt16 section_id = m_doc->getElementNameIndex(L"section");
+    if (body == NULL) {
+        // Get sections from EPUB books
+        body = m_doc->nodeFromXPath(cs16("/body[1]"));
+        section_id = m_doc->getElementNameIndex(L"DocFragment");
+    }
+    int fh = GetFullHeight();
+    int pc = getVisiblePageCount();
+    if (body && fh > 0) {
+        int cnt = body->getChildCount();
+        for (int i = 0; i < cnt; i++) {
+
+            ldomNode * l1section = body->getChildElementNode(i, section_id);
+            if (!l1section)
+                continue;
+
+            lvRect rc;
+            l1section->getAbsRect(rc);
+            if (getViewMode() == DVM_SCROLL) {
+                int p = (int) (((lInt64) rc.top * 10000) / fh);
                 m_section_bounds.add(p);
             } else {
                 int fh = m_pages.length();
@@ -1463,12 +1575,31 @@ LVArray<int> & LVDocView::getSectionBounds() {
                 if (fh > 1)
                     m_section_bounds.add((int) (((lInt64) p * 10000) / fh));
             }
-
-		}
-	}
-	m_section_bounds.add(10000);
-	m_section_bounds_valid = true;
-	return m_section_bounds;
+            //plotn
+            int cnt2 = l1section->getChildCount();
+            for (int ii = 0; ii < cnt2; ii++) {
+                ldomNode *l2section = l1section->getChildElementNode(ii, section_id);
+                if (!l2section)
+                    continue;
+                lvRect rc;
+                l2section->getAbsRect(rc);
+                if (getViewMode() == DVM_SCROLL) {
+                    int p = (int) (((lInt64) rc.top * 10000) / fh);
+                    m_section_bounds.add(p);
+                } else {
+                    int fh = m_pages.length();
+                    if ((pc == 2 && (fh & 1)))
+                        fh++;
+                    int p = m_pages.FindNearestPage(rc.top, 0);
+                    if (fh > 1)
+                        m_section_bounds.add((int) (((lInt64) p * 10000) / fh));
+                }
+            }
+        }
+    }
+    m_section_bounds.add(10000);
+    m_section_bounds_valid = true;
+    return m_section_bounds;
 }
 
 int LVDocView::getPosEndPagePercent() {
@@ -1620,7 +1751,7 @@ void LVDocView::drawPageHeader(LVDrawBuf * drawbuf, const lvRect & headerRc,
 		percent = 10000;
         int percent_pos = /*info.left + */percent * info.width() / 10000;
 	//    int gh = 3; //drawGauge ? 3 : 1;
-	LVArray<int> & sbounds = getSectionBounds();
+	LVArray<int> & sbounds = getSectionBounds4Levels();
 	lvRect navBar;
 	getNavigationBarRectangle(pageIndex, navBar);
 	int gpos = info.bottom;
@@ -1637,8 +1768,18 @@ void LVDocView::drawPageHeader(LVDrawBuf * drawbuf, const lvRect & headerRc,
         //                      + 1, cl1); // cl3
 
 	int sbound_index = 0;
-	bool enableMarks = !leftPage && (phi & PGHDR_CHAPTER_MARKS) && sbounds.length()<info.width()/5;
-	int w = GetWidth();
+    int maxLevel = 1;
+    bool enableMarks = !leftPage && (phi & PGHDR_CHAPTER_MARKS) && sbounds.length()<info.width()/5;
+    int curBound = 0;
+    int curBoundLevel = 0;
+    while ( enableMarks && sbound_index<sbounds.length() ) {
+        curBound = sbounds[sbound_index];
+        curBoundLevel = curBound % 10;
+        if ((curBoundLevel+1) > maxLevel) maxLevel = curBoundLevel+1;
+        sbound_index++;
+    }
+    sbound_index = 0;
+    int w = GetWidth();
 	int h = GetHeight();
 	if (w > h)
 		w = h;
@@ -1651,10 +1792,14 @@ void LVDocView::drawPageHeader(LVDrawBuf * drawbuf, const lvRect & headerRc,
 	for ( int x = info.left; x<info.right; x++ ) {
 		int cl = -1;
 		int sz = 1;
-		int szx = 1;
+        int sz1 = 1;
+        int szx = 1;
 		int boundCategory = 0;
-		while ( enableMarks && sbound_index<sbounds.length() ) {
-			int sx = info.left + sbounds[sbound_index] * (info.width() - 1) / 10000;
+        while ( enableMarks && sbound_index<sbounds.length() ) {
+            curBound = sbounds[sbound_index];
+            curBoundLevel = curBound % 10;
+            curBound = curBound / 10;
+			int sx = info.left + curBound * (info.width() - 1) / 10000;
 			if ( sx<x ) {
 				sbound_index++;
 				continue;
@@ -1667,22 +1812,35 @@ void LVDocView::drawPageHeader(LVDrawBuf * drawbuf, const lvRect & headerRc,
 		if ( leftPage ) {
 			cl = cl1;
 			sz = 1;
+            sz1 = 1;
 		} else {
             if ( x < info.left + percent_pos ) {
                 sz = 3;
+                sz1 = 3;
 				if ( boundCategory==0 )
 					cl = cl1;
                 else
                     sz = 0;
+                    sz1 = 0;
             } else {
-				if ( boundCategory!=0 )
-					sz = markh;
+				if ( boundCategory!=0 ) {
+                    sz = markh;
+                    sz1 = markh + (3 - curBoundLevel);
+                }
 				cl = cl1;
 				szx = markw;
+                int maxLevelC = maxLevel;
+                if (curBoundLevel == 0) szx = markw * maxLevelC;
+                if (maxLevelC > 1) maxLevelC = maxLevelC - 1;
+                if (curBoundLevel == 1) szx = markw * maxLevelC;
+                if (maxLevelC > 1) maxLevelC = maxLevelC - 1;
+                if (curBoundLevel == 2) szx = markw * maxLevelC;
+                if (maxLevelC > 1) maxLevelC = maxLevelC - 1;
+                if (curBoundLevel == 3) szx = markw * maxLevelC;
 			}
 		}
         if ( cl!=-1 && sz>0 )
-            drawbuf->FillRect(x, gpos - 2 - sz/2, x + szx, gpos - 2 + sz/2 + 1, cl);
+            drawbuf->FillRect(x, gpos - 2 - sz/2, x + szx, gpos - 2 + sz1 / 2 + 1, cl);
 	}
 
 	lString16 text;
@@ -2841,6 +2999,7 @@ bool LVDocView::goLink(lString16 link, bool savePos) {
 			_pos = 0;
 			_page = 0;
 			m_section_bounds_valid = false;
+            m_section_bounds_valid10 = false;
 			m_doc_props->setString(DOC_PROP_FILE_PATH, dir);
 			m_doc_props->setString(DOC_PROP_FILE_NAME, filename);
 			m_doc_props->setString(DOC_PROP_CODE_BASE, LVExtractPath(filename));
@@ -4126,7 +4285,9 @@ void LVDocView::createEmptyDocument() {
 	_posBookmark.clear();
 	m_section_bounds.clear();
 	m_section_bounds_valid = false;
-	_posIsSet = false;
+    m_section_bounds10.clear();
+    m_section_bounds_valid10 = false;
+    _posIsSet = false;
 	m_swapDone = false;
 
 	m_doc->setProps(m_doc_props);

@@ -884,6 +884,28 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 
 		public String getValueLabel() { return ">"; }
 	}
+
+	class SkippedResOption extends SubmenuOption {
+		public SkippedResOption( OptionOwner owner, String label ) {
+			super(owner, label, PROP_SKIPPED_RES);
+		}
+
+		public void onSelect() {
+			BaseDialog dlg = new BaseDialog(mActivity, label, false, false);
+			OptionsListView listView = new OptionsListView(getContext());
+
+			((CoolReader)mActivity).readResizeHistory();
+			for (CoolReader.ResizeHistory rh: ((CoolReader)mActivity).getResizeHist()) {
+				String sProp = rh.X+"."+rh.Y;
+				String sText = rh.X+" x "+rh.Y;
+				listView.add(new BoolOption(mOwner, sText, PROP_SKIPPED_RES+"."+sProp).setDefaultValue("0"));
+			}
+			dlg.setView(listView);
+			dlg.show();
+		}
+
+		public String getValueLabel() { return ">"; }
+	}
 	
 	class StatusBarOption extends SubmenuOption {
 		public StatusBarOption( OptionOwner owner, String label ) {
@@ -2377,6 +2399,7 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 		if ( !DeviceInfo.FORCE_HC_THEME) {
 			mOptionsApplication.add(new ThemeOptions(this, getString(R.string.options_app_ui_theme)).noIcon());
 		}
+		mOptionsApplication.add(new SkippedResOption(this, getString(R.string.skipped_res)).noIcon());
 		if ( !DeviceInfo.EINK_SCREEN ) {
 			mOptionsApplication.add(new ListOption(this, getString(R.string.options_app_backlight_timeout), PROP_APP_SCREEN_BACKLIGHT_LOCK).add(mBacklightTimeout, mBacklightTimeoutTitles).setDefaultValue("3").noIcon());
 			mBacklightLevelsTitles[0] = getString(R.string.options_app_backlight_screen_default);

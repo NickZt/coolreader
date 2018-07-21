@@ -80,6 +80,17 @@
 	            android:focusableInTouchMode="false"
 	            android:background="@null"
 	            android:contentDescription="@string/dlg_button_book_delete"/>
+			<ImageButton android:id="@+id/book_shortcut"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerVertical="true"
+				android:gravity="right"
+				android:minWidth="?android:attr/listPreferredItemHeight"
+				android:src="@drawable/cr3_browser_book_hc"
+				android:focusable="false"
+				android:focusableInTouchMode="false"
+				android:background="@null"
+				android:contentDescription="@string/btn_shortcut"/>
 	    </LinearLayout>
         <LinearLayout 
             android:orientation="horizontal"

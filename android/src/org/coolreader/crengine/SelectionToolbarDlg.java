@@ -17,6 +17,8 @@ import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.PopupWindow.OnDismissListener;
 import android.widget.SeekBar;
@@ -84,7 +86,8 @@ public class SelectionToolbarDlg {
 		});
 	}
 	
-	private final static int SELECTION_CONTROL_STEP = 10; 
+	private final static int SELECTION_CONTROL_STEP = 10;
+	private final static int SELECTION_SMALL_STEP = 1;
 	private class BoundControlListener implements OnSeekBarChangeListener {
 
 		public BoundControlListener(SeekBar sb, boolean start) {
@@ -199,14 +202,14 @@ public class SelectionToolbarDlg {
 
 		mPanel.findViewById(R.id.selection_bookmark).setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				mReaderView.showNewBookmarkDialog(selection);
+				mReaderView.showNewBookmarkDialog(selection,Bookmark.TYPE_COMMENT);
 				closeDialog(true);
 			}
 		});
 
 		mPanel.findViewById(R.id.selection_bookmark).setOnLongClickListener(new View.OnLongClickListener() {
 			public boolean onLongClick(View v) {
-				BookmarksDlg dlg = new BookmarksDlg(mCoolReader, mReaderView);
+				BookmarksDlg dlg = new BookmarksDlg(mCoolReader, mReaderView, false, null);
 				dlg.show();
 				closeDialog(true);
 				return true;
@@ -240,6 +243,27 @@ public class SelectionToolbarDlg {
 		});
 		new BoundControlListener((SeekBar)mPanel.findViewById(R.id.selection_left_bound_control), true);
 		new BoundControlListener((SeekBar)mPanel.findViewById(R.id.selection_right_bound_control), false);
+
+		((ImageButton)mPanel.findViewById(R.id.btn_next1)).setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View v) {
+			changeSelectionBound(true, SELECTION_SMALL_STEP);
+			}
+		});
+		((ImageButton)mPanel.findViewById(R.id.btn_next2)).setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View v) {
+			changeSelectionBound(false, SELECTION_SMALL_STEP);
+			}
+		});
+		((ImageButton)mPanel.findViewById(R.id.btn_prev1)).setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View v) {
+				changeSelectionBound(true, -SELECTION_SMALL_STEP);
+			}
+		});
+		((ImageButton)mPanel.findViewById(R.id.btn_prev2)).setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View v) {
+				changeSelectionBound(false, -SELECTION_SMALL_STEP);
+			}
+		});
 		mPanel.setFocusable(true);
 		mPanel.setOnKeyListener( new OnKeyListener() {
 

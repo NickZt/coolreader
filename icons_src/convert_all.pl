@@ -67,7 +67,13 @@ my %ic_actions_list=(
 	'cr3_button_ok_hc-48x48-src.svg' => 'cr3_button_ok_hc.png',
 	'cr3_button_cancel_hc-48x48-src.svg' => 'cr3_button_cancel_hc.png',
 	'cr3_button_more_hc-48x48-src.svg' => 'cr3_button_more_hc.png',
-	'cr3_browser_book_hc-48x48-src.svg' => 'cr3_browser_book_hc.png'
+	'cr3_browser_book_hc-48x48-src.svg' => 'cr3_browser_book_hc.png',
+        'cr3_logo_nerd_hc-48x48-src.svg' => 'cr3_logo_nerd_hc.png',
+        'cr3_share-48x48-src.svg' => 'cr3_share.png',
+        'cr3_translate-48x48-src.svg' => 'cr3_translate.png',
+        'cr3_search-48x48-src.svg' => 'cr3_search.png',
+        'cr3_bookmark_border-48x48-src.svg' => 'cr3_bookmark_border.png',
+        'cr3_exit_to_app-48x48-src.svg' => 'cr3_exit_to_app.png'
 );
 
 my %ic_menu_list=(

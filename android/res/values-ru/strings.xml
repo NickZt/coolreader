@@ -209,6 +209,7 @@
     <string name="book_info_system_version">Версия</string>
     <string name="book_info_system_battery">Батарея</string>
     <string name="book_info_system_time">Время</string>
+    <string name="book_info_system_resolution">Разрешение</string>
     <string name="book_info_position_chapter">Глава</string>
     <string name="book_info_position_page">Страница</string>
     <string name="book_info_position_percent">Процент</string>
@@ -619,5 +620,9 @@
     <string name="docx_convert">CoolReader может попробовать преобразовать документ в формат html, а затем открыть его. Продолжить?</string>
     <string name="btn_edit_info">Редактировать информацию о книге</string>
     <string name="mark_book_as_read">Отметить книгу как прочитанную?</string>
+    <string name="resizing_to">изменение размера</string>
+    <string name="skipped_res">Не перерисовывать книгу на разрешениях</string>
+    <string name="search_pages">страницы...</string>
+    <string name="btn_shortcut">Создать ярлык книги</string>
 </resources>
 

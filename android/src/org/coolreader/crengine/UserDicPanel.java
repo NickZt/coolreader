@@ -33,10 +33,8 @@ public class UserDicPanel extends LinearLayout implements Settings {
 		private int wc = 0;
 		private boolean fullscreen;
 		private boolean nightMode;
-		private PositionProperties prevrpos1;
-		private PositionProperties prevrpos2;
 
-			FileInfo book;
+		FileInfo book;
 		Bookmark position;
 		PositionProperties props;
 
@@ -144,7 +142,7 @@ public class UserDicPanel extends LinearLayout implements Settings {
 
 								}
 								if (sKey.equals(sWord)) {
-									activity.showToast(StrUtils.updateText(ude.getDic_word_translate(),true));
+									activity.showSuperToast(StrUtils.updateText(ude.getDic_word_translate(),true));
 									activity.getDB().saveUserDic(ude, UserDicEntry.ACTION_UPDATE_CNT);
 									break;
 								}
@@ -208,33 +206,49 @@ public class UserDicPanel extends LinearLayout implements Settings {
 			this.book = book != null ? new FileInfo(book) : null;
 			this.position = position != null ? new Bookmark(position) : null;
 			this.props = props != null ? new PositionProperties(props) : null;
-			updateUserDicWords();
+			BackgroundThread.instance().postGUI(new Runnable() {
+				@Override
+				public void run() {
+					updateUserDicWords();
+				}
+			}, 500);
 		}
 
 		public void updateUserDicWords() {
-			PositionProperties currpos = activity.getReaderView().getDoc().getPositionProps(null);
-			String sPageText = currpos.pageText;
-			this.wc = 0;
+			//PositionProperties currpos = activity.getReaderView().getDoc().getPositionProps(null);
+			int curPage = activity.getReaderView().getDoc().getCurPage();
+			activity.getReaderView().CheckAllPagesLoad();
+            String sPrevPage = "";
+            String sPageText = "";
+			if ((activity.getReaderView().getArrAllPages().size()>curPage)&&(curPage>=0)) {
+                sPageText = activity.getReaderView().getArrAllPages().get(curPage);
+                if (curPage > 0)
+                    sPrevPage = activity.getReaderView().getArrAllPages().get(curPage - 1);
+            }
+			if (sPageText==null) sPageText = "";
+            if (sPrevPage==null) sPrevPage = "";
+            this.wc = 0;
 			this.arrUdeWords.clear();
 			Iterator it = activity.getmUserDic().entrySet().iterator();
 			String sCurPage = sPageText.toLowerCase();
-			PositionProperties pr = null;
-			//this all is for a word splitted into two pages..
-			if ((prevrpos1!=null)&&(currpos!=null))
-				if (currpos.pageNumber-1==prevrpos1.pageNumber) pr = prevrpos1;
-			if ((prevrpos2!=null)&&(currpos!=null))
-				if (currpos.pageNumber-1==prevrpos2.pageNumber) pr = prevrpos2;
-			if (pr!=null) {
-				String sPrevPage = pr.pageText.toLowerCase();
-				if (!Character.isWhitespace(sPrevPage.charAt(sPrevPage.length() - 1))) {
-					for (int i=sPrevPage.length()-1;i>0;i--) {
-						if (Character.isWhitespace(sPrevPage.charAt(i))) {
-							sCurPage=sPrevPage.substring(i,sPrevPage.length())+sCurPage;
-							break;
-						}
-					}
-				}
-			}
+			sPrevPage = sPrevPage.toLowerCase();
+            int cnt = 50;
+            try {
+                if (sPrevPage.length() > 10) {
+                    if (!Character.isWhitespace(sPrevPage.charAt(sPrevPage.length() - 1))) {
+                        for (int i = sPrevPage.length() - 1; i > 0; i--) {
+                            cnt++;
+                            if (Character.isWhitespace(sPrevPage.charAt(i))) {
+                                sCurPage = sPrevPage.substring(i, sPrevPage.length()) + sCurPage;
+                                break;
+                            }
+                            if (cnt>100) break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+
+            }
 			while (it.hasNext()) {
 				Map.Entry pair = (Map.Entry)it.next();
 				String sKey = pair.getKey().toString().toLowerCase();
@@ -269,8 +283,6 @@ public class UserDicPanel extends LinearLayout implements Settings {
 					return lhs.getDic_word().compareToIgnoreCase(rhs.getDic_word());
 				}
 			});
-			prevrpos2 = prevrpos1;
-			prevrpos1 = currpos;
 			updateViews();
 		}
 

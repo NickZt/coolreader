@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-   Book item layout for CR3 file browser
--->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/dict_item_body"
+	android:id="@+id/page_item_body"
 	android:orientation="horizontal"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
@@ -15,7 +12,7 @@
 	android:layout_marginRight="2dip"
 	>
 
-	<LinearLayout android:id="@+id/shortcut_dict_item_sc_layout"
+	<LinearLayout android:id="@+id/shortcut_page_item_sc_layout"
 		android:orientation="vertical"
 		android:layout_marginTop="3dip"
 		android:layout_marginBottom="3dip"
@@ -27,7 +24,7 @@
 		android:baselineAligned="false">
 
 
-		<TextView android:id="@+id/dict_item_shortcut"
+		<TextView android:id="@+id/page_item_shortcut"
 			style="@style/TextAppearance.Medium"
 			android:text="1"
 			android:layout_width="wrap_content"
@@ -36,7 +33,7 @@
 			android:layout_gravity="left" />
 	</LinearLayout>
 
-	<LinearLayout android:id="@+id/dict_item_text"
+	<LinearLayout android:id="@+id/page_item_text"
 		android:orientation="vertical"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
@@ -44,13 +41,15 @@
 		android:baselineAligned="false">
 
 
-		<TextView android:id="@+id/dict_item_title"
-			style="@style/TextAppearance.Large"
+		<TextView android:id="@+id/page_item_title"
+			style="@style/TextAppearance.Smaller"
 			android:text="10% Title Text"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:singleLine="true"
+			android:singleLine="false"
 			android:ellipsize="end"
+			android:textAppearance="?android:attr/textAppearanceSmall"
+			android:maxLines="6"
 			android:layout_gravity="left" />
 	</LinearLayout>
 </LinearLayout>

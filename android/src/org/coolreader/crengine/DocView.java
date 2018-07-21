@@ -13,6 +13,9 @@ public class DocView {
 
 	private final Object mutex;
 
+	private Bookmark curPageBookmark;
+	private long curPageBmkTime;
+
 	public DocView(Object mutex) {
 		log.i("DocView()");
 		this.mutex = mutex;
@@ -78,7 +81,49 @@ public class DocView {
 			return checkLinkInternal(x, y, delta);
 		}
 	}
-	
+
+	/**
+	 * Get page text
+	 * @param wrapWords
+	 * @param pageIndex
+	 * @return
+	 */
+	public String getPageText(boolean wrapWords, int pageIndex) {
+		synchronized(mutex) {
+			return getPageTextInternal(wrapWords, pageIndex);
+		}
+	}
+
+	/**
+	 * Get page count
+	 * @return
+	 */
+	public int getPageCount() {
+		synchronized(mutex) {
+			return getPageCountInternal();
+		}
+	}
+
+	/**
+	 * Get visible page count
+	 * @return
+	 */
+	public int getVisiblePageCount() {
+		synchronized(mutex) {
+			return getVisiblePageCountInternal();
+		}
+	}
+
+	/**
+	 * Get page number
+	 * @return
+	 */
+
+	public int getCurPage() {
+		synchronized(mutex) {
+			return getCurPageInternal();
+		}
+	}
 	/**
 	 * Set selection range.
 	 * @param sel
@@ -210,9 +255,15 @@ public class DocView {
 	 * @return
 	 */
 	public Bookmark getCurrentPageBookmark() {
-		synchronized(mutex) {
-			return getCurrentPageBookmarkInternal();
-		}
+		// make not to call this too many times
+		long curTime = System.currentTimeMillis();
+		if (((curTime-curPageBmkTime)>2000)||(curPageBmkTime==0)||(curPageBookmark==null)) {
+			synchronized (mutex) {
+				curPageBookmark = getCurrentPageBookmarkInternal();
+				curPageBmkTime = System.currentTimeMillis();
+				return curPageBookmark;
+			}
+		} else return curPageBookmark;
 	}
 	
 	/**
@@ -435,6 +486,14 @@ public class DocView {
 			int moveCmd, int params);
 
 	private native String checkLinkInternal(int x, int y, int delta);
+
+	private native String getPageTextInternal(boolean wrapWords, int pageIndex);
+
+	private native int getPageCountInternal();
+
+	private native int getVisiblePageCountInternal();
+
+	private native int getCurPageInternal();
 
 	private native boolean checkImageInternal(int x, int y, ImageInfo dstImage);
 

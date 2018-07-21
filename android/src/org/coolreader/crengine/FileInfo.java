@@ -32,9 +32,7 @@ public class FileInfo {
 	public final static String TITLE_TAG = "@titlesRoot";
 	public final static String TITLE_GROUP_PREFIX = "@titleGroup:";
 	public final static String SEARCH_SHORTCUT_TAG = "@search";
-	
-	
-	
+
 	public Long id; // db id
 	public String title; // book title
 	public String authors; // authors, delimited with '|'

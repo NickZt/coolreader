@@ -24,6 +24,7 @@ public class BookInfoDialog extends BaseDialog {
 		mLabelMap.put("system.version", R.string.book_info_system_version);
 		mLabelMap.put("system.battery", R.string.book_info_system_battery);
 		mLabelMap.put("system.time", R.string.book_info_system_time);
+		mLabelMap.put("system.resolution", R.string.book_info_system_resolution);
 		mLabelMap.put("section.file", R.string.book_info_section_file_properties);
 		mLabelMap.put("file.name", R.string.book_info_file_name);
 		mLabelMap.put("file.path", R.string.book_info_file_path);
@@ -97,6 +98,14 @@ public class BookInfoDialog extends BaseDialog {
 					cr.editBookInfo(dfi, fi);
 					dismiss();
 				}
+			}
+		});
+		Button btnShortcut = (Button) view.findViewById(R.id.btn_shortcut);
+		btnShortcut.setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View v) {
+				CoolReader cr = (CoolReader)mCoolReader;
+				FileInfo fi = cr.getReaderView().getBookInfo().getFileInfo();
+				cr.createBookShortcut(fi);
 			}
 		});
 		for ( String item : items ) {

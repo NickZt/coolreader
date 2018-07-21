@@ -329,6 +329,9 @@ private:
     LVArray<int> m_section_bounds;
     bool m_section_bounds_valid;
 
+    LVArray<int> m_section_bounds10;
+    bool m_section_bounds_valid10;
+
     LVMutex _mutex;
 #if CR_ENABLE_PAGE_IMAGE_CACHE==1
     LVDocViewImageCache m_imageCache;
@@ -531,8 +534,7 @@ public:
     /// update selection -- command handler
     int onSelectionCommand( int cmd, int param );
 
-
-    /// navigation history
+/// navigation history
     ldomNavigationHistory & getNavigationHistory() { return _navigationHistory; }
     /// get list of links
     virtual void getCurrentPageLinks( ldomXRangeList & list );
@@ -628,6 +630,8 @@ public:
     bool isDocumentOpened();
     /// returns section bounds, in 1/100 of percent
     LVArray<int> & getSectionBounds( );
+    /// returns section bounds, in 1/100 of percent * 10
+    LVArray<int> & getSectionBounds4Levels( );
     /// sets battery state
     virtual bool setBatteryState( int newState );
     /// returns battery state

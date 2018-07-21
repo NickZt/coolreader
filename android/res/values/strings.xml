@@ -215,6 +215,7 @@
     <string name="book_info_system_version">Version</string>
     <string name="book_info_system_battery">Battery</string>
     <string name="book_info_system_time">Time</string>
+    <string name="book_info_system_resolution">Resolution</string>
     <string name="book_info_position_chapter">Chapter</string>
     <string name="book_info_position_page">Page</string>
     <string name="book_info_position_percent">Percent</string>
@@ -645,4 +646,8 @@
     <string name="docx_convert">CoolReader could try to convert document in html format, then open it. Proceed?</string>
     <string name="btn_edit_info">Edit book info</string>
     <string name="mark_book_as_read">Mark this book as read?</string>
+    <string name="resizing_to">resizing to</string>
+    <string name="skipped_res">Skip redraw at resolutions</string>
+    <string name="search_pages">pages...</string>
+    <string name="btn_shortcut">Create book shortcut</string>
 </resources>

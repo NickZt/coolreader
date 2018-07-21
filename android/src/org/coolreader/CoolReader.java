@@ -1,9 +1,15 @@
 // Main Class
 package org.coolreader;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,6 +44,7 @@ import org.coolreader.crengine.ReaderAction;
 import org.coolreader.crengine.ReaderView;
 import org.coolreader.crengine.ReaderViewLayout;
 import org.coolreader.crengine.Services;
+import org.coolreader.crengine.StrUtils;
 import org.coolreader.crengine.TTS;
 import org.coolreader.crengine.TTS.OnTTSCreatedListener;
 import org.coolreader.crengine.UserDicEntry;
@@ -46,6 +53,7 @@ import org.coolreader.donations.CRDonationService;
 import org.koekak.android.ebookdownloader.SonyBookSelector;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
@@ -55,11 +63,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
+import android.graphics.drawable.Icon;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,12 +79,38 @@ import android.view.ViewGroup;
 import android.provider.Settings.Secure;
 
 import com.google.android.gms.common.util.Strings;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class CoolReader extends BaseActivity
 {
 	public static final Logger log = L.create("cr");
 	
 	private ReaderView mReaderView;
+
+    public class ResizeHistory {
+        public int X;
+        public int Y;
+        public long lastSet;
+        public int wasX;
+        public int wasY;
+        public int cnt;
+    }
+
+    public ArrayList<ResizeHistory> getResizeHist() {
+        return resizeHist;
+    }
+
+	public ResizeHistory getNewResizeHistory() {
+		ResizeHistory rh = new ResizeHistory();
+    	return rh;
+	}
+
+	public void setResizeHist(ArrayList<ResizeHistory> resizeHist) {
+		this.resizeHist = resizeHist;
+	}
+
+	private ArrayList<ResizeHistory> resizeHist = new ArrayList<ResizeHistory>();
 
 	public ReaderViewLayout getmReaderFrame() {
 		return mReaderFrame;
@@ -220,6 +258,7 @@ public class CoolReader extends BaseActivity
 		}
 
 		showRootWindow();
+        createDynShortcuts();
 		
         log.i("CoolReader.onCreate() exiting");
     }
@@ -377,6 +416,51 @@ public class CoolReader extends BaseActivity
 		}
 		if (Intent.ACTION_SEND.equals(intent.getAction())) {
 			fileToOpen = intent.getStringExtra(Intent.EXTRA_SUBJECT);
+			if (fileToOpen.equals(FileInfo.RECENT_DIR_TAG)) {
+                this.showRecentBooks();
+                return true;
+            }
+			if (fileToOpen.equals(FileInfo.STATE_READING_TAG)) {
+				FileInfo dir = new FileInfo();
+				dir.isDirectory = true;
+				dir.pathname = fileToOpen;
+				dir.filename = this.getString(R.string.folder_name_books_by_state_reading);
+				dir.isListed = true;
+				dir.isScanned = true;
+				this.showDirectory(dir);
+				return true;
+			}
+            if (fileToOpen.equals(FileInfo.STATE_TO_READ_TAG)) {
+                FileInfo dir = new FileInfo();
+                dir.isDirectory = true;
+                dir.pathname = fileToOpen;
+                dir.filename = this.getString(R.string.folder_name_books_by_state_to_read);
+                dir.isListed = true;
+                dir.isScanned = true;
+                this.showDirectory(dir);
+                return true;
+            }
+			if (fileToOpen.equals(FileInfo.STATE_FINISHED_TAG)) {
+				FileInfo dir = new FileInfo();
+				dir.isDirectory = true;
+				dir.pathname = fileToOpen;
+				dir.filename = this.getString(R.string.folder_name_books_by_state_finished);
+				dir.isListed = true;
+				dir.isScanned = true;
+				this.showDirectory(dir);
+				return true;
+			}
+            if (fileToOpen.equals(FileInfo.SEARCH_SHORTCUT_TAG)) {
+                FileInfo dir = new FileInfo();
+                dir.isDirectory = true;
+                dir.pathname = fileToOpen;
+                dir.filename = this.getString(R.string.dlg_book_search);
+                dir.isListed = true;
+                dir.isScanned = true;
+                this.showDirectory(dir);
+                return true;
+            }
+
 		}
 
 		if (fileToOpen == null && intent.getExtras() != null) {
@@ -1635,6 +1719,195 @@ public class CoolReader extends BaseActivity
 		if (bi != null)
 			loadDocument(bi.getFileInfo());
 	}
-	
+
+	public void readResizeHistory()
+	{
+        log.d("Reading rh.json");
+		String rh = "";
+		try {
+			final File fJson = new File(getSettingsFile(0).getParent() + "/rh.json");
+			BufferedReader reader = new BufferedReader(
+					new FileReader(fJson));
+			StringBuilder stringBuilder = new StringBuilder();
+			String line = null;
+			String ls = System.getProperty("line.separator");
+			while ((line = reader.readLine()) != null) {
+				stringBuilder.append(line);
+				stringBuilder.append(ls);
+			}
+			reader.close();
+			rh = stringBuilder.toString();
+			setResizeHist(new ArrayList<ResizeHistory>(StrUtils.stringToArray(rh, ResizeHistory[].class)));
+		} catch (Exception e) {
+		}
+	}
+
+	public void saveResizeHistory()
+	{
+		log.d("Starting save rh.json");
+		try {
+			final File fJson = new File(getSettingsFile(0).getParent() + "/rh.json");
+
+			final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			final String prettyJson = gson.toJson(getResizeHist());
+
+			BufferedWriter bw = null;
+			FileWriter fw = null;
+			char[] bytesArray = new char[1000];
+			int bytesRead = 1000;
+			try {
+				fw = new FileWriter(fJson);
+				bw = new BufferedWriter(fw);
+				bw.write(prettyJson);
+				bw.close();
+				fw.close();
+			} catch (Exception e) {
+			}
+		} catch (Exception e) {
+		}
+	}
+
+	@TargetApi(26)
+	public static final boolean addShortCut(Context context, Intent in_shortcut, Icon icon, String title) {
+		boolean res = false;
+
+		try {
+
+			ShortcutManager shortcutManager = context.getSystemService(ShortcutManager.class);
+
+			ShortcutInfo shortcut = new ShortcutInfo.Builder(context, "id" + Long.toString(System.currentTimeMillis()))
+					.setShortLabel(title)
+					.setLongLabel(title)
+					.setIcon(icon)
+					.setIntent(in_shortcut)
+					.build();
+			//ArrayList<ShortcutInfo> scList = new ArrayList<ShortcutInfo>();
+			//scList.add(shortcut);
+
+			shortcutManager.requestPinShortcut(shortcut, null);
+			res = true;
+			//res = shortcutManager.setDynamicShortcuts(Arrays.asList(shortcut));
+		} catch (Exception e) {
+			e.printStackTrace();
+			res = false;
+		}
+
+		return res;
+	}
+
+	@TargetApi(23)
+	public boolean createBookShortcut(FileInfo item) {
+		final String sPathName = item.pathname;
+		final String sPathName2 = item.isArchive && item.arcname != null
+				? new File(item.arcname).getPath() : null;
+		String sPathNameF = sPathName2 == null ? sPathName : sPathName2;
+		Intent shortcutIntent;
+		if (DeviceInfo.getSDKLevel() >= 26) {
+			shortcutIntent = new Intent(getApplicationContext(), CoolReader.class);
+		} else {
+			shortcutIntent = new Intent();
+			shortcutIntent.setClassName(this, this.getLocalClassName());
+		}
+		shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		shortcutIntent.setAction(Intent.ACTION_VIEW);
+
+		if (DeviceInfo.getSDKLevel() >= 19) {
+			shortcutIntent.setData(Uri.parse("coolreader://" + sPathNameF));
+		} else {
+			shortcutIntent.setData(Uri.parse("file://" + sPathNameF));
+		}
+
+		Intent addIntent = new Intent();
+		addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+		addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, item.title);
+
+		addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
+					Intent.ShortcutIconResource.fromContext(getApplicationContext(), R.drawable.cr3_browser_book_hc));
+
+		if (DeviceInfo.getSDKLevel() >= 26) {
+			Icon icon = Icon.createWithResource(getApplicationContext(), R.drawable.cr3_browser_book_hc);
+			return addShortCut(this, shortcutIntent, icon, item.title);
+		} else {
+			addIntent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+			this.sendBroadcast(addIntent);
+			return true;
+		}
+	}
+
+    @TargetApi(25)
+    public void createDynShortcuts() {
+		try {
+			if (DeviceInfo.getSDKLevel() >= 25) {
+				ShortcutManager shortcutManager = getSystemService(ShortcutManager.class);
+
+				Intent intent = new Intent(Intent.ACTION_SEND);
+				intent.setPackage("org.coolreader");
+				intent.setType("text/plain");
+				intent.putExtra(android.content.Intent.EXTRA_SUBJECT, FileInfo.RECENT_DIR_TAG);
+
+				ShortcutInfo shortcut1 = new ShortcutInfo.Builder(this, "id_recent")
+						.setShortLabel(this.getString(R.string.mi_book_recent_books))
+						.setLongLabel(this.getString(R.string.mi_book_recent_books))
+						.setIcon(Icon.createWithResource(getApplicationContext(), R.drawable.cr3_browser_book_hc))
+						.setIntent(intent)
+						.build();
+
+				intent = new Intent(Intent.ACTION_SEND);
+				intent.setPackage("org.coolreader");
+				intent.setType("text/plain");
+				intent.putExtra(android.content.Intent.EXTRA_SUBJECT, FileInfo.STATE_READING_TAG);
+
+				ShortcutInfo shortcut2 = new ShortcutInfo.Builder(this, "id_reading")
+						.setShortLabel(this.getString(R.string.folder_name_books_by_state_reading))
+						.setLongLabel(this.getString(R.string.folder_name_books_by_state_reading))
+						.setIcon(Icon.createWithResource(getApplicationContext(), R.drawable.cr3_browser_book_hc))
+						.setIntent(intent)
+						.build();
+
+				intent = new Intent(Intent.ACTION_SEND);
+				intent.setPackage("org.coolreader");
+				intent.setType("text/plain");
+				intent.putExtra(android.content.Intent.EXTRA_SUBJECT, FileInfo.STATE_TO_READ_TAG);
+
+				ShortcutInfo shortcut3 = new ShortcutInfo.Builder(this, "id_to_read")
+						.setShortLabel(this.getString(R.string.folder_name_books_by_state_to_read))
+						.setLongLabel(this.getString(R.string.folder_name_books_by_state_to_read))
+						.setIcon(Icon.createWithResource(getApplicationContext(), R.drawable.cr3_browser_book_hc))
+						.setIntent(intent)
+						.build();
+
+				intent = new Intent(Intent.ACTION_SEND);
+				intent.setPackage("org.coolreader");
+				intent.setType("text/plain");
+				intent.putExtra(android.content.Intent.EXTRA_SUBJECT, FileInfo.STATE_FINISHED_TAG);
+
+				ShortcutInfo shortcut4 = new ShortcutInfo.Builder(this, "id_finished")
+						.setShortLabel(this.getString(R.string.folder_name_books_by_state_finished))
+						.setLongLabel(this.getString(R.string.folder_name_books_by_state_finished))
+						.setIcon(Icon.createWithResource(getApplicationContext(), R.drawable.cr3_browser_book_hc))
+						.setIntent(intent)
+						.build();
+
+				intent = new Intent(Intent.ACTION_SEND);
+				intent.setPackage("org.coolreader");
+				intent.setType("text/plain");
+				intent.putExtra(android.content.Intent.EXTRA_SUBJECT, FileInfo.SEARCH_SHORTCUT_TAG);
+
+				ShortcutInfo shortcut5 = new ShortcutInfo.Builder(this, "id_search")
+						.setShortLabel(this.getString(R.string.dlg_book_search))
+						.setLongLabel(this.getString(R.string.dlg_book_search))
+						.setIcon(Icon.createWithResource(getApplicationContext(), R.drawable.cr3_browser_find_hc))
+						.setIntent(intent)
+						.build();
+
+				shortcutManager.setDynamicShortcuts(Arrays.asList(shortcut1, shortcut2, shortcut3,
+						/*shortcut4,*/ shortcut5));
+			}
+		} catch (Exception e) {
+
+		}
+	}
+
 }
 

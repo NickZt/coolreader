@@ -1,5 +1,10 @@
 package org.coolreader.crengine;
 
+import com.google.gson.Gson;
+
+import java.util.Arrays;
+import java.util.List;
+
 public class StrUtils {
 
     public static boolean isEmptyStr(String s) {
@@ -211,6 +216,11 @@ public class StrUtils {
                     repl.equals("smb\\")||repl.equals("smb's\\")) res=res+" "+repl; else res=res.trim()+" "+ss.trim();
         }
         return res;
+    }
+
+    public static <T> List<T> stringToArray(String s, Class<T[]> clazz) {
+        T[] arr = new Gson().fromJson(s, clazz);
+        return Arrays.asList(arr); //or return Arrays.asList(new Gson().fromJson(s, clazz)); for a one-liner
     }
 
 }

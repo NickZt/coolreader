@@ -191,6 +191,62 @@ JNIEXPORT jstring JNICALL Java_org_coolreader_crengine_DocView_checkLinkInternal
 
 /*
  * Class:     org_coolreader_crengine_DocView
+ * Method:    getPageCountInternal
+ * Signature: ()Ljava/util/Properties;
+ */
+JNIEXPORT jint JNICALL Java_org_coolreader_crengine_DocView_getPageCountInternal
+        (JNIEnv *, jobject);
+
+/*
+ * Class:     org_coolreader_crengine_DocView
+ * Method:    getVisiblePageCountInternal
+ * Signature: ()Ljava/util/Properties;
+ */
+JNIEXPORT jint JNICALL Java_org_coolreader_crengine_DocView_getVisiblePageCountInternal
+        (JNIEnv *, jobject);
+
+/*
+ * Class:     org_coolreader_crengine_DocView
+ * Method:    getCurPageInternal
+ * Signature: ()Ljava/util/Properties;
+ */
+JNIEXPORT jint JNICALL Java_org_coolreader_crengine_DocView_getCurPageInternal
+        (JNIEnv *, jobject);
+
+/*
+ * Class:     org_coolreader_crengine_DocView
+ * Method:    getPageTextInternal
+ * Signature: (III)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_org_coolreader_crengine_DocView_getPageTextInternal
+        (JNIEnv *, jobject, jboolean, jint);
+
+/*
+ * Class:     org_coolreader_crengine_DocView
+ * Method:    getPageCountInternal
+ * Signature: (III)Ljava/lang/String;
+ */
+JNIEXPORT jint JNICALL Java_org_coolreader_crengine_DocView_getPageCountInternal
+        (JNIEnv *, jobject);
+
+/*
+ * Class:     org_coolreader_crengine_DocView
+ * Method:    getVisiblePageCountInternal
+ * Signature: (III)Ljava/lang/String;
+ */
+JNIEXPORT jint JNICALL Java_org_coolreader_crengine_DocView_getVisiblePageCountInternal
+        (JNIEnv *, jobject);
+
+/*
+ * Class:     org_coolreader_crengine_DocView
+ * Method:    getCurPageInternal
+ * Signature: (III)Ljava/lang/String;
+ */
+JNIEXPORT jint JNICALL Java_org_coolreader_crengine_DocView_getCurPageInternal
+        (JNIEnv *, jobject);
+
+/*
+ * Class:     org_coolreader_crengine_DocView
  * Method:    checkImageInternal
  * Signature: (IILorg/coolreader/crengine/ImageInfo;)Z
  */

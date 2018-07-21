@@ -261,8 +261,17 @@ public class BookInfoEditDialog extends BaseDialog {
         btnDeleteBook.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mActivity.askDeleteBook(mBookInfo.getFileInfo());
-				dismiss();
+			mActivity.askDeleteBook(mBookInfo.getFileInfo());
+			dismiss();
+			}
+		});
+
+		ImageButton btnShortcutBook = (ImageButton)view.findViewById(R.id.book_shortcut);
+		btnShortcutBook.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+			mActivity.createBookShortcut(mBookInfo.getFileInfo());
+			dismiss();
 			}
 		});
 

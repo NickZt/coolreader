@@ -55,7 +55,9 @@ public interface Settings {
     public static final String PROP_TOOLBAR_LOCATION        ="viewer.toolbar.location2";
     public static final String PROP_TOOLBAR_HIDE_IN_FULLSCREEN="viewer.toolbar.fullscreen.hide";
     public static final String PROP_TOOLBAR_APPEARANCE="viewer.toolbar.appearance";
-    
+    public static final String PROP_TOOLBAR_BUTTONS     ="viewer.toolbar.buttons";
+    public static final String PROP_SKIPPED_RES     ="viewer.skipped.resolutions";
+
     public static final String PROP_STATUS_LINE             ="window.status.line";
     public static final String PROP_BOOKMARK_ICONS          ="crengine.bookmarks.icons";
     public static final String PROP_FOOTNOTES               ="crengine.footnotes";

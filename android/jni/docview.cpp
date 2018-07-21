@@ -2058,6 +2058,89 @@ JNIEXPORT jstring JNICALL Java_org_coolreader_crengine_DocView_checkLinkInternal
 
 /*
  * Class:     org_coolreader_crengine_DocView
+ * Method:    getPageTextInternal
+ * Signature: (III)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_org_coolreader_crengine_DocView_getPageTextInternal
+		(JNIEnv * _env, jobject _this, jboolean wrapWords, jint pageIndex)
+{
+	CRJNIEnv env(_env);
+	DocViewNative * p = getNative(_env, _this);
+	if (!p) {
+		CRLog::error("Cannot get native view");
+		return NULL;
+	}
+	lString16 pageText;
+	if ( !p->_docview->isDocumentOpened() )
+		return NULL;
+	DocViewCallback callback( _env, p->_docview, _this );
+
+	pageText = p->_docview->getPageText(wrapWords, pageIndex);
+		if ( !pageText.empty() )
+			return env.toJavaString(pageText);
+	return NULL;
+}
+
+/*
+ * Class:     org_coolreader_crengine_DocView
+ * Method:    getPageCountInternal
+ * Signature: (III)Ljava/lang/String;
+ */
+JNIEXPORT jint JNICALL Java_org_coolreader_crengine_DocView_getPageCountInternal
+        (JNIEnv * _env, jobject _this)
+{
+    CRJNIEnv env(_env);
+    DocViewNative * p = getNative(_env, _this);
+    if (!p) {
+        CRLog::error("Cannot get native view");
+        return NULL;
+    }
+    if ( !p->_docview->isDocumentOpened() )
+        return NULL;
+    DocViewCallback callback( _env, p->_docview, _this );
+
+    return p->_docview->getPageCount();
+}
+
+/*
+ * Class:     org_coolreader_crengine_DocView
+ * Method:    getVisiblePageCountInternal
+ * Signature: (III)Ljava/lang/String;
+ */
+JNIEXPORT jint JNICALL Java_org_coolreader_crengine_DocView_getVisiblePageCountInternal
+        (JNIEnv * _env, jobject _this)
+{
+    CRJNIEnv env(_env);
+    DocViewNative * p = getNative(_env, _this);
+    if (!p) {
+        CRLog::error("Cannot get native view");
+        return NULL;
+    }
+    if ( !p->_docview->isDocumentOpened() )
+        return NULL;
+    DocViewCallback callback( _env, p->_docview, _this );
+
+    return p->_docview->getVisiblePageCount();
+}
+
+JNIEXPORT jint JNICALL Java_org_coolreader_crengine_DocView_getCurPageInternal
+        (JNIEnv * _env, jobject _this)
+{
+    CRJNIEnv env(_env);
+    DocViewNative * p = getNative(_env, _this);
+    if (!p) {
+        CRLog::error("Cannot get native view");
+        return NULL;
+    }
+    if ( !p->_docview->isDocumentOpened() )
+        return NULL;
+    DocViewCallback callback( _env, p->_docview, _this );
+
+    return p->_docview->getCurPage();
+}
+
+/*
+ * Class:     org_coolreader_crengine_DocView
  * Method:    goLinkInternal
  * Signature: (Ljava/lang/String;)I
  */

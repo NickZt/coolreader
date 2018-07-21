@@ -29,6 +29,7 @@ public class SearchDlg extends BaseDialog {
 	CheckBox mCaseSensitive;
 	CheckBox mReverse;
 	BookInfo mBookInfo;
+	Button mSearchPages;
 	ArrayList<String> mSearches;
 	private SearchList mList;
 
@@ -137,7 +138,9 @@ public class SearchDlg extends BaseDialog {
 				@Override
 				public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
 											   int position, long arg3) {
-					openContextMenu(SearchDlg.SearchList.this);
+					//openContextMenu(SearchDlg.SearchList.this);
+					mEditView.setText(mSearches.get(position));
+					mSearchPages.callOnClick();
 					return true;
 				}
 			});
@@ -165,7 +168,30 @@ public class SearchDlg extends BaseDialog {
     		mEditView.setText(initialText);
     	mCaseSensitive = (CheckBox)mDialogView.findViewById(R.id.search_case_sensitive);
     	mReverse = (CheckBox)mDialogView.findViewById(R.id.search_reverse);
-
+    	mSearchPages = (Button)mDialogView.findViewById(R.id.btn_search_pages);
+    	mSearchPages.setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View v) {
+				final String sText = mEditView.getText().toString().trim();
+				final GotoPageDialog dlg = new GotoPageDialog(activity, title, sText,
+						new GotoPageDialog.GotoPageHandler() {
+							int pageNumber = 0;
+							@Override
+							public boolean validate(String s) {
+								pageNumber = Integer.valueOf(s);
+								return pageNumber>0; // && pageNumber <= mReaderView.props.pageCount;
+							}
+							@Override
+							public void onOk(String s) {
+								mReaderView.goToPage(pageNumber);
+							}
+							@Override
+							public void onCancel() {
+							}
+						});
+				dlg.show();
+				dismiss();
+			}
+		});
 		ImageButton btnMinus1 = (ImageButton)mDialogView.findViewById(R.id.search_dlg_clear_hist_btn);
 		//btnMinus1.setImageResource(R.drawable.cr3_button_remove);
 

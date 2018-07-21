@@ -4,14 +4,24 @@
   android:orientation="vertical"
   android:layout_width="fill_parent"
   android:layout_height="wrap_content">
-<EditText 
-    android:id="@+id/search_text" 
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content"
-	android:text="" 
-    style="@style/TextAppearance.Widget.EditText"
-	android:editable="true" android:hint="@string/dlg_search_hint" android:singleLine="true"
-/>
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/page_item_body"
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content">
+		<EditText
+			android:id="@+id/search_text"
+			android:layout_width="0dip" android:layout_weight="1"
+			android:layout_height="wrap_content"
+			android:text=""
+			style="@style/TextAppearance.Widget.EditText"
+			android:editable="true" android:hint="@string/dlg_search_hint" android:singleLine="true"
+		/>
+	  <Button android:id="@+id/btn_search_pages"
+		  android:layout_width="wrap_content"
+		  android:layout_height="wrap_content"
+		  android:text="@string/search_pages"/>
+</LinearLayout>
 <CheckBox android:text="@string/dlg_search_case_sensitive" android:id="@+id/search_case_sensitive" android:layout_width="fill_parent" android:layout_height="wrap_content"></CheckBox>
 <CheckBox android:text="@string/dlg_search_reverse" android:id="@+id/search_reverse" android:layout_width="fill_parent" android:layout_height="wrap_content"></CheckBox>
 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"

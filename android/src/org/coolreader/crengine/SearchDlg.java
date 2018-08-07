@@ -160,7 +160,7 @@ public class SearchDlg extends BaseDialog {
 		this.mCoolReader = coolReader;
 		this.mReaderView = readerView;
 		this.mBookInfo = mReaderView.getBookInfo();
-		setPositiveButtonImage(R.drawable.cr3_button_find, R.string.action_search);
+		setPositiveButtonImage(R.drawable.icons8_search, R.string.action_search);
         mInflater = LayoutInflater.from(getContext());
         mDialogView = mInflater.inflate(R.layout.search_dialog, null);
     	mEditView = (EditText)mDialogView.findViewById(R.id.search_text);
@@ -185,6 +185,10 @@ public class SearchDlg extends BaseDialog {
 								mReaderView.goToPage(pageNumber);
 							}
 							@Override
+							public void onOkPage(String s) {
+								mReaderView.goToPage(pageNumber);
+							}
+							@Override
 							public void onCancel() {
 							}
 						});
@@ -193,7 +197,6 @@ public class SearchDlg extends BaseDialog {
 			}
 		});
 		ImageButton btnMinus1 = (ImageButton)mDialogView.findViewById(R.id.search_dlg_clear_hist_btn);
-		//btnMinus1.setImageResource(R.drawable.cr3_button_remove);
 
 		btnMinus1.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View v) {

@@ -150,9 +150,7 @@ public class DictsDlg extends BaseDialog {
 		mReaderView = readerView;
 		View frame = mInflater.inflate(R.layout.dict_dialog, null);
 		ImageButton btnMinus1 = (ImageButton)frame.findViewById(R.id.dict_dlg_minus1_btn);
-		//btnMinus1.setImageResource(R.drawable.cr3_button_remove);
 		ImageButton btnMinus2 = (ImageButton)frame.findViewById(R.id.dict_dlg_minus2_btn);
-		//btnMinus2.setImageResource(R.drawable.cr3_button_remove);
 		Button btnPronoun = (Button)frame.findViewById(R.id.dict_dlg_btn_pronoun);
 		selEdit = (EditText)frame.findViewById(R.id.selection_text);
 		selEdit.setText(mSearchText);

@@ -183,25 +183,25 @@ public class AboutDialog extends BaseDialog implements TabContentFactory {
 		tabs.setup();
 		TabHost.TabSpec tsApp = tabs.newTabSpec("App");
 		tsApp.setIndicator("", 
-				getContext().getResources().getDrawable(R.drawable.cr3_menu_link));
+				getContext().getResources().getDrawable(R.drawable.icons8_link));
 		tsApp.setContent(this);
 		tabs.addTab(tsApp);
 
 		TabHost.TabSpec tsDirectories = tabs.newTabSpec("Directories");
 		tsDirectories.setIndicator("",
-				getContext().getResources().getDrawable(R.drawable.ic_menu_archive));
+				getContext().getResources().getDrawable(R.drawable.icons8_folder_2));
 		tsDirectories.setContent(this);
 		tabs.addTab(tsDirectories);
 
 		TabHost.TabSpec tsLicense = tabs.newTabSpec("License");
 		tsLicense.setIndicator("", 
-				getContext().getResources().getDrawable(R.drawable.ic_menu_star));
+				getContext().getResources().getDrawable(R.drawable.icons8_star));
 		tsLicense.setContent(this);
 		tabs.addTab(tsLicense);
 		
 		TabHost.TabSpec tsDonation = tabs.newTabSpec("Donation");
 		tsDonation.setIndicator("", 
-				getContext().getResources().getDrawable(R.drawable.ic_menu_emoticons));
+				getContext().getResources().getDrawable(R.drawable.icons8_happy));
 		tsDonation.setContent(this);
 		tabs.addTab(tsDonation);
 		

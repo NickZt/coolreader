@@ -5542,10 +5542,15 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 		public void OnFormatEnd() {
 			log.d("readerCallback.OnFormatEnd");
 			//mEngine.hideProgress();
+			arrAllPages = null;
 			hideProgress();
+			if (arrAllPages == null) {
+				showProgress(10000,R.string.progress_please_wait);
+				CheckAllPagesLoad();
+				hideProgress();
+			}
 			drawPage();
 			scheduleSwapTask();
-			arrAllPages = null;
 		}
 		public boolean OnFormatProgress(final int percent) {
 			if ( enable_progress_callback ) {
@@ -5576,7 +5581,11 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 				doc.resize(internalDX, internalDY);
 				hideProgress();
 			}
-			arrAllPages = null;
+			if (arrAllPages == null) {
+				showProgress(10000,R.string.progress_please_wait);
+				CheckAllPagesLoad();
+				hideProgress();
+			}
 		}
 		public void OnLoadFileError(String message) {
 			log.d("readerCallback.OnLoadFileError(" + message + ")");
@@ -5976,6 +5985,10 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 								goToPage(pageNumber);
 							}
 							@Override
+							public void onOkPage(String s) {
+								goToPage(pageNumber);
+							}
+							@Override
 							public void onCancel() {
 							}
 						});
@@ -5998,11 +6011,17 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 							@Override
 							public boolean validate(String s) {
 								percent = Integer.valueOf(s);
-								return percent>=0 && percent<=100;
+								//return percent>=0 && percent<=100;
+								return percent>=0;
 							}
 							@Override
 							public void onOk(String s) {
+								if (percent>=0 && percent<=100)
 								goToPercent(percent);
+							}
+							@Override
+							public void onOkPage(String s) {
+								goToPage(percent);
 							}
 							@Override
 							public void onCancel() {

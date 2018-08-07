@@ -73,7 +73,9 @@ my %ic_actions_list=(
         'cr3_translate-48x48-src.svg' => 'cr3_translate.png',
         'cr3_search-48x48-src.svg' => 'cr3_search.png',
         'cr3_bookmark_border-48x48-src.svg' => 'cr3_bookmark_border.png',
-        'cr3_exit_to_app-48x48-src.svg' => 'cr3_exit_to_app.png'
+        'cr3_exit_to_app-48x48-src.svg' => 'cr3_exit_to_app.png',
+        'blue_book-48x48-src.svg' => 'blue_book.png',
+        'gray_book-48x48-src.svg' => 'gray_book.png'
 );
 
 my %ic_menu_list=(

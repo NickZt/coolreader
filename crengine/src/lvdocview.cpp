@@ -977,18 +977,18 @@ void LVDocView::drawCoverTo(LVDrawBuf * drawBuf, lvRect & rc) {
     CRLog::trace("drawCoverTo");
 	if (rc.width() < 130 || rc.height() < 130)
 		return;
-	int base_font_size = 16;
+	int base_font_size = 20; //16;
 	int w = rc.width();
 	if (w < 200)
-		base_font_size = 16;
+		base_font_size = 20; //16;
 	else if (w < 300)
-		base_font_size = 18;
+		base_font_size = 22; //18;
 	else if (w < 500)
-		base_font_size = 20;
+		base_font_size = 24; //20;
 	else if (w < 700)
-		base_font_size = 22;
+		base_font_size = 26; //22;
 	else
-		base_font_size = 24;
+		base_font_size = 28; // 24;
 	//CRLog::trace("drawCoverTo() - loading fonts...");
 	LVFontRef author_fnt(fontMan->GetFont(base_font_size, 700, false,
             css_ff_serif, cs8("Times New Roman")));

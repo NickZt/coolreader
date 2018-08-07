@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import org.coolreader.CoolReader;
 import org.coolreader.Dictionaries;
 import org.coolreader.Dictionaries.DictInfo;
 import org.coolreader.R;
@@ -1351,6 +1352,17 @@ public class BaseActivity extends Activity implements Settings {
 	
 	public void setSettings(Properties settings, int delayMillis, boolean notify) {
 		mSettingsManager.setSettings(settings, delayMillis, notify);
+		//plotn: restore recent and dirs
+		//plotn: restore recent and dirs
+		if (this instanceof CoolReader) {
+			CoolReader cr = (CoolReader) this;
+			if (cr.mHomeFrame != null) {
+				if (cr.mHomeFrame.lastRecentFiles != null) cr.mHomeFrame.lastRecentFiles.clear();
+				cr.mHomeFrame.refreshRecentBooks();
+				cr.mHomeFrame.refreshFileSystemFolders();
+			}
+
+		}
 	}
 	
 	public void notifySettingsChanged() {

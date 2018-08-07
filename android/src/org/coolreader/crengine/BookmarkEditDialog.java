@@ -100,7 +100,7 @@ public class BookmarkEditDialog extends BaseDialog {
 		//else
 		//	mBookmark = bookmark;
 		if (!isNew) {
-			setThirdButtonImage(R.drawable.cr3_button_remove, R.string.mi_bookmark_delete);
+			setThirdButtonImage(R.drawable.icons8_minus, R.string.mi_bookmark_delete);
 		}
 		boolean isComment = bookmark.getType()==Bookmark.TYPE_COMMENT;
 		boolean isCorrection = bookmark.getType()==Bookmark.TYPE_CORRECTION;

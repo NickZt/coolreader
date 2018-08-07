@@ -1103,7 +1103,7 @@ public class FileBrowser extends LinearLayout implements FileInfoChangeListener 
 					else if (item.isOPDSRoot() || item.isOPDSDir())
 						image.setImageResource(Utils.resolveResourceIdByAttr(mActivity, R.attr.cr3_browser_folder_opds_drawable, R.drawable.cr3_browser_folder_opds));
 					else if (item.isOnlineCatalogPluginDir())
-						image.setImageResource(R.drawable.plugins_logo_litres);
+						image.setImageResource(R.drawable.litres);
 					else if (item.isSearchShortcut())
 						image.setImageResource(Utils.resolveResourceIdByAttr(mActivity, R.attr.cr3_browser_find_drawable, R.drawable.cr3_browser_find));
 					else if ( item.isRecentDir() )

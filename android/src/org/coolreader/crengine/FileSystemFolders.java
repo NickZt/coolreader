@@ -65,6 +65,7 @@ public class FileSystemFolders extends FileInfoChangeSource {
     }
 
     public ArrayList<FileInfo> getFileSystemFolders() {
+        if (favoriteFolders==null) return null;
         return updateEntries(favoriteFolders);
     }
 

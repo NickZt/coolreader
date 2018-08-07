@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.coolreader.CoolReader;
+import org.coolreader.R;
 import org.coolreader.db.CRDBService;
 
 import android.graphics.Bitmap;
@@ -12,6 +14,7 @@ import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
@@ -21,7 +24,17 @@ import android.widget.ImageView;
 public class CoverpageManager {
 
 	public static final Logger log = L.create("cp");
-	
+
+	public CoolReader getmCoolReader() {
+		return mCoolReader;
+	}
+
+	public void setmCoolReader(CoolReader mCoolReader) {
+		this.mCoolReader = mCoolReader;
+	}
+
+	private CoolReader mCoolReader;
+
 	public static class ImageItem {
 		public FileInfo file;
 		public int maxWidth;
@@ -632,6 +645,11 @@ public class CoverpageManager {
 							drawShadow(canvas, rc, shadowRect);
 						}
 						return;
+					} else {
+						log.d("Image for " + book + " is found in cache, drawing...");
+						Bitmap bmp = ((BitmapDrawable) CoverpageManager.this.getmCoolReader().getApplicationContext().getResources()
+								.getDrawable(R.drawable.icons8_book_2)).getBitmap();
+						canvas.drawBitmap(bmp, null, rc, defPaint);
 					}
 				}
 				log.d("Image for " + book + " is not found in cache, scheduling generation...");

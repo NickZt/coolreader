@@ -121,7 +121,7 @@ public class CoolReader extends BaseActivity
 	private View mBrowserTitleBar;
 	private CRToolBar mBrowserToolBar;
 	private BrowserViewLayout mBrowserFrame;
-	CRRootView mHomeFrame;
+	public CRRootView mHomeFrame;
 	private Engine mEngine;
 
 	public HashMap<String, UserDicEntry> getmUserDic() {
@@ -832,7 +832,7 @@ public class CoolReader extends BaseActivity
 	}
 
 	private void setCurrentFrame(ViewGroup newFrame) {
-		if (mCurrentFrame != newFrame) {
+        if (mCurrentFrame != newFrame) {
 			mPreviousFrame = mCurrentFrame;
 			log.i("New current frame: " + newFrame.getClass().toString());
 			mCurrentFrame = newFrame;
@@ -843,6 +843,7 @@ public class CoolReader extends BaseActivity
 			if (mCurrentFrame == mHomeFrame) {
 				// update recent books
 				mHomeFrame.refreshRecentBooks();
+				mHomeFrame.refreshFileSystemFolders();
 				setLastLocationRoot();
 				mCurrentFrame.invalidate();
 			}

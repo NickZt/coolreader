@@ -24,6 +24,7 @@ public class GotoPageDialog extends BaseDialog {
 	public interface GotoPageHandler {
 		boolean validate(String s) throws Exception;
 		void onOk(String s) throws Exception;
+		void onOkPage(String s) throws Exception;
 		void onCancel();
 	};
 
@@ -157,7 +158,7 @@ public class GotoPageDialog extends BaseDialog {
 			}
 			try {
 				if ( handler.validate(value) )
-					handler.onOk(value);
+					handler.onOkPage(value);
 				else
 					handler.onCancel();
 			} catch ( Exception e ) {

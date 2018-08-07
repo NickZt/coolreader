@@ -35,12 +35,13 @@ public class CRRootView extends ViewGroup implements CoverpageReadyListener {
 	private int coverHeight;
 	private BookInfo currentBook;
 	private CoverpageReadyListener coverpageListener;
+	public ArrayList<FileInfo> lastRecentFiles = new ArrayList<FileInfo>();
 	public CRRootView(CoolReader activity) {
 		super(activity);
 		this.mActivity = activity;
 		this.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 		this.mCoverpageManager = Services.getCoverpageManager();
-
+		this.mCoverpageManager.setmCoolReader(mActivity);
 
 		int screenHeight = mActivity.getWindowManager().getDefaultDisplay().getHeight();
 		int screenWidth = mActivity.getWindowManager().getDefaultDisplay().getWidth();
@@ -169,6 +170,19 @@ public class CRRootView extends ViewGroup implements CoverpageReadyListener {
 	
 	private final static int MAX_RECENT_BOOKS = 12;
 	private void updateRecentBooks(ArrayList<BookInfo> books) {
+		boolean bNotNeeded = false;
+		if (lastRecentFiles.size()==books.size()) {
+			bNotNeeded = true;
+			for (int i=0;i<lastRecentFiles.size();i++) {
+				if (!lastRecentFiles.get(i).equals(books.get(i).getFileInfo())) {
+					bNotNeeded = false;
+				}
+			}
+		}
+		if (bNotNeeded) return;
+
+		lastRecentFiles.clear();
+		for (int i=0;i<books.size();i++) lastRecentFiles.add(books.get(i).getFileInfo());
 		ArrayList<FileInfo> files = new ArrayList<FileInfo>();
 		for (int i = 1; i <= MAX_RECENT_BOOKS && i < books.size(); i++)
 			files.add(books.get(i).getFileInfo());
@@ -234,7 +248,7 @@ public class CRRootView extends ViewGroup implements CoverpageReadyListener {
 		BackgroundThread.instance().postGUI(new Runnable() {
 			@Override
 			public void run() {
-				if (Services.getHistory() != null && mActivity.getDB() != null)
+				if (Services.getHistory() != null && mActivity.getDB() != null) {
 					Services.getHistory().getOrLoadRecentBooks(mActivity.getDB(), new CRDBService.RecentBooksLoadingCallback() {
 						@Override
 						public void onRecentBooksListLoaded(ArrayList<BookInfo> bookList) {
@@ -242,6 +256,7 @@ public class CRRootView extends ViewGroup implements CoverpageReadyListener {
 							updateRecentBooks(bookList);
 						}
 					});
+				}
 			}
 		});
 	}
@@ -300,7 +315,7 @@ public class CRRootView extends ViewGroup implements CoverpageReadyListener {
 					}
 				});
 			} else if (item.isOnlineCatalogPluginDir()) {
-				icon.setImageResource(R.drawable.plugins_logo_litres);
+				icon.setImageResource(R.drawable.litres);
 				label.setText(item.filename);
 				view.setOnLongClickListener(new OnLongClickListener() {
 					@Override
@@ -382,8 +397,7 @@ public class CRRootView extends ViewGroup implements CoverpageReadyListener {
 	}
 
 	private void updateFilesystems(List<FileInfo> dirs) {
-
-		//mActivity.showToast("cnt "+dirs.size());
+		if (dirs==null) return;
 		if (dirs.size()!=0) {
 			LayoutInflater inflater = LayoutInflater.from(mActivity);
 			mFilesystemScroll.removeAllViews();

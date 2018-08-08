@@ -9,8 +9,13 @@ android {
         // When new version released, version code must be incremented at least by 8
         // for compatibility with ABI versioning of split apk (see below).
 <<<<<<< HEAD
+<<<<<<< HEAD
         versionCode 2041
         versionName "3.2.4-1"
+=======
+        versionCode 2061
+        versionName "3.2.6-1"
+>>>>>>> 60e5bc6c... update version, candidate for Market
 =======
         versionCode 2061
         versionName "3.2.6-1"

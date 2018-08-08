@@ -5,7 +5,11 @@
       package="org.coolreader"
       android:installLocation="auto"
 <<<<<<< HEAD
+<<<<<<< HEAD
       android:versionName="3.2.4-1" android:versionCode="2041">
+=======
+      android:versionName="3.2.6-1" android:versionCode="2061">
+>>>>>>> 60e5bc6c... update version, candidate for Market
 =======
       android:versionName="3.2.6-1" android:versionCode="2061">
 >>>>>>> 60e5bc6c... update version, candidate for Market

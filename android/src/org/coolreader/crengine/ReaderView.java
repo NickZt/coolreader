@@ -2467,90 +2467,6 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 			default:
 				// do nothing
 				break;
-			case DCMD_SAVE_SETTINGS_TO_GD:
-				log.i("Save settings to GD");
-				((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_SAVE_SETTINGS, null);
-				break;
-			case DCMD_LOAD_SETTINGS_FROM_GD:
-				log.i("Load settings from GD");
-				((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_LOAD_SETTINGS_LIST, null);
-				break;
-			case DCMD_SAVE_READING_POS:
-				log.i("Save reading pos to GD");
-				((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_SAVE_READING_POS, this);
-				break;
-			case DCMD_LOAD_READING_POS:
-				log.i("Load reading pos from GD");
-				((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_LOAD_READING_POS_LIST, this);
-				break;
-			case DCMD_SAVE_BOOKMARKS:
-				log.i("Save bookmarks to GD");
-				((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_SAVE_BOOKMARKS, this);
-				break;
-			case DCMD_LOAD_BOOKMARKS:
-				log.i("Load bookmarks from GD");
-				((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_LOAD_BOOKMARKS_LIST, this);
-				break;
-			case DCMD_SAVE_CURRENT_BOOK_TO_GD:
-				log.i("Save current book to GD");
-				((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_SAVE_CURRENT_BOOK_TO_GD, this);
-				break;
-			case DCMD_OPEN_BOOK_FROM_GD:
-				log.i("Open book from GD");
-				((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_LOAD_BOOKS_FOLDER_CONTENTS, this);
-				break;
-			case DCMD_GD_MENU:
-				log.i("GD menu");
-				ReaderAction[] actions = {
-						ReaderAction.SAVE_SETTINGS_TO_GD,
-						ReaderAction.LOAD_SETTINGS_FROM_GD,
-						ReaderAction.SAVE_READING_POS,
-						ReaderAction.LOAD_READING_POS,
-						ReaderAction.SAVE_BOOKMARKS,
-						ReaderAction.LOAD_BOOKMARKS,
-						ReaderAction.SAVE_CURRENT_BOOK_TO_GD,
-						ReaderAction.OPEN_BOOK_FROM_GD
-				};
-				mActivity.showActionsPopupMenu(actions, new CRToolBar.OnActionHandler() {
-					@Override
-					public boolean onActionSelected(ReaderAction item) {
-						if (item == ReaderAction.SAVE_SETTINGS_TO_GD) {
-							log.i("Save settings to GD");
-							((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_SAVE_SETTINGS, null);
-							return true;
-						} else if (item == ReaderAction.LOAD_SETTINGS_FROM_GD) {
-							log.i("Load settings from GD");
-							((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_LOAD_SETTINGS_LIST, null);
-							return true;
-						} else if (item == ReaderAction.SAVE_READING_POS) {
-							log.i("Save reading pos to GD");
-							((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_SAVE_READING_POS, ReaderView.this);
-							return true;
-						} else if (item == ReaderAction.LOAD_READING_POS) {
-							log.i("Load reading pos from GD");
-							((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_LOAD_READING_POS_LIST, ReaderView.this);
-							return true;
-						} else if (item == ReaderAction.SAVE_BOOKMARKS) {
-							log.i("Save bookmarks to GD");
-							((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_SAVE_BOOKMARKS, ReaderView.this);
-							return true;
-						} else if (item == ReaderAction.LOAD_BOOKMARKS) {
-							log.i("Load bookmarks from GD");
-							((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_LOAD_BOOKMARKS_LIST, ReaderView.this);
-							return true;
-						} else if (item == ReaderAction.SAVE_CURRENT_BOOK_TO_GD) {
-							log.i("Save current book to GD");
-							((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_SAVE_CURRENT_BOOK_TO_GD, ReaderView.this);
-							return true;
-						} else if (item == ReaderAction.OPEN_BOOK_FROM_GD) {
-							log.i("Open book from GD");
-							((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_LOAD_BOOKS_FOLDER_CONTENTS, ReaderView.this);
-							return true;
-						}
-						return false;
-					}
-				});
-				break;
 			case DCMD_FONTS_MENU:
 				log.i("Fonts menu");
 				ReaderAction[] fonts_actions = {
@@ -5283,19 +5199,6 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 									}
 								}
 							}}, delayMillis);
-						int autosaveInterval = (getSettings().getInt(ReaderView.PROP_SAVE_POS_TO_GD_TIMEOUT, 0))*1000*60;
-						if (autosaveInterval > 0)
-							BackgroundThread.instance().postGUI(new Runnable() {
-								@Override
-								public void run() {
-									if (mylastSavePositionTaskId == lastSavePositionTaskId) {
-										if (bookInfo != null) {
-											log.v("saving last position to google drive");
-											((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).
-													mGoogleDriveTools.REQUEST_CODE_SAVE_READING_POS_QUIET, ReaderView.this);
-										}
-									}
-								}}, autosaveInterval);
 					}
 				}
 			}

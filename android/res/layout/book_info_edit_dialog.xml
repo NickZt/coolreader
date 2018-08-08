@@ -148,18 +148,6 @@
 					android:layout_marginLeft="2dip"
 					android:layout_marginRight="2dip"
 					>
-					<ImageButton android:id="@+id/save_to_gd"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:layout_marginTop="5dip"
-						android:layout_marginBottom="5dip"
-						android:layout_marginLeft="5dip"
-						android:layout_marginRight="5dip"
-						android:src="@drawable/icons8_book_to_gd"
-						android:focusable="false"
-						android:focusableInTouchMode="false"
-						android:background="@null"
-						android:contentDescription="@string/save_current_book_to_gd"/>
 					<TextView
 						android:id="@+id/lbl_comment_from_cb_capt"
 						style="@style/TextAppearance.Medium"

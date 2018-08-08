@@ -744,8 +744,7 @@ public class CRRootView extends ViewGroup implements CoverpageReadyListener {
 			ReaderAction.RECENT_BOOKS,
 			ReaderAction.USER_MANUAL,
 			ReaderAction.OPTIONS,
-			ReaderAction.OPEN_BOOK_FROM_GD,
-			ReaderAction.EXIT,	
+			ReaderAction.EXIT,
 		};
 		mActivity.showActionsPopupMenu(actions, new OnActionHandler() {
 			@Override
@@ -767,10 +766,6 @@ public class CRRootView extends ViewGroup implements CoverpageReadyListener {
 					return true;
 				} else if (item == ReaderAction.OPTIONS) {
 					mActivity.showBrowserOptionsDialog();
-					return true;
-				}
-				else if (item == ReaderAction.OPEN_BOOK_FROM_GD) {
-					mActivity.mGoogleDriveTools.signInAndDoAnAction(((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_LOAD_BOOKS_FOLDER_CONTENTS, this);
 					return true;
 				}
 				return false;

@@ -275,17 +275,7 @@ public class BookInfoEditDialog extends BaseDialog {
 			}
 		});
 
-		ImageButton btnSaveToGD = (ImageButton)view.findViewById(R.id.save_to_gd);
-
-		btnSaveToGD.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				((CoolReader)mActivity).mGoogleDriveTools.signInAndDoAnAction(
-						((CoolReader)mActivity).mGoogleDriveTools.REQUEST_CODE_SAVE_CURRENT_BOOK_TO_GD, BookInfoEditDialog.this);
-			}
-		});
-
-        edTitle = (EditText)view.findViewById(R.id.book_title);
+		edTitle = (EditText)view.findViewById(R.id.book_title);
         edSeriesName = (EditText)view.findViewById(R.id.book_series_name);
         edSeriesNumber = (EditText)view.findViewById(R.id.book_series_number);
         rbBookRating = (RatingBar)view.findViewById(R.id.book_rating);

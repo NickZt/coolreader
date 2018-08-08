@@ -4,7 +4,6 @@ package org.coolreader;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.lang.reflect.Field;
@@ -30,7 +29,6 @@ import org.coolreader.crengine.Engine;
 import org.coolreader.crengine.ErrorDialog;
 import org.coolreader.crengine.FileBrowser;
 import org.coolreader.crengine.FileInfo;
-import org.coolreader.crengine.GoogleDriveTools;
 import org.coolreader.crengine.History.BookInfoLoadedCallack;
 import org.coolreader.crengine.InterfaceTheme;
 import org.coolreader.crengine.L;
@@ -54,8 +52,6 @@ import org.koekak.android.ebookdownloader.SonyBookSelector;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -71,7 +67,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -167,8 +162,6 @@ public class CoolReader extends BaseActivity
 	private static final int PERM_REQUEST_STORAGE_CODE = 1;
 	private static final int PERM_REQUEST_READ_PHONE_STATE_CODE = 2;
 
-	public GoogleDriveTools mGoogleDriveTools = null;
-
 	public String getAndroid_id() {
 		return android_id;
 	}
@@ -245,7 +238,6 @@ public class CoolReader extends BaseActivity
 
 		N2EpdController.n2MainActivity = this;
 
-		mGoogleDriveTools = new GoogleDriveTools(this);
 		android_id = Secure.getString(getApplicationContext().getContentResolver(),
 				Secure.ANDROID_ID);
 
@@ -1163,11 +1155,7 @@ public class CoolReader extends BaseActivity
     	if (mDonationService != null) {
     		mDonationService.onActivityResult(requestCode, resultCode, intent);
     	}
-
-        if (mGoogleDriveTools != null) {
-			mGoogleDriveTools.onActivityResult(requestCode, resultCode, intent);
-        }
-	}
+    }
 	
 	public void setDict( String id ) {
 		mDictionaries.setDict(id);

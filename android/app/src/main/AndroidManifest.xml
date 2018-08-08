@@ -37,10 +37,6 @@
         android:resizeableActivity="true"
         >
 
-        <meta-data
-        android:name="com.google.android.geo.API_KEY"
-        android:value="AIzaSyCr_nWVRATHYaPyTn0wxpjpy4QR2eTEvB0" />
-
         <meta-data android:name="android.max_aspect" android:value="2.1" />
 
         <meta-data

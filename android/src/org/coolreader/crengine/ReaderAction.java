@@ -147,16 +147,7 @@ public class ReaderAction {
 	public final static ReaderAction PREV_CHAPTER = new ReaderAction("PREV_CHAPTER", R.string.action_chapter_prev, ReaderCommand.DCMD_MOVE_BY_CHAPTER, -1, NEXT_CHAPTER).setIconId(R.drawable.icons8_document_up_ch);
 	public final static ReaderAction EXIT = new ReaderAction("EXIT", R.string.action_exit, ReaderCommand.DCMD_EXIT, 0, R.id.cr3_mi_exit, null ).setIconId(R.drawable.cr3_viewer_exit);
 
-	public final static ReaderAction SAVE_SETTINGS_TO_GD = new ReaderAction("SAVE_SETTINGS_TO_GD", R.string.save_settings_to_gd, ReaderCommand.DCMD_SAVE_SETTINGS_TO_GD, 0, null).setIconId(R.drawable.icons8_settings_to_gd);
-	public final static ReaderAction LOAD_SETTINGS_FROM_GD = new ReaderAction("LOAD_SETTINGS_FROM_GD", R.string.load_settings_from_gd, ReaderCommand.DCMD_LOAD_SETTINGS_FROM_GD, 0, SAVE_SETTINGS_TO_GD).setIconId(R.drawable.icons8_settings_from_gd);
-	public final static ReaderAction SAVE_READING_POS = new ReaderAction("SAVE_READING_POS", R.string.save_reading_pos_to_gd, ReaderCommand.DCMD_SAVE_READING_POS, 0, null).setIconId(R.drawable.icons8_position_to_gd);
-	public final static ReaderAction LOAD_READING_POS = new ReaderAction("LOAD_READING_POS", R.string.load_reading_pos_from_gd, ReaderCommand.DCMD_LOAD_READING_POS, 0, SAVE_READING_POS).setIconId(R.drawable.icons8_position_from_gd);
-	public final static ReaderAction SAVE_BOOKMARKS = new ReaderAction("SAVE_BOOKMARKS", R.string.save_bookmarks_to_gd, ReaderCommand.DCMD_SAVE_BOOKMARKS, 0, null).setIconId(R.drawable.icons8_bookmarks_to_gd);
-	public final static ReaderAction LOAD_BOOKMARKS = new ReaderAction("LOAD_BOOKMARKS", R.string.load_bookmarks_from_gd, ReaderCommand.DCMD_LOAD_BOOKMARKS, 0, SAVE_BOOKMARKS).setIconId(R.drawable.icons8_bookmarks_from_gd);
-    public final static ReaderAction GD_MENU = new ReaderAction("GD_MENU", R.string.gd_menu, ReaderCommand.DCMD_GD_MENU, 0, null).setIconId(R.drawable.icons8_google_drive_2);
-    public final static ReaderAction SAVE_CURRENT_BOOK_TO_GD = new ReaderAction("SAVE_CURRENT_BOOK_TO_GD", R.string.save_current_book_to_gd, ReaderCommand.DCMD_SAVE_CURRENT_BOOK_TO_GD, 0, null).setIconId(R.drawable.icons8_book_to_gd);
-	public final static ReaderAction OPEN_BOOK_FROM_GD = new ReaderAction("OPEN_BOOK_FROM_GD", R.string.open_book_from_gd, ReaderCommand.DCMD_OPEN_BOOK_FROM_GD, 0, SAVE_CURRENT_BOOK_TO_GD).setIconId(R.drawable.icons8_book_from_gd);
-	public final static ReaderAction FONTS_MENU = new ReaderAction("FONTS_MENU", R.string.fonts_menu, ReaderCommand.DCMD_FONTS_MENU, 0, GD_MENU).setIconId(R.drawable.icons8_type_filled_2);
+	public final static ReaderAction FONTS_MENU = new ReaderAction("FONTS_MENU", R.string.fonts_menu, ReaderCommand.DCMD_FONTS_MENU, 0, null).setIconId(R.drawable.icons8_type_filled_2);
 	public final static ReaderAction SAVE_BOOKMARK_LAST_SEL = new ReaderAction("SAVE_BOOKMARK_LAST_SEL", R.string.save_bookmark_last_sel, ReaderCommand.DCMD_SAVE_BOOKMARK_LAST_SEL, 0, null).setIconId(R.drawable.icons8_bookmark_plus);
 	public final static ReaderAction SAVE_BOOKMARK_LAST_SEL_USER_DIC = new ReaderAction("SAVE_BOOKMARK_LAST_SEL_USER_DIC", R.string.save_bookmark_last_sel_user_dic, ReaderCommand.DCMD_SAVE_BOOKMARK_LAST_SEL_USER_DIC, 0, SAVE_BOOKMARK_LAST_SEL).setIconId(R.drawable.icons8_google_translate_save);
 	public final static ReaderAction SHOW_USER_DIC = new ReaderAction("SHOW_USER_DIC", R.string.win_title_user_dic, ReaderCommand.DCMD_SHOW_USER_DIC, 0, SHOW_DICTIONARY).setIconId(R.drawable.icons8_google_translate_user);
@@ -211,15 +202,6 @@ public class ReaderAction {
 //		AUTOSCROLL_SPEED_DECREASE,
 		TOGGLE_DICT_ONCE,
 		TOGGLE_DICT,
-		SAVE_SETTINGS_TO_GD,
-		LOAD_SETTINGS_FROM_GD,
-		SAVE_READING_POS,
-		LOAD_READING_POS,
-		SAVE_BOOKMARKS,
-		LOAD_BOOKMARKS,
-        GD_MENU,
-        SAVE_CURRENT_BOOK_TO_GD,
-		OPEN_BOOK_FROM_GD,
 		FONTS_MENU,
 		SAVE_BOOKMARK_LAST_SEL,
 		SAVE_BOOKMARK_LAST_SEL_USER_DIC,

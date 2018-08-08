@@ -5975,7 +5975,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 						1, props.pageCount, props.pageNumber,
 						new GotoPageDialog.GotoPageHandler() {
 							int pageNumber = 0;
-							@Override 
+							@Override
 							public boolean validate(String s) {
 								pageNumber = Integer.valueOf(s);
 								return pageNumber>0 && pageNumber <= props.pageCount;

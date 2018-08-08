@@ -51,11 +51,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.Toast;
-
 import com.github.johnpersano.supertoasts.library.Style;
 import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.github.johnpersano.supertoasts.library.SuperToast;
 
+@SuppressLint("Registered")
 public class BaseActivity extends Activity implements Settings {
 
 	private static final Logger log = L.create("ba");
@@ -170,8 +170,7 @@ public class BaseActivity extends Activity implements Settings {
 			WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
 			lp.alpha = 1.0f;
 			lp.dimAmount = 0.0f;
-			if (!DeviceInfo.EINK_SCREEN)
-				lp.format = DeviceInfo.PIXEL_FORMAT;
+			lp.format = DeviceInfo.PIXEL_FORMAT;
 			lp.gravity = Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL;
 			lp.horizontalMargin = 0;
 			lp.verticalMargin = 0;
@@ -191,7 +190,7 @@ public class BaseActivity extends Activity implements Settings {
 		
 		setScreenBacklightDuration(props.getInt(ReaderView.PROP_APP_SCREEN_BACKLIGHT_LOCK, 3));
 
-		setFullscreen( props.getBool(ReaderView.PROP_APP_FULLSCREEN, (DeviceInfo.EINK_SCREEN?true:false)));
+		setFullscreen( props.getBool(ReaderView.PROP_APP_FULLSCREEN, DeviceInfo.EINK_SCREEN));
 		int orientation = props.getInt(ReaderView.PROP_APP_SCREEN_ORIENTATION, 5); //(DeviceInfo.EINK_SCREEN?0:4)
 		if (orientation < 0 || orientation > 5)
 			orientation = 5;
@@ -1469,7 +1468,7 @@ public class BaseActivity extends Activity implements Settings {
 			new DefKeyAction(KeyEvent.KEYCODE_CAMERA, ReaderAction.LONG, ReaderAction.NONE),
 			new DefKeyAction(KeyEvent.KEYCODE_SEARCH, ReaderAction.NORMAL, ReaderAction.SEARCH),
 			new DefKeyAction(KeyEvent.KEYCODE_SEARCH, ReaderAction.LONG, ReaderAction.TOGGLE_SELECTION_MODE),
-			
+
 			new DefKeyAction(KeyEvent.KEYCODE_PAGE_UP, ReaderAction.NORMAL, ReaderAction.PAGE_UP),
 			new DefKeyAction(KeyEvent.KEYCODE_PAGE_UP, ReaderAction.LONG, ReaderAction.NONE),
 			new DefKeyAction(KeyEvent.KEYCODE_PAGE_UP, ReaderAction.DOUBLE, ReaderAction.NONE),
@@ -1489,7 +1488,7 @@ public class BaseActivity extends Activity implements Settings {
 			
 			new DefKeyAction(ReaderView.KEYCODE_ESCAPE, ReaderAction.NORMAL, ReaderAction.PAGE_DOWN),
 			new DefKeyAction(ReaderView.KEYCODE_ESCAPE, ReaderAction.LONG, ReaderAction.REPEAT),
-			
+
 //		    public static final int KEYCODE_PAGE_BOTTOMLEFT = 0x5d; // fwd
 //		    public static final int KEYCODE_PAGE_BOTTOMRIGHT = 0x5f; // fwd
 //		    public static final int KEYCODE_PAGE_TOPLEFT = 0x5c; // back

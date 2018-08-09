@@ -128,6 +128,24 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
     }
 
+<<<<<<< HEAD
+=======
+//    applicationVariants.all { variant ->
+//        variant.outputs.all { output ->
+//            def project = "CoolReader"
+//            def SEP = "_"
+//            def buildType = variant.variantData.variantConfiguration.buildType.name
+//            def version = variant.versionName
+//            def date = new Date();
+//            def formattedDate = date.format('yyyyMMdd_HHmm')
+//
+//            def newApkName = project + SEP + buildType + SEP + version + SEP + formattedDate + ".apk"
+//
+//            outputFileName = new File(newApkName)
+//        }
+//    }
+
+>>>>>>> 20bfb8a5... open document format support ...
     // https://developer.android.com/about/versions/marshmallow/android-6.0-changes#behavior-apache-http-client
     useLibrary 'org.apache.http.legacy'
 }

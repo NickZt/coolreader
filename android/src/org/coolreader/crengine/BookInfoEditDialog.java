@@ -361,7 +361,7 @@ public class BookInfoEditDialog extends BaseDialog {
 	}
 	
 	private void save() {
-		L.d("BokoInfoEditDialog.save()");
+		L.d("BookInfoEditDialog.save()");
 		
         FileInfo file = mBookInfo.getFileInfo();
         boolean modified = false;

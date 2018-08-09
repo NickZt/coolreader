@@ -1398,6 +1398,12 @@ public class CoolReader extends BaseActivity
 				@Override
 				public void run() {
 					book1.setReadingState(FileInfo.STATE_FINISHED);
+					BookInfo bookInfo = new BookInfo(book1);
+					CoolReader.this.getDB().saveBookInfo(bookInfo);
+					CoolReader.this.getDB().flush();
+					BookInfo bi = Services.getHistory().getBookInfo(book1);
+					if (bi != null)
+						bi.getFileInfo().setFileProperties(book1);
 				}
 			});
 		}

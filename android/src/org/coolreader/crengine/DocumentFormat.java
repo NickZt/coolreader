@@ -38,6 +38,9 @@ public enum DocumentFormat {
 	DOCX("htm.css", R.raw.htm, R.drawable.icons8_docx, false, false, 5,
 			new String[] {".docx"},
 			new String[] {}), // doc_format_docx,
+	ODT("htm.css", R.raw.htm, R.drawable.icons8_odt, false, false, 6,
+			new String[] {".odt",".odp",".ods"},
+			new String[] {}), // doc_format_odt,
 	; // doc_format_txt/html/...,
     // don't forget update getDocFormatName() when changing this enum
 	//} doc_format_t;

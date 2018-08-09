@@ -135,7 +135,10 @@ public class FileBrowser extends LinearLayout implements FileInfoChangeListener 
 			else if (item.isOnlineCatalogPluginBook())
 				showOnlineCatalogBookDialog(item);
 			else {
-				if (item.format.name().equals("DOCX")) {
+				if (
+						(item.format.name().equals("DOCX"))||
+						(item.format.name().equals("ODT"))
+				   ){
 					final FileInfo downloadDir = Services.getScanner().getDownloadDirectory();
 					File f = new File(downloadDir.pathname+"/converted/"+item.filename+".html");
 					if (f.exists()) {

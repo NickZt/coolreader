@@ -129,7 +129,10 @@ android {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 20bfb8a5... open document format support ...
 //    applicationVariants.all { variant ->
 //        variant.outputs.all { output ->
 //            def project = "CoolReader"

@@ -235,6 +235,8 @@ public class BookInfoEditDialog extends BaseDialog {
 	AuthorList authors;
 	RatingBar rbBookRating;
 	RadioGroup rgState;
+	EditText edLangFrom;
+	EditText edLangTo;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -280,7 +282,9 @@ public class BookInfoEditDialog extends BaseDialog {
         edSeriesNumber = (EditText)view.findViewById(R.id.book_series_number);
         rbBookRating = (RatingBar)view.findViewById(R.id.book_rating);
         rgState = (RadioGroup)view.findViewById(R.id.book_state);
-        int state = file.getReadingState();
+		edLangFrom = (EditText)view.findViewById(R.id.book_lang_from);
+		edLangTo = (EditText)view.findViewById(R.id.book_lang_to);
+		int state = file.getReadingState();
         int[] stateButtons = new int[] {R.id.book_state_new, R.id.book_state_toread, R.id.book_state_reading, R.id.book_state_finished};
         rgState.check(state >= 0 && state < stateButtons.length ? stateButtons[state] : R.id.book_state_new);
 
@@ -330,6 +334,8 @@ public class BookInfoEditDialog extends BaseDialog {
         edSeriesName.setText(file.series);
         if (file.series != null && file.series.trim().length() > 0 && file.seriesNumber > 0)
         	edSeriesNumber.setText(String.valueOf(file.seriesNumber));
+        edLangFrom.setText(file.lang_from);
+		edLangTo.setText(file.lang_to);
         LinearLayout llBookAuthorsList = (LinearLayout)view.findViewById(R.id.book_authors_list);
         authors = new AuthorList(llBookAuthorsList, file.authors);
         rbBookRating.setRating(file.getRate());
@@ -368,7 +374,16 @@ public class BookInfoEditDialog extends BaseDialog {
         modified = file.setTitle(edTitle.getText().toString().trim()) || modified;
         modified = file.setAuthors(authors.getAuthorsList()) || modified;
         modified = file.setSeriesName(edSeriesName.getText().toString().trim()) || modified;
-        int number = 0;
+        modified = file.setLangFrom(edLangFrom.getText().toString().trim()) || modified;
+        modified = file.setLangTo(edLangTo.getText().toString().trim()) || modified;
+		if (mActivity.getReaderView()!=null) {
+			if (mActivity.getReaderView().getBookInfo()!=null) {
+				BookInfo book = mActivity.getReaderView().getBookInfo();
+				book.getFileInfo().lang_from = edLangFrom.getText().toString().trim();
+				book.getFileInfo().lang_to = edLangTo.getText().toString().trim();
+			}
+		}
+		int number = 0;
         if (file.series != null && file.series.length() > 0) {
     	    String numberString = edSeriesNumber.getText().toString().trim();
     	    try {
@@ -393,7 +408,7 @@ public class BookInfoEditDialog extends BaseDialog {
 			state = FileInfo.STATE_FINISHED;
         modified = file.setReadingState(state) || modified;
         if (modified) {
-        	mActivity.getDB().saveBookInfo(mBookInfo);
+			mActivity.getDB().saveBookInfo(mBookInfo);
         	mActivity.getDB().flush();
         	BookInfo bi = Services.getHistory().getBookInfo(file);
         	if (bi != null)

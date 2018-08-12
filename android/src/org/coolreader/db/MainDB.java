@@ -52,7 +52,9 @@ public class MainDB extends BaseDB {
 					"create_time INTEGER," +
 					"last_access_time INTEGER, " +
 					"flags INTEGER DEFAULT 0, " +
-					"language VARCHAR DEFAULT NULL" +
+					"language VARCHAR DEFAULT NULL, " +
+					"lang_from VARCHAR DEFAULT NULL, " +
+					"lang_to VARCHAR DEFAULT NULL " +
 					")");
 			execSQL("CREATE INDEX IF NOT EXISTS " +
 					"book_folder_index ON book (folder_fk) ");
@@ -160,6 +162,8 @@ public class MainDB extends BaseDB {
 		execSQL("CREATE INDEX IF NOT EXISTS " +
 				"user_dic_index ON user_dic (dic_word) ");
 		execSQLIgnoreErrors("ALTER TABLE bookmark ADD COLUMN link_pos VARCHAR DEFAULT NULL");
+		execSQLIgnoreErrors("ALTER TABLE book ADD COLUMN lang_from VARCHAR DEFAULT NULL");
+		execSQLIgnoreErrors("ALTER TABLE book ADD COLUMN lang_to VARCHAR DEFAULT NULL");
 		dumpStatistics();
 		
 		return true;
@@ -1478,6 +1482,8 @@ public class MainDB extends BaseDB {
 			add("create_time", (long)newValue.createTime, (long)oldValue.createTime);
 			add("flags", (long)newValue.flags, (long)oldValue.flags);
 			add("language", newValue.language, oldValue.language);
+			add("lang_from", newValue.lang_from, oldValue.lang_from);
+			add("lang_to", newValue.lang_to, oldValue.lang_to);
 			if (fields.size() == 0)
 				vlog.v("QueryHelper: no fields to update");
 		}
@@ -1507,7 +1513,7 @@ public class MainDB extends BaseDB {
 		"s.name as series_name, " +
 		"series_number, " +
 		"format, filesize, arcsize, " +
-		"create_time, last_access_time, flags, language ";
+		"create_time, last_access_time, flags, language, lang_from, lang_to ";
 	
 	private static final String READ_FILEINFO_SQL = 
 		"SELECT " +
@@ -1536,6 +1542,8 @@ public class MainDB extends BaseDB {
 		fileInfo.lastAccessTime = rs.getInt(i++);
 		fileInfo.flags = rs.getInt(i++);
 	    fileInfo.language = rs.getString(i++);
+		fileInfo.lang_from = rs.getString(i++);
+		fileInfo.lang_to = rs.getString(i++);
 		fileInfo.isArchive = fileInfo.arcname!=null; 
 	}
 

@@ -343,7 +343,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 	private final CoolReader mActivity;
 	private final Engine mEngine;
 
-	private Selection lastSelection;
+	public Selection lastSelection;
 	private Bookmark hyplinkBookmark;
 
 	private BookInfo mBookInfo;
@@ -1854,6 +1854,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 				if ( fi.language != null) {
 					items.add("book.language=" + fi.language);
 				}
+                items.add("book.translation=" + fi.lang_from + " -> " + fi.lang_to);
 				BookInfoDialog dlg = new BookInfoDialog(mActivity, items);
 				dlg.show();
 			}

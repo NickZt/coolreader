@@ -42,6 +42,7 @@ public class BookInfoDialog extends BaseDialog {
 		mLabelMap.put("book.title", R.string.book_info_book_title);
 		mLabelMap.put("book.series", R.string.book_info_book_series_name);
 		mLabelMap.put("book.language", R.string.book_info_book_language);
+		mLabelMap.put("book.translation", R.string.book_info_book_translation);
 	}
 	
 	private void addItem(TableLayout table, String item) {

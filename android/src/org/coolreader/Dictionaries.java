@@ -1,6 +1,7 @@
 package org.coolreader;
 
 import org.coolreader.crengine.BaseActivity;
+import org.coolreader.crengine.BookInfo;
 import org.coolreader.crengine.DeviceInfo;
 import org.coolreader.crengine.L;
 import org.coolreader.crengine.Logger;
@@ -11,11 +12,31 @@ import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.util.DisplayMetrics;
 
+import com.abbyy.mobile.lingvo.api.MinicardContract;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Dictionaries {
+
+	public static class PopupFrameMetric {
+		public final int Height;
+		public final int Gravity;
+
+		PopupFrameMetric(DisplayMetrics metrics, int selectionTop, int selectionBottom) {
+			final int screenHeight = metrics.heightPixels;
+			final int topSpace = selectionTop;
+			final int bottomSpace = metrics.heightPixels - selectionBottom;
+			final boolean showAtBottom = bottomSpace >= topSpace;
+			final int space = (showAtBottom ? bottomSpace : topSpace) - metrics.densityDpi / 12;
+			final int maxHeight = Math.min(metrics.densityDpi * 20 / 12, screenHeight * 2 / 3);
+			final int minHeight = Math.min(metrics.densityDpi * 10 / 12, screenHeight * 2 / 3);
+
+			Height = Math.max(minHeight, Math.min(maxHeight, space));
+			Gravity = showAtBottom ? android.view.Gravity.BOTTOM : android.view.Gravity.TOP;
+		}
+	}
 
 	private Activity mActivity;
 
@@ -82,6 +103,7 @@ public class Dictionaries {
 		new DictInfo("Dictan", "Dictan Dictionary", "info.softex.dictan", null, Intent.ACTION_VIEW, 2),
 		new DictInfo("FreeDictionary.org", "Free Dictionary . org", "org.freedictionary", "org.freedictionary.MainActivity", "android.intent.action.VIEW", 0),
 		new DictInfo("ABBYYLingvo", "ABBYY Lingvo", "com.abbyy.mobile.lingvo.market", null /*com.abbyy.mobile.lingvo.market.MainActivity*/, "com.abbyy.mobile.lingvo.intent.action.TRANSLATE", 0).setDataKey("com.abbyy.mobile.lingvo.intent.extra.TEXT"),
+		new DictInfo("ABBYYLingvo (minicard)", "ABBYY Lingvo (minicard)", "com.abbyy.mobile.lingvo.market", null, "com.abbyy.mobile.lingvo.intent.action.TRANSLATE", 5).setDataKey("com.abbyy.mobile.lingvo.intent.extra.TEXT"),
 		//new DictInfo("ABBYYLingvoLive", "ABBYY Lingvo Live", "com.abbyy.mobile.lingvolive", null, "com.abbyy.mobile.lingvo.intent.action.TRANSLATE", 0).setDataKey("com.abbyy.mobile.lingvo.intent.extra.TEXT"),
 		new DictInfo("LingoQuizLite", "Lingo Quiz Lite", "mnm.lite.lingoquiz", "mnm.lite.lingoquiz.ExchangeActivity", "lingoquiz.intent.action.ADD_WORD", 0).setDataKey("EXTRA_WORD"),
 		new DictInfo("LingoQuiz", "Lingo Quiz", "mnm.lingoquiz", "mnm.lingoquiz.ExchangeActivity", "lingoquiz.intent.action.ADD_WORD", 0).setDataKey("EXTRA_WORD"),
@@ -263,18 +285,6 @@ public class Dictionaries {
 			intent4.setType("text/plain");
 			intent4.putExtra(android.content.Intent.EXTRA_SUBJECT, "");
 			intent4.putExtra(android.content.Intent.EXTRA_TEXT, s);
-			//List<ResolveInfo> resInfo = mActivity.getPackageManager().queryIntentActivities(intent4, 0);
-			//for (resInfo : mActivity.getPackageManager().queryIntentActivities(intent4, 0)) {
-			//	if (resInfo.
-			//};
-			//startActivity(Intent.createChooser(intent4, null));
-			//intent4.setAction(Intent.ACTION_VIEW);
-			//intent4.putExtra("key_text_input", "What time is it?");
-			//intent4.putExtra("key_text_output", "");
-			//intent4.putExtra("key_language_from", "en");
-			//intent4.putExtra("key_language_to", "es");
-			//intent4.putExtra("key_suggest_translation", "");
-			//intent4.putExtra("key_from_floating_window", false);
 			intent4.setComponent(new ComponentName(curDict.packageName, curDict.className));
 			try
 			{
@@ -283,8 +293,72 @@ public class Dictionaries {
 				throw new DictionaryException("Dictionary \"" + curDict.name + "\" is not installed");
 			}
 			break;
+		case 5:
+			Intent intent5 = new Intent(curDict.action);
+			final DisplayMetrics metrics = new DisplayMetrics();
+			mActivity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+			int selectionTop = 0;
+			int selectionBottom = 0;
+			if (mActivity instanceof CoolReader) {
+				CoolReader cr = (CoolReader) mActivity;
+				if (cr.getReaderView()!=null) {
+					if (cr.getReaderView().lastSelection != null) {
+						selectionTop = cr.getReaderView().lastSelection.startY;
+						selectionBottom = cr.getReaderView().lastSelection.endY;
+					}
+					if (cr.getReaderView().getBookInfo()!=null) {
+						BookInfo book = cr.getReaderView().getBookInfo();
+						String lang = book.getFileInfo().lang_to;
+						if (lang==null) lang = "";
+						if (lang.equals("")) lang = "ru";
+						String langf = book.getFileInfo().lang_from;
+						if (langf==null) langf = "";
+						if (langf.equals("")) langf = book.getFileInfo().language;
+						if (langf==null) langf = "";
+						if (lang.equals("")) lang = "en";
+						intent5.putExtra(MinicardContract.EXTRA_LANGUAGE_TO, lang);
+						intent5.putExtra(MinicardContract.EXTRA_LANGUAGE_FROM, langf);
+					}
+				}
+			}
+			if (selectionBottom<selectionTop) {
+				int dummy = selectionBottom;
+				selectionBottom = selectionTop;
+				selectionTop = dummy;
+			}
+			final PopupFrameMetric frameMetrics =
+					new PopupFrameMetric(metrics, selectionTop, selectionBottom);
+			intent5.putExtra(MinicardContract.EXTRA_GRAVITY, frameMetrics.Gravity);
+			intent5.putExtra(MinicardContract.EXTRA_HEIGHT, frameMetrics.Height);
+			intent5.putExtra(MinicardContract.EXTRA_FORCE_LEMMATIZATION, true);
+			intent5.putExtra(MinicardContract.EXTRA_TRANSLATE_VARIANTS, true);
+			intent5.putExtra(MinicardContract.EXTRA_ENABLE_SUGGESTIONS, true);
+			//intent5.putExtra(MinicardContract.EXTRA_LIGHT_THEME, true);
+			intent5.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+			intent5.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+			if (curDict.className != null || DeviceInfo.getSDKLevel() == 3) {
+				intent5.setComponent(new ComponentName(
+						curDict.packageName, curDict.className));
+			} else {
+				intent5.setPackage(curDict.packageName);
+			}
+			intent5.addFlags(DeviceInfo.getSDKLevel() >= 7 ? Intent.FLAG_ACTIVITY_CLEAR_TASK : Intent.FLAG_ACTIVITY_NEW_TASK);
+			if (s!=null)
+				intent5.putExtra(curDict.dataKey, s);
+			try {
+				mActivity.startActivity( intent5 );
+			} catch ( ActivityNotFoundException e ) {
+				throw new DictionaryException("Dictionary \"" + curDict.name + "\" is not installed");
+			} catch ( Exception e ) {
+				throw new DictionaryException("Can't open dictionary \"" + curDict.name + "\"");
+			}
+			break;
+			//final String targetLanguage = DictionaryUtil.TargetLanguageOption.getValue();
+			//if (!Language.ANY_CODE.equals(targetLanguage)) {
+			//	intent.putExtra(MinicardContract.EXTRA_LANGUAGE_TO, targetLanguage);
+			//}
+			//InternalUtil.startDictionaryActivity(fbreader, intent, this);
 		}
-
 	}
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) throws DictionaryException {

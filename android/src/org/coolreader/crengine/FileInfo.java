@@ -43,6 +43,8 @@ public class FileInfo {
 	public String pathname; // full path+arcname+filename
 	public String arcname; // archive file name w/o path
 	public String language; // document language
+	public String lang_from; // translate from
+	public String lang_to; // translate to
 	public String username; // username for online catalogs
 	public String password; // password for online catalogs
 	public DocumentFormat format;
@@ -305,6 +307,8 @@ public class FileInfo {
 		createTime = v.createTime;
 		lastAccessTime = v.lastAccessTime;
 		language = v.language;
+		lang_from = v.lang_from;
+		lang_to = v.lang_to;
 		username = v.username;
 		password = v.password;
 		id = v.id;
@@ -873,6 +877,20 @@ public class FileInfo {
 		this.series = series;
 		return true;
 	}
+
+	public boolean setLangFrom(String lang) {
+		if (eq(this.lang_from, lang))
+			return false;
+		this.lang_from = lang;
+		return true;
+	}
+
+	public boolean setLangTo(String lang) {
+		if (eq(this.lang_to, lang))
+			return false;
+		this.lang_to = lang;
+		return true;
+	}
 	
 	public boolean setSeriesNumber(int seriesNumber) {
 		if (this.seriesNumber == seriesNumber)
@@ -887,6 +905,14 @@ public class FileInfo {
 	
 	public String getLanguage() {
 		return language;
+	}
+
+	public String getLang_from() {
+		return lang_from;
+	}
+
+	public String getLang_to() {
+		return lang_to;
 	}
 
 	public void clear()
@@ -1079,6 +1105,10 @@ public class FileInfo {
 		result = prime * result
 				+ ((language == null) ? 0 : language.hashCode());
 		result = prime * result
+				+ ((lang_from == null) ? 0 : lang_from.hashCode());
+		result = prime * result
+				+ ((lang_to == null) ? 0 : lang_to.hashCode());
+		result = prime * result
 				+ (int) (lastAccessTime ^ (lastAccessTime >>> 32));
 		result = prime * result + ((parent == null) ? 0 : parent.hashCode());
 		result = prime * result + ((path == null) ? 0 : path.hashCode());
@@ -1145,6 +1175,16 @@ public class FileInfo {
 			if (other.language != null)
 				return false;
 		} else if (!language.equals(other.language))
+			return false;
+		if (lang_from == null) {
+			if (other.lang_from != null)
+				return false;
+		} else if (!lang_from.equals(other.lang_from))
+			return false;
+		if (lang_to == null) {
+			if (other.lang_to != null)
+				return false;
+		} else if (!lang_to.equals(other.lang_to))
 			return false;
 		if (lastAccessTime != other.lastAccessTime)
 			return false;

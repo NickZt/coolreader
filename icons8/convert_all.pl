@@ -9,8 +9,11 @@ my %ic_launcher_sizes = (ldpi=>36, mdpi=>48, hdpi=>72, xhdpi=>96, xxhdpi=>144, x
 my %ic_bigicons_sizes = (ldpi=>36, mdpi=>48, hdpi=>72, xhdpi=>96, xxhdpi=>144, xxxhdpi=>192);
 
 my %ic_actions_list=(
+        'icons8_quote_2.svg' => 'icons8_quote_2.png',
+        'icons8_ok_from_clipboard.svg' => 'icons8_ok_from_clipboard.png',
         'icons8_odt.svg' => 'icons8_odt.png',
         'icons8_bookmark_simple_color.svg' => 'icons8_bookmark_simple_color.png',
+        'icons8_bookmark_link.svg' => 'icons8_bookmark_link.png',
         'icons8_book_big_and_small.svg' => 'icons8_book_big_and_small.png',
         'icons8_book_scan_properties.svg' => 'icons8_book_scan_properties.png',
         'icons8_computer_mouse.svg' => 'icons8_computer_mouse.png',

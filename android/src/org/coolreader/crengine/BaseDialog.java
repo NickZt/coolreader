@@ -33,6 +33,8 @@ public class BaseDialog extends Dialog {
 	int negativeButtonContentDescriptionId = R.string.action_go_back;
 	int thirdButtonImage;
 	int thirdButtonContentDescriptionId;
+	int addButtonImage;
+	int addButtonContentDescriptionId;
 	public void setPositiveButtonImage(int imageId, int descriptionId) {
 		positiveButtonImage = imageId;
 		positiveButtonContentDescriptionId = descriptionId;
@@ -44,6 +46,10 @@ public class BaseDialog extends Dialog {
 	public void setThirdButtonImage(int imageId, int descriptionId) {
 		thirdButtonImage = imageId;
 		thirdButtonContentDescriptionId = descriptionId;
+	}
+	public void setAddButtonImage(int imageId, int descriptionId) {
+		addButtonImage = imageId;
+		addButtonContentDescriptionId = descriptionId;
 	}
 	
 	public static final boolean DARK_THEME = !DeviceInfo.FORCE_HC_THEME;
@@ -124,12 +130,19 @@ public class BaseDialog extends Dialog {
 		dismiss();
 	}
 
+	protected void onAddButtonClick()
+	{
+		// override it
+		dismiss();
+	}
+
 	protected void createButtonsPane( ViewGroup parent, ViewGroup layout )
 	{
 		//getWindow().getDecorView().getWidth()
 		ImageButton positiveButton = (ImageButton)layout.findViewById(R.id.base_dlg_btn_positive);
 		ImageButton negativeButton = (ImageButton)layout.findViewById(R.id.base_dlg_btn_negative);
 		ImageButton backButton = (ImageButton)layout.findViewById(R.id.base_dlg_btn_back);
+		ImageButton addButton = (ImageButton)layout.findViewById(R.id.base_dlg_btn_add);
 		if (positiveButtonImage != 0) {
 			positiveButton.setImageResource(positiveButtonImage);
 			if (positiveButtonContentDescriptionId != 0)
@@ -140,6 +153,17 @@ public class BaseDialog extends Dialog {
 			negativeButton.setImageResource(thirdButtonImage);
 			if (thirdButtonContentDescriptionId != 0)
 				Utils.setContentDescription(negativeButton, getContext().getString(thirdButtonContentDescriptionId));
+		}
+		if (addButtonImage != 0) {
+			addButton.setImageResource(addButtonImage);
+			if (addButtonContentDescriptionId != 0) {
+				Utils.setContentDescription(addButton, getContext().getString(addButtonContentDescriptionId));
+				addButton.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						onAddButtonClick();
+					}
+				});
+			}
 		}
 		if (negativeButtonImage != 0) {
 			if (thirdButtonImage == 0) {

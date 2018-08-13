@@ -228,6 +228,7 @@
     <string name="dlg_bookmark_edit_range_text">Selection text</string>
     <string name="dlg_bookmark_type_comment">Comment</string>
     <string name="dlg_bookmark_internal_link">Internal link</string>
+    <string name="dlg_bookmark_citation">Citation</string>
     <string name="dlg_bookmark_user_dic">User dictionary</string>
     <string name="toast_shortcut_bookmark_is_set">Bookmark $1 is set</string>
     <string name="toast_position_bookmark_is_set">Added bookmark for page</string>
@@ -630,6 +631,7 @@
     <string name="save_bookmark_last_sel_user_dic">Save user dictionary entry (last selection)</string>
     <string name="options_app_dict_longtap_change">Toggle dictionary button action - short/long tap</string>
     <string name="win_title_user_dic">User dictionary</string>
+    <string name="win_title_citations">Citations</string>
     <string name="dlg_userdic_page">Page</string>
     <string name="dlg_userdic_book">Book</string>
     <string name="dlg_userdic_all">All</string>

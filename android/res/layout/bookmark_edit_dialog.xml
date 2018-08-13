@@ -19,85 +19,70 @@
 			android:singleLine="false"
 			android:text="Page 34/1024 (25%) Chapter 1" />
 
-		<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-			android:id="@+id/layout_comment"
-			android:orientation="horizontal"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:baselineAligned="false"
-			android:layout_marginTop="3dip"
-			android:layout_marginBottom="3dip"
-			android:layout_marginLeft="2dip"
-			android:layout_marginRight="2dip"
-			>
-			<ImageButton android:id="@+id/set_comment_from_cb"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_marginTop="5dip"
-				android:layout_marginBottom="5dip"
-				android:layout_marginLeft="5dip"
-				android:layout_marginRight="5dip"
-				android:src="?attr/cr3_button_ok_drawable"
-				android:focusable="false"
-				android:focusableInTouchMode="false"
-				android:background="@null"
-				android:contentDescription="@string/set_comment_from_cb"/>
-			<TextView
-				android:id="@+id/lbl_comment_from_cb_capt"
-				style="@style/TextAppearance.Medium"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:maxLines="3"
-				android:singleLine="true"
-				android:layout_gravity="center_vertical"
-				android:gravity="center_vertical"
-				android:text="@string/set_comment_from_cb_capt" />
-		</LinearLayout>
-
 		<TableLayout
 			android:id="@+id/rg_type"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+			android:stretchColumns="1"
 			android:orientation="vertical">
 
 			<TableRow
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content">
-
-				<RadioButton
+				android:layout_weight="1"
+				>
+				<ImageButton
 					android:id="@+id/rb_comment"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
+					android:layout_width="0dip"
 					android:checked="true"
 					android:layout_weight="1"
-					android:text="@string/dlg_bookmark_type_comment" />
-
-				<RadioButton
+					android:src="@drawable/icons8_bookmark_simple"
+					android:contentDescription="@string/dlg_bookmark_type_comment"
+					android:text="@null" />
+				<ImageButton
 					android:id="@+id/rb_correction"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
+					android:layout_width="0dip"
 					android:checked="false"
 					android:layout_weight="1"
-					android:text="@string/dlg_bookmark_type_correction" />
+					android:src="@drawable/icons8_edit_row_2"
+					android:contentDescription="@string/dlg_bookmark_type_correction"
+					android:text="@null" />
+				<ImageButton
+					android:id="@+id/rb_internal_link"
+					android:layout_width="0dip"
+					android:checked="false"
+					android:layout_weight="1"
+					android:src="@drawable/icons8_bookmark_link"
+					android:contentDescription="@string/dlg_bookmark_internal_link"
+					android:text="@null" />
+				<ImageButton
+					android:id="@+id/rb_user_dic"
+					android:layout_width="0dip"
+					android:checked="false"
+					android:layout_weight="1"
+					android:src="@drawable/icons8_google_translate_user"
+					android:contentDescription="@string/dlg_bookmark_user_dic"
+					android:text="@null" />
+				<ImageButton
+					android:id="@+id/rb_citation"
+					android:layout_width="0dip"
+					android:checked="false"
+					android:layout_weight="1"
+					android:src="@drawable/icons8_quote_2"
+					android:contentDescription="@string/dlg_bookmark_citation"
+					android:text="@null" />
 			</TableRow>
 			<TableRow
+				android:id="@+id/tr_rb_descr"
+				android:layout_weight="1"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content">
-				<RadioButton
-					android:id="@+id/rb_internal_link"
+				<TextView
+					android:id="@+id/lbl_rb_descr"
+					style="@style/TextAppearance.Small"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:checked="false"
-					android:layout_weight="1"
-					android:text="@string/dlg_bookmark_internal_link" />
-
-				<RadioButton
-					android:id="@+id/rb_user_dic"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:checked="false"
-					android:layout_weight="1"
-					android:text="@string/dlg_bookmark_user_dic" />
+					android:maxLines="1"
+					android:singleLine="true"
+					android:text="_" />
 			</TableRow>
 		</TableLayout>
 

@@ -240,6 +240,7 @@ public class Bookmark {
 	public static final int TYPE_CORRECTION = 3;
 	public static final int TYPE_USER_DIC = 4;
 	public static final int TYPE_INTERNAL_LINK = 5;
+	public static final int TYPE_CITATION = 6;
 
 	private Long id;
 	private int type;

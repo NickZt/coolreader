@@ -1,7 +1,9 @@
 package org.coolreader.crengine;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.database.DataSetObserver;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,9 +12,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import org.coolreader.CoolReader;
@@ -29,6 +33,15 @@ public class UserDicDlg extends BaseDialog {
 	private CoolReader mCoolReader;
 	private LayoutInflater mInflater;
 	private UserDicList mList;
+	private int openPage = 0;
+	final TextView rb_descr;
+	final TableRow tr_descr;
+	final ImageButton btnUserDic;
+	final ImageButton btnCitation;
+	final RadioButton btnPage;
+	final RadioButton btnBook;
+	final RadioButton btnAll;
+
 
 	private ArrayList<UserDicEntry> mUserDic = new ArrayList<UserDicEntry>();
 
@@ -168,24 +181,87 @@ public class UserDicDlg extends BaseDialog {
 
 	}
 
-	public UserDicDlg(final CoolReader activity)
+	private void setChecked(ImageButton btn) {
+		rb_descr.setText(btn.getContentDescription()+" ");
+		if (btn.getContentDescription().equals(mCoolReader.getString(R.string.dlg_bookmark_user_dic))) {
+			openPage = 0;
+		}
+		if (btn.getContentDescription().equals(mCoolReader.getString(R.string.dlg_bookmark_citation))) {
+			openPage = 1;
+		}
+		int colorGray;
+		int colorGrayC;
+		TypedArray a = mCoolReader.getTheme().obtainStyledAttributes(new int[]
+				{R.attr.colorThemeGray2, R.attr.colorThemeGray2Contrast});
+		colorGray = a.getColor(0, Color.GRAY);
+		colorGrayC = a.getColor(1, Color.GRAY);
+		rb_descr.setBackgroundColor(colorGrayC);
+		//tr_descr.setBackgroundColor(colorGrayC);
+		btnUserDic.setBackgroundColor(colorGrayC);
+		btnCitation.setBackgroundColor(colorGrayC);
+		btn.setBackgroundColor(colorGray);
+	}
+
+	private boolean getChecked(ImageButton btn) {
+		if (btn.getContentDescription().equals(R.string.dlg_bookmark_user_dic)) {
+			return openPage == 0;
+		}
+		if (btn.getContentDescription().equals(R.string.dlg_bookmark_citation)) {
+			return openPage == 1;
+		}
+		return false;
+	}
+
+	private void checkedCallback(RadioButton btn) {
+		boolean bPageC = btnPage.isChecked();
+		boolean bBookC = btnBook.isChecked();
+		boolean bAllC = btnAll.isChecked();
+		if (btn!=null) {
+			bPageC = (btn.equals(btnPage));
+			bBookC = (btn.equals(btnBook));
+			bAllC = (btn.equals(btnAll));
+		}
+		if (bPageC) {
+			mUserDic.clear();
+			for (UserDicEntry ude: mCoolReader.getmReaderFrame().getUserDicPanel().getArrUdeWords()) {
+				if (ude.getIs_citation()==openPage) mUserDic.add(ude);
+			}
+		}
+		if (bBookC) {
+			final String sBookFName = mCoolReader.getReaderView().getBookInfo().getFileInfo().filename;
+			CRC32 crc = new CRC32();
+			crc.update(sBookFName.getBytes());
+			String sCRC = String.valueOf(crc.getValue());
+			updUserDic(sCRC);
+		}
+		if (bAllC) {
+			updUserDic("");
+		}
+		listUpdated();
+	}
+
+	public UserDicDlg(final CoolReader activity, final int openPage)
 	{
 		super(activity, activity.getResources().getString(R.string.win_title_user_dic), false, true);
 		mInflater = LayoutInflater.from(getContext());
 		mCoolReader = activity;
-        mUserDic.clear();
-
 		mUserDic.clear();
 		for (UserDicEntry ude: activity.getmReaderFrame().getUserDicPanel().getArrUdeWords()) {
-			mUserDic.add(ude);
+			if (ude.getIs_citation()==openPage) mUserDic.add(ude);
+			//mCoolReader.showToast(ude.getDic_word()+" "+ude.getIs_citation());
 		}
-
 		View frame = mInflater.inflate(R.layout.userdic_list_dialog, null);
 		ViewGroup body = (ViewGroup)frame.findViewById(R.id.userdic_list);
 		mList = new UserDicList(activity, this);
-		final RadioButton btnPage = (RadioButton)frame.findViewById(R.id.rb_page);
-		final RadioButton btnBook = (RadioButton)frame.findViewById(R.id.rb_book);
-		final RadioButton btnAll = (RadioButton)frame.findViewById(R.id.rb_userdic_all);
+		btnPage = (RadioButton)frame.findViewById(R.id.rb_page);
+		btnBook = (RadioButton)frame.findViewById(R.id.rb_book);
+		btnAll = (RadioButton)frame.findViewById(R.id.rb_userdic_all);
+		btnUserDic = (ImageButton)frame.findViewById(R.id.rb_user_dic);
+		btnCitation = (ImageButton)frame.findViewById(R.id.rb_citation);
+		rb_descr = (TextView)frame.findViewById(R.id.lbl_rb_descr);
+		tr_descr = (TableRow)frame.findViewById(R.id.tr_rb_descr);
+		if (openPage==0) setChecked(btnUserDic);
+		if (openPage==1) setChecked(btnCitation);
 		body.addView(mList);
 		setView(frame);
 		setFlingHandlers(mList, null, null);
@@ -194,11 +270,7 @@ public class UserDicDlg extends BaseDialog {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if ( isChecked ) {
-					mUserDic.clear();
-					for (UserDicEntry ude: activity.getmReaderFrame().getUserDicPanel().getArrUdeWords()) {
-						mUserDic.add(ude);
-					}
-					listUpdated();
+					checkedCallback(btnPage);
 				}
 			}
 		});
@@ -206,12 +278,7 @@ public class UserDicDlg extends BaseDialog {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if ( isChecked ) {
-					final String sBookFName = mCoolReader.getReaderView().getBookInfo().getFileInfo().filename;
-					CRC32 crc = new CRC32();
-					crc.update(sBookFName.getBytes());
-					String sCRC = String.valueOf(crc.getValue());
-					updUserDic(sCRC);
-					listUpdated();
+					checkedCallback(btnBook);
 				}
 			}
 		});
@@ -219,9 +286,22 @@ public class UserDicDlg extends BaseDialog {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if ( isChecked ) {
-					updUserDic("");
-					listUpdated();
+					checkedCallback(btnAll);
 				}
+			}
+		});
+
+		btnUserDic.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				setChecked(btnUserDic);
+				checkedCallback(null);
+			}
+		});
+
+		btnCitation.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				setChecked(btnCitation);
+				checkedCallback(null);
 			}
 		});
 	}
@@ -232,7 +312,9 @@ public class UserDicDlg extends BaseDialog {
 		while (it.hasNext()) {
 			Map.Entry pair = (Map.Entry)it.next();
 			UserDicEntry ude = (UserDicEntry)pair.getValue();
-			if ((ude.getDic_from_book().equals(sCRC))||(sCRC.equals(""))) mUserDic.add(ude);
+			if (((ude.getDic_from_book().equals(sCRC))||(sCRC.equals(""))) &&
+				(openPage==ude.getIs_citation())) mUserDic.add(ude);
+			//mCoolReader.showToast(ude.getDic_word()+" "+ude.getIs_citation());
 		}
 		Collections.sort(mUserDic, new Comparator<UserDicEntry>() {
 			@Override

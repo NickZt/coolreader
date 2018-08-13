@@ -151,6 +151,7 @@ public class ReaderAction {
 	public final static ReaderAction SAVE_BOOKMARK_LAST_SEL = new ReaderAction("SAVE_BOOKMARK_LAST_SEL", R.string.save_bookmark_last_sel, ReaderCommand.DCMD_SAVE_BOOKMARK_LAST_SEL, 0, null).setIconId(R.drawable.icons8_bookmark_plus);
 	public final static ReaderAction SAVE_BOOKMARK_LAST_SEL_USER_DIC = new ReaderAction("SAVE_BOOKMARK_LAST_SEL_USER_DIC", R.string.save_bookmark_last_sel_user_dic, ReaderCommand.DCMD_SAVE_BOOKMARK_LAST_SEL_USER_DIC, 0, SAVE_BOOKMARK_LAST_SEL).setIconId(R.drawable.icons8_google_translate_save);
 	public final static ReaderAction SHOW_USER_DIC = new ReaderAction("SHOW_USER_DIC", R.string.win_title_user_dic, ReaderCommand.DCMD_SHOW_USER_DIC, 0, SHOW_DICTIONARY).setIconId(R.drawable.icons8_google_translate_user);
+	public final static ReaderAction SHOW_CITATIONS = new ReaderAction("SHOW_CITATIONS", R.string.win_title_citations, ReaderCommand.DCMD_SHOW_CITATIONS, 0, null).setIconId(R.drawable.icons8_quote_2);
 
 	public final static ReaderAction[] AVAILABLE_ACTIONS = {
 		NONE,
@@ -205,7 +206,8 @@ public class ReaderAction {
 		FONTS_MENU,
 		SAVE_BOOKMARK_LAST_SEL,
 		SAVE_BOOKMARK_LAST_SEL_USER_DIC,
-		SHOW_USER_DIC
+		SHOW_USER_DIC,
+		SHOW_CITATIONS
 	};
 
 	public boolean isNone() {

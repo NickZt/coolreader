@@ -118,4 +118,7 @@
     <attr name="colorThemeBlue" format="reference" />
     <attr name="colorThemeGreen" format="reference" />
     <attr name="colorThemeGray" format="reference" />
+    <attr name="colorThemeGray2" format="reference" />
+    <attr name="colorThemeGray2Contrast" format="reference" />
+
 </resources>

@@ -3,9 +3,11 @@
     <color name="blueLight">#ff8080ff</color>
     <color name="greenLight">#ff00ffaa</color>
     <color name="grayLight">#ffffdf80</color>
+    <color name="grayLight2">#ffdddddd</color>
     <color name="blueDark">#ff000080</color>
     <color name="greenDark">#ff00802b</color>
     <color name="grayDark">#ff664d00</color>
+    <color name="grayDark2">#ff444444</color>
 
     <style name="TabWidget" parent="@android:style/Widget.TabWidget">
         <!-- item name="android:textAppearance">@style/TextAppearance.Small</item>
@@ -66,6 +68,8 @@
         <item name="colorThemeBlue">@color/blueDark</item>
         <item name="colorThemeGray">@color/grayDark</item>
         <item name="colorThemeGreen">@color/greenDark</item>
+        <item name="colorThemeGray2">@color/grayDark2</item>
+        <item name="colorThemeGray2Contrast">@color/grayLight2</item>
 
         <item name="android:windowBackground">@drawable/background_tiled_light</item>
         <item name="android:colorBackground">#ffe0e0e0</item>
@@ -147,6 +151,8 @@
         <item name="colorThemeBlue">@color/blueLight</item>
         <item name="colorThemeGray">@color/grayLight</item>
         <item name="colorThemeGreen">@color/greenLight</item>
+        <item name="colorThemeGray2">@color/grayLight2</item>
+        <item name="colorThemeGray2Contrast">@color/grayDark2</item>
 
         <item name="android:windowBackground">@drawable/background_tiled_dark</item>
         <item name="android:colorBackground">#ff302030</item>
@@ -228,6 +234,8 @@
         <item name="colorThemeBlue">@color/blueDark</item>
         <item name="colorThemeGray">@color/grayDark</item>
         <item name="colorThemeGreen">@color/greenDark</item>
+        <item name="colorThemeGray2">@color/grayDark2</item>
+        <item name="colorThemeGray2Contrast">@color/grayLight2</item>
 
         <item name="android:windowBackground">@android:color/white</item>
         <item name="android:colorBackground">@android:color/white</item>
@@ -339,6 +347,8 @@
         <item name="colorThemeBlue">@color/blueLight</item>
         <item name="colorThemeGray">@color/grayLight</item>
         <item name="colorThemeGreen">@color/greenLight</item>
+        <item name="colorThemeGray2">@color/grayLight2</item>
+        <item name="colorThemeGray2Contrast">@color/grayDark2</item>
 
         <item name="android:windowBackground">@android:color/black</item>
         <item name="android:colorBackground">@android:color/black</item>
@@ -451,6 +461,8 @@
         <item name="colorThemeBlue">@color/blueLight</item>
         <item name="colorThemeGray">@color/grayLight</item>
         <item name="colorThemeGreen">@color/greenLight</item>
+        <item name="colorThemeGray2">@color/grayLight2</item>
+        <item name="colorThemeGray2Contrast">@color/grayDark2</item>
 
         <item name="android:windowBackground">@color/gray1</item>
         <item name="android:colorBackground">@color/gray1</item>
@@ -565,6 +577,8 @@
         <item name="colorThemeBlue">@color/blueDark</item>
         <item name="colorThemeGray">@color/grayDark</item>
         <item name="colorThemeGreen">@color/greenDark</item>
+        <item name="colorThemeGray2">@color/grayDark2</item>
+        <item name="colorThemeGray2Contrast">@color/grayLight2</item>
 
         <item name="android:windowBackground">@color/gray2</item>
         <item name="android:colorBackground">@color/gray2</item>
@@ -678,6 +692,8 @@
         <item name="colorThemeBlue">@color/blueDark</item>
         <item name="colorThemeGray">@color/grayDark</item>
         <item name="colorThemeGreen">@color/greenDark</item>
+        <item name="colorThemeGray2">@color/grayDark2</item>
+        <item name="colorThemeGray2Contrast">@color/grayLight2</item>
 
         <item name="android:windowBackground">@android:color/white</item>
         <item name="android:colorBackground">@android:color/white</item>
@@ -761,6 +777,8 @@
         <item name="colorThemeBlue">@color/blueLight</item>
         <item name="colorThemeGray">@color/grayLight</item>
         <item name="colorThemeGreen">@color/greenLight</item>
+        <item name="colorThemeGray2">@color/grayLight2</item>
+        <item name="colorThemeGray2Contrast">@color/grayDark2</item>
 
         <item name="android:windowBackground">@android:color/black</item>
         <item name="android:colorBackground">@android:color/black</item>

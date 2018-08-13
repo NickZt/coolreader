@@ -157,13 +157,15 @@ public class MainDB extends BaseDB {
 				"create_time INTEGER, " +
 				"last_access_time INTEGER, " +
 				"language VARCHAR DEFAULT NULL, " +
-				"seen_count INTEGER " +
+				"seen_count INTEGER, " +
+				"is_citation INTEGER DEFAULT 0 " +
 				")");
 		execSQL("CREATE INDEX IF NOT EXISTS " +
 				"user_dic_index ON user_dic (dic_word) ");
 		execSQLIgnoreErrors("ALTER TABLE bookmark ADD COLUMN link_pos VARCHAR DEFAULT NULL");
 		execSQLIgnoreErrors("ALTER TABLE book ADD COLUMN lang_from VARCHAR DEFAULT NULL");
 		execSQLIgnoreErrors("ALTER TABLE book ADD COLUMN lang_to VARCHAR DEFAULT NULL");
+		execSQLIgnoreErrors("ALTER TABLE user_dic ADD COLUMN is_citation INTEGER DEFAULT 0");
 		dumpStatistics();
 		
 		return true;
@@ -336,6 +338,7 @@ public class MainDB extends BaseDB {
 			return false;
         String sWord = ude.getDic_word();
 		String sWordTranslate = ude.getDic_word_translate();
+		int is_cit = ude.getIs_citation();
 		if (!isOpened())
 			return false;
 		if (sWord==null)
@@ -353,7 +356,8 @@ public class MainDB extends BaseDB {
 
         try {
 			if (action == UserDicEntry.ACTION_NEW) {
-				String sql = "SELECT id, dic_word_translate FROM user_dic where dic_word=" + quoteSqlString(sWord);
+				String sql = "SELECT id, dic_word_translate FROM user_dic where dic_word=" + quoteSqlString(sWord) +
+						" and coalesce(is_citation,0) = "+is_cit;
 				rs = mDB.rawQuery(sql, null);
 				if (rs.moveToFirst()) {
 					sW = rs.getString(1);
@@ -363,34 +367,36 @@ public class MainDB extends BaseDB {
 								" dic_word_translate = " + quoteSqlString(sWordTranslate) + ", " +
 								" dic_from_book = " + quoteSqlString(String.valueOf(ude.getDic_from_book())) + ", " +
 								" last_access_time = " + System.currentTimeMillis() + ", " +
-								" language = " + quoteSqlString(ude.getLanguage()) +
+								" language = " + quoteSqlString(ude.getLanguage()) + ", " +
+								" is_citation = " + is_cit +
 								" WHERE id = " + rs.getInt(0)
 						);
 					}
 				} else {
 					// need insert
 					execSQL("INSERT INTO user_dic " +
-							"(dic_word, dic_word_translate, dic_from_book, create_time, last_access_time, language, seen_count) " +
+							"(dic_word, dic_word_translate, dic_from_book, create_time, last_access_time, language, seen_count, is_citation) " +
 							"values (" + quoteSqlString(sWord) + ", " +
 							quoteSqlString(sWordTranslate) + ", " +
 							quoteSqlString(String.valueOf(ude.getDic_from_book())) + ", " +
 							System.currentTimeMillis() + ", " +
 							System.currentTimeMillis() + ", " +
 							quoteSqlString(ude.getLanguage()) + ", " +
-							"0)"
+							"0, "+
+							is_cit +
+							")"
 					);
 				}
 			}
 			if (action == UserDicEntry.ACTION_DELETE) {
 				execSQL("DELETE FROM user_dic " +
-						" where dic_word = " + quoteSqlString(sWord));
+						" where dic_word = " + quoteSqlString(sWord) + " and coalesce(is_citation,0) = "+is_cit);
 			}
 			if (action == UserDicEntry.ACTION_UPDATE_CNT) {
 				execSQL("UPDATE user_dic SET " +
 						" last_access_time = " + System.currentTimeMillis() + ", " +
 						" seen_count = seen_count + 1 " +
-						" WHERE dic_word = " + quoteSqlString(sWord)
-				);
+						" WHERE dic_word = " + quoteSqlString(sWord) + " and coalesce(is_citation,0) = "+is_cit);
 			}
 		} catch (Exception e) {
 			Log.e("cr3", "exception while saving user dic", e);
@@ -444,7 +450,7 @@ public class MainDB extends BaseDB {
 		Cursor rs = null;
 		try {
 			String sql = "SELECT id, dic_word, dic_word_translate, dic_from_book, "+
-				" create_time, last_access_time, language, seen_count "+
+				" create_time, last_access_time, language, seen_count, coalesce(is_citation,0) as is_cit "+
 				" FROM user_dic";
 			rs = mDB.rawQuery(sql, null);
 			if ( rs.moveToFirst() ) {
@@ -458,7 +464,8 @@ public class MainDB extends BaseDB {
 					ude.setLast_access_time(rs.getLong(5));
 					ude.setLanguage(rs.getString(6));
 					ude.setSeen_count(rs.getLong(7));
-					hshDic.put(ude.getDic_word(),ude);
+					ude.setIs_citation(rs.getInt(8));
+					hshDic.put(ude.getIs_citation()+ude.getDic_word(),ude);
 				} while (rs.moveToNext());
 			}
 		} catch (Exception e) {

@@ -67,6 +67,18 @@
             android:focusableInTouchMode="false"
             android:background="@null"
             android:contentDescription="@string/dlg_button_cancel"/>
+        <ImageButton android:id="@+id/base_dlg_btn_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dip"
+            android:layout_marginBottom="5dip"
+            android:layout_marginLeft="5dip"
+            android:layout_marginRight="5dip"
+            android:src="@null"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:background="@null"
+            android:contentDescription="@null"/>
     </LinearLayout>
     <FrameLayout android:id="@+id/base_dialog_content_view"
         android:gravity="top"

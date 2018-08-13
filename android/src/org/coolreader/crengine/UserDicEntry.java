@@ -16,6 +16,17 @@ public class UserDicEntry {
     private String dic_from_book;
     private long create_time = System.currentTimeMillis(); // UTC timestamp
     private long last_access_time = System.currentTimeMillis(); // UTC timestamp
+    private String language;
+    private Long seen_count;
+    private int is_citation;
+
+    public int getIs_citation() {
+        return is_citation;
+    }
+
+    public void setIs_citation(int is_citation) {
+        this.is_citation = is_citation;
+    }
 
     public Long getId() {
         return id;
@@ -80,8 +91,5 @@ public class UserDicEntry {
     public void setSeen_count(Long seen_count) {
         this.seen_count = seen_count;
     }
-
-    private String language;
-    private Long seen_count;
 
 }

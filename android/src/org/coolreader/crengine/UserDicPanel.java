@@ -113,7 +113,7 @@ public class UserDicPanel extends LinearLayout implements Settings {
 
 				@Override
 				public void onClick(View v) {
-					UserDicDlg dlg = new UserDicDlg(activity);
+					UserDicDlg dlg = new UserDicDlg(activity,0);
 					dlg.show();
 				}
 			});
@@ -252,7 +252,9 @@ public class UserDicPanel extends LinearLayout implements Settings {
 			while (it.hasNext()) {
 				Map.Entry pair = (Map.Entry)it.next();
 				String sKey = pair.getKey().toString().toLowerCase();
-				if (!StrUtils.isEmptyStr(sKey)) {
+				String sType = sKey.substring(0,1);
+				sKey = sKey.substring(1);
+				if ((!StrUtils.isEmptyStr(sKey))&&(!sType.equals("1"))) {
 					try {
 						String[] arrKey = sKey.split("~");
 						boolean bWas = false;

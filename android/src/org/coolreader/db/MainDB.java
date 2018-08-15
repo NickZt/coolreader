@@ -345,7 +345,8 @@ public class MainDB extends BaseDB {
 			return false;
 		if ((sWordTranslate==null)&&(action == UserDicEntry.ACTION_NEW))
 			return false;
-		sWord = sWord.trim().toLowerCase();
+		if (ude.getIs_citation()==0)
+			sWord = sWord.trim().toLowerCase();
 		if (sWord.length()==0)
 			return false;
 		sWordTranslate = sWordTranslate.trim();

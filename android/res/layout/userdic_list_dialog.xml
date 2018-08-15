@@ -51,6 +51,31 @@
                 android:text="_" />
         </TableRow>
     </TableLayout>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/page_item_body"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/search_text"
+            android:layout_width="0dip"
+            android:layout_weight="6"
+            android:layout_height="wrap_content"
+            android:text=""
+            style="@style/TextAppearance.Widget.EditText"
+            android:editable="true" android:hint="@string/dlg_search_hint" android:singleLine="true"
+            />
+        <ImageButton
+            android:id="@+id/btn_search"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:layout_weight="1"
+            android:src="@drawable/icons8_search"
+            android:background="@null"
+            android:contentDescription="@string/dlg_bookmark_user_dic"
+            android:text="@null" />
+    </LinearLayout>
 
     <RadioGroup
         android:id="@+id/rg_scope"

@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -41,7 +42,8 @@ public class UserDicDlg extends BaseDialog {
 	final RadioButton btnPage;
 	final RadioButton btnBook;
 	final RadioButton btnAll;
-
+	final ImageButton searchButton;
+	final EditText selEdit;
 
 	private ArrayList<UserDicEntry> mUserDic = new ArrayList<UserDicEntry>();
 
@@ -183,10 +185,17 @@ public class UserDicDlg extends BaseDialog {
 
 	private void setChecked(ImageButton btn) {
 		rb_descr.setText(btn.getContentDescription()+" ");
+		btnPage.setEnabled(true);
 		if (btn.getContentDescription().equals(mCoolReader.getString(R.string.dlg_bookmark_user_dic))) {
 			openPage = 0;
 		}
 		if (btn.getContentDescription().equals(mCoolReader.getString(R.string.dlg_bookmark_citation))) {
+			if (openPage == 0) {
+				if (btnPage.isChecked()) {
+					btnBook.setChecked(true);
+				}
+			}
+			btnPage.setEnabled(false);
 			openPage = 1;
 		}
 		int colorGray;
@@ -224,7 +233,15 @@ public class UserDicDlg extends BaseDialog {
 		if (bPageC) {
 			mUserDic.clear();
 			for (UserDicEntry ude: mCoolReader.getmReaderFrame().getUserDicPanel().getArrUdeWords()) {
-				if (ude.getIs_citation()==openPage) mUserDic.add(ude);
+				if (ude.getIs_citation()==openPage)
+					if (
+					    (selEdit.getText().toString().trim().equals("")) ||
+						(
+					    	(ude.getDic_word().toLowerCase().contains(selEdit.getText().toString().toLowerCase().trim())) ||
+				        	(ude.getDic_word_translate().toLowerCase().contains(selEdit.getText().toString().toLowerCase().trim()))
+						)
+					   )
+					  mUserDic.add(ude);
 			}
 		}
 		if (bBookC) {
@@ -247,7 +264,8 @@ public class UserDicDlg extends BaseDialog {
 		mCoolReader = activity;
 		mUserDic.clear();
 		for (UserDicEntry ude: activity.getmReaderFrame().getUserDicPanel().getArrUdeWords()) {
-			if (ude.getIs_citation()==openPage) mUserDic.add(ude);
+			if (ude.getIs_citation()==openPage)
+				mUserDic.add(ude);
 			//mCoolReader.showToast(ude.getDic_word()+" "+ude.getIs_citation());
 		}
 		View frame = mInflater.inflate(R.layout.userdic_list_dialog, null);
@@ -264,7 +282,18 @@ public class UserDicDlg extends BaseDialog {
 		if (openPage==1) setChecked(btnCitation);
 		body.addView(mList);
 		setView(frame);
+		searchButton = (ImageButton) frame.findViewById(R.id.btn_search);
+		selEdit = (EditText) frame.findViewById(R.id.search_text);
+		selEdit.clearFocus();
+		searchButton.requestFocus();
 		setFlingHandlers(mList, null, null);
+
+		searchButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				checkedCallback(null);
+			}
+		});
 
 		btnPage.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
@@ -313,7 +342,15 @@ public class UserDicDlg extends BaseDialog {
 			Map.Entry pair = (Map.Entry)it.next();
 			UserDicEntry ude = (UserDicEntry)pair.getValue();
 			if (((ude.getDic_from_book().equals(sCRC))||(sCRC.equals(""))) &&
-				(openPage==ude.getIs_citation())) mUserDic.add(ude);
+				(openPage==ude.getIs_citation()))
+				if (
+						(selEdit.getText().toString().trim().equals("")) ||
+								(
+									(ude.getDic_word().toLowerCase().contains(selEdit.getText().toString().toLowerCase().trim())) ||
+									(ude.getDic_word_translate().toLowerCase().contains(selEdit.getText().toString().toLowerCase().trim()))
+								)
+						)
+					mUserDic.add(ude);
 			//mCoolReader.showToast(ude.getDic_word()+" "+ude.getIs_citation());
 		}
 		Collections.sort(mUserDic, new Comparator<UserDicEntry>() {

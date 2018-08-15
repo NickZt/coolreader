@@ -60,6 +60,8 @@
 					android:layout_weight="1"
 					android:src="@drawable/icons8_google_translate_user"
 					android:contentDescription="@string/dlg_bookmark_user_dic"
+					android:focusable="true"
+					android:focusableInTouchMode="true"
 					android:text="@null" />
 				<ImageButton
 					android:id="@+id/rb_citation"

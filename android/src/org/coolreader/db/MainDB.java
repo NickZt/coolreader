@@ -390,6 +390,8 @@ public class MainDB extends BaseDB {
 				}
 			}
 			if (action == UserDicEntry.ACTION_DELETE) {
+//				Log.i("sql","DELETE FROM user_dic " +
+//						" where dic_word = " + quoteSqlString(sWord) + " and coalesce(is_citation,0) = "+is_cit);
 				execSQL("DELETE FROM user_dic " +
 						" where dic_word = " + quoteSqlString(sWord) + " and coalesce(is_citation,0) = "+is_cit);
 			}

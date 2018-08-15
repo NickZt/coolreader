@@ -74,6 +74,8 @@
             android:src="@drawable/icons8_search"
             android:background="@null"
             android:contentDescription="@string/dlg_bookmark_user_dic"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:text="@null" />
     </LinearLayout>
 

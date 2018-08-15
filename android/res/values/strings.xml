@@ -612,6 +612,7 @@
     <string name="dlg_button_delete_word">Delete word</string>
     <string name="dlg_button_pronoun_replace">Pronoun replace (to smb)</string>
     <string name="dlg_button_clear_hist">Clear history</string>
+    <string name="dlg_button_search_hist">Search history</string>
     <string name="search_hist_will_be_cleared">Search history cleared</string>
     <string name="win_title_reading_pos">Choose reading position</string>
     <string name="load_reading_pos_from_gd">Restore reading pos from Google One</string>

@@ -680,7 +680,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 			ClipboardManager cm = mActivity.getClipboardmanager();
 			cm.setText(text);
 			log.i("Setting clipboard text: " + text);
-			mActivity.showSuperToast(mActivity.getString(R.string.copied_to_cb));
+			mActivity.showToast(mActivity.getString(R.string.copied_to_cb));
 		}
 	}
 
@@ -711,7 +711,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 
 	public void toggleSelectionMode() {
 		selectionModeActive = !selectionModeActive;
-		mActivity.showSuperToast( selectionModeActive ? R.string.action_toggle_selection_mode_on : R.string.action_toggle_selection_mode_off);
+		mActivity.showToast( selectionModeActive ? R.string.action_toggle_selection_mode_on : R.string.action_toggle_selection_mode_off);
 	}
 
 	private ImageViewer currentImageViewer;
@@ -1133,7 +1133,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 									}
 								}
 							}
-							mActivity.showSuperToast("Cannot open link " + link);
+							mActivity.showSToast("Cannot open link " + link);
 						}
 					}
 				}
@@ -1177,7 +1177,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 							dlg.show();
 						} else {
 							if (!StrUtils.isEmptyStr(bookmark.getCommentText()))
-								mActivity.showSuperToast(StrUtils.updateText(bookmark.getCommentText(),true));
+								mActivity.showSToast(StrUtils.updateText(bookmark.getCommentText(),true));
 							if (bMenuShow) {
 								ReaderAction[] actions = {
 										ReaderAction.GO_BACK
@@ -1389,7 +1389,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 					TOCDlg dlg = new TOCDlg(mActivity, view, toc, pos.pageNumber);
 					dlg.show();
 				} else {
-					mActivity.showSuperToast("No Table of Contents found");
+					mActivity.showToast("No Table of Contents found");
 				}
 			}
 		});
@@ -1426,7 +1426,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 			}
 			public void fail(Exception e) {
 				BackgroundThread.ensureGUI();
-				mActivity.showSuperToast("Pattern not found");
+				mActivity.showToast("Pattern not found");
 			}
 
 		});
@@ -1579,7 +1579,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 						s.replace("$1", String.valueOf(shortcut));
 					}
 					highlightBookmarks();
-					mActivity.showSuperToast(s);
+					mActivity.showToast(s);
 					scheduleSaveCurrentPositionBookmark(DEF_SAVE_POSITION_INTERVAL);
 				}
 			}
@@ -1705,7 +1705,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 				}
 			}
 			public void done() {
-				mActivity.showSuperToast(buf.toString());
+				mActivity.showSToast(buf.toString());
 			}
 		});
 	}
@@ -1905,7 +1905,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 				@Override
 				public void run() {
 					if (myId == autoScrollNotificationId)
-						mActivity.showSuperToast(msg);
+						mActivity.showSToast(msg);
 				}}, 1000);
 		}
 	}
@@ -2372,9 +2372,9 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 			case DCMD_TOGGLE_TOUCH_SCREEN_LOCK:
 				isTouchScreenEnabled = !isTouchScreenEnabled;
 				if ( isTouchScreenEnabled )
-					mActivity.showSuperToast(R.string.action_touch_screen_enabled_toast);
+					mActivity.showToast(R.string.action_touch_screen_enabled_toast);
 				else
-					mActivity.showSuperToast(R.string.action_touch_screen_disabled_toast);
+					mActivity.showToast(R.string.action_touch_screen_disabled_toast);
 				break;
 			case DCMD_LINK_BACK:
 			case DCMD_LINK_FORWARD:
@@ -2452,7 +2452,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 				break;
 			case DCMD_TOGGLE_DICT_ONCE:
 				log.i("Next dictionary will be the 2nd for one time");
-				mActivity.showSuperToast(mActivity.getString(R.string.next_dict_will_be_2nd));
+				mActivity.showToast(mActivity.getString(R.string.next_dict_will_be_2nd));
 				mActivity.mDictionaries.setiDic2IsActive(2);
 				break;
 			case DCMD_TOGGLE_DICT:
@@ -2463,7 +2463,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 					mActivity.mDictionaries.setiDic2IsActive(1);
 				}
 				log.i(mActivity.getString(R.string.switched_to_dic) + ": "+Integer.toString(mActivity.mDictionaries.isiDic2IsActive()+1));
-				mActivity.showSuperToast(mActivity.getString(R.string.switched_to_dic) + ": "+Integer.toString(mActivity.mDictionaries.isiDic2IsActive()+1));
+				mActivity.showToast(mActivity.getString(R.string.switched_to_dic) + ": "+Integer.toString(mActivity.mDictionaries.isiDic2IsActive()+1));
 				break;
 			default:
 				// do nothing
@@ -2764,7 +2764,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 		return loadDocument(getManualFileName(), new Runnable() {
 			@Override
 			public void run() {
-				mActivity.showSuperToast("Error while opening manual");
+				mActivity.showToast("Error while opening manual");
 			}
 		});
 	}
@@ -3085,7 +3085,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 		String normalized = mEngine.getPathCorrector().normalize(fileName);
 		if (normalized == null) {
 			log.e("Trying to load book from non-standard path " + fileName);
-			mActivity.showSuperToast("Trying to load book from non-standard path " + fileName);
+			mActivity.showSToast("Trying to load book from non-standard path " + fileName);
 			hideProgress();
 			if (errorHandler != null)
 				errorHandler.run();
@@ -3805,7 +3805,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 			OptionsDialog.mBacklightLevelsTitles[0] = mActivity.getString(R.string.options_app_backlight_screen_default);
 			if ( showBrightnessFlickToast ) {
 				String s = OptionsDialog.mBacklightLevelsTitles[currentBrightnessValueIndex];
-				mActivity.showSuperToast(s);
+				mActivity.showToast(s);
 			}
 			saveSettings(mSettings);
 			currentBrightnessValueIndex = -1;
@@ -4972,7 +4972,7 @@ public class ReaderView implements android.view.SurfaceHolder.Callback, Settings
 			mOpened = false;
 			drawPage();
 			hideProgress();
-			mActivity.showSuperToast("Error while loading document");
+			mActivity.showToast("Error while loading document");
 			if ( errorHandler!=null ) {
 				log.e("LoadDocumentTask: Calling error handler");
 				errorHandler.run();

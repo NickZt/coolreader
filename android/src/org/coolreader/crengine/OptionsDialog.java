@@ -681,20 +681,43 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 			super(owner, label, PROP_APP_KEY_ACTIONS_PRESS);
 		}
 		private void addKey( OptionsListView list, int keyCode, String keyName) {
-			addKey(list, keyCode, keyName, EnumSet.allOf(KeyActionFlag.class));
+			addKey(list, keyCode, keyName, EnumSet.allOf(KeyActionFlag.class),
+					0, 0,
+					0, 0,
+					0, 0);
 		}
-		private void addKey( OptionsListView list, int keyCode, String keyName, EnumSet<KeyActionFlag> keyFlags ) {
+		private void addKey( OptionsListView list, int keyCode, String keyName,
+							 int drawableAttrId, int fallbackIconId,
+							 int drawableAttrId_long, int fallbackIconId_long,
+							 int drawableAttrId_double, int fallbackIconId_double) {
+			addKey(list, keyCode, keyName, EnumSet.allOf(KeyActionFlag.class),
+					drawableAttrId, fallbackIconId,
+					drawableAttrId_long, fallbackIconId_long,
+					drawableAttrId_double, fallbackIconId_double);
+		}
+
+		private void addKey( OptionsListView list, int keyCode, String keyName, EnumSet<KeyActionFlag> keyFlags) {
+			addKey(list, keyCode, keyName, keyFlags, 0, 0, 0, 0, 0, 0);
+		}
+
+		private void addKey( OptionsListView list, int keyCode, String keyName, EnumSet<KeyActionFlag> keyFlags,
+							 int drawableAttrId, int fallbackIconId,
+							 int drawableAttrId_long, int fallbackIconId_long,
+							 int drawableAttrId_double, int fallbackIconId_double) {
 			if (keyFlags.contains(KeyActionFlag.KEY_ACTION_FLAG_NORMAL)) {
 				final String propName = ReaderAction.getKeyProp(keyCode, ReaderAction.NORMAL);
-				list.add(new ActionOption(mOwner, keyName, propName, false, false));
+				list.add((new ActionOption(mOwner, keyName, propName, false, false)).
+						setIconIdByAttr(drawableAttrId, fallbackIconId));
 			}
 			if (keyFlags.contains(KeyActionFlag.KEY_ACTION_FLAG_LONG)) {
 				final String longPropName = ReaderAction.getKeyProp(keyCode, ReaderAction.LONG);
-				list.add(new ActionOption(mOwner, keyName + " " + getContext().getString(R.string.options_app_key_long_press), longPropName, false, true));
+				list.add((new ActionOption(mOwner, keyName + " " + getContext().getString(R.string.options_app_key_long_press), longPropName, false, true)).
+						setIconIdByAttr(drawableAttrId_long, fallbackIconId_long));
 			}
 			if (keyFlags.contains(KeyActionFlag.KEY_ACTION_FLAG_DOUBLE)) {
 				final String dblPropName = ReaderAction.getKeyProp(keyCode, ReaderAction.DOUBLE);
-				list.add(new ActionOption(mOwner, keyName + " " + getContext().getString(R.string.options_app_key_double_press), dblPropName, false, false));
+				list.add((new ActionOption(mOwner, keyName + " " + getContext().getString(R.string.options_app_key_double_press), dblPropName, false, false)).
+						setIconIdByAttr(drawableAttrId_double, fallbackIconId_double));
 			}
 		}
 		public void onSelect() {
@@ -708,8 +731,16 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 //				addKey(listView, ReaderView.KEYCODE_PAGE_BOTTOMRIGHT, "Bottom right navigation button");
 
 				// on rooted Nook, side navigation keys may be reassigned on some standard android keycode
-				addKey(listView, KeyEvent.KEYCODE_MENU, "Menu");
-				addKey(listView, KeyEvent.KEYCODE_BACK, "Back");
+				addKey(listView, KeyEvent.KEYCODE_MENU, "Menu",
+						R.attr.attr_icons8_menu_key, R.drawable.icons8_menu_key,
+						R.attr.attr_icons8_menu_key_long, R.drawable.icons8_menu_key_long,
+						R.attr.attr_icons8_menu_key_double, R.drawable.icons8_menu_key_double
+				);
+				addKey(listView, KeyEvent.KEYCODE_BACK, "Back",
+						R.attr.attr_icons8_back_key, R.drawable.icons8_back_key,
+						R.attr.attr_icons8_back_key_long, R.drawable.icons8_back_key_long,
+						R.attr.attr_icons8_back_key_double, R.drawable.icons8_back_key_double
+				);
 				addKey(listView, KeyEvent.KEYCODE_SEARCH, "Search");
 				
 				addKey(listView, KeyEvent.KEYCODE_HOME, "Home");
@@ -721,14 +752,27 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 //				addKey(listView, KeyEvent.KEYCODE_DPAD_DOWN, "Next button");
 				addKey(listView, ReaderView.SONY_DPAD_UP_SCANCODE, "Prev button");
 				addKey(listView, ReaderView.SONY_DPAD_DOWN_SCANCODE, "Next button");
-				addKey(listView, ReaderView.SONY_DPAD_LEFT_SCANCODE, "Left button");
-				addKey(listView, ReaderView.SONY_DPAD_RIGHT_SCANCODE, "Right button");
+				addKey(listView, ReaderView.SONY_DPAD_LEFT_SCANCODE, "Left button",
+						R.attr.attr_icons8_left_key, R.drawable.icons8_left_key,
+						R.attr.attr_icons8_left_key_long, R.drawable.icons8_left_key_long,
+						R.attr.attr_icons8_left_key_double, R.drawable.icons8_left_key_double);
+				addKey(listView, ReaderView.SONY_DPAD_RIGHT_SCANCODE, "Right button",
+						R.attr.attr_icons8_right_key, R.drawable.icons8_right_key,
+						R.attr.attr_icons8_right_key_long, R.drawable.icons8_right_key_long,
+						R.attr.attr_icons8_right_key_double, R.drawable.icons8_right_key_double);
 //				addKey(listView, ReaderView.SONY_MENU_SCANCODE, "Menu");
 //				addKey(listView, ReaderView.SONY_BACK_SCANCODE, "Back");
 //				addKey(listView, ReaderView.SONY_HOME_SCANCODE, "Home");
-				addKey(listView, KeyEvent.KEYCODE_MENU, "Menu");
-				addKey(listView, KeyEvent.KEYCODE_BACK, "Back");
-
+				addKey(listView, KeyEvent.KEYCODE_MENU, "Menu",
+						R.attr.attr_icons8_menu_key, R.drawable.icons8_menu_key,
+						R.attr.attr_icons8_menu_key_long, R.drawable.icons8_menu_key_long,
+						R.attr.attr_icons8_menu_key_double, R.drawable.icons8_menu_key_double
+				);
+				addKey(listView, KeyEvent.KEYCODE_BACK, "Back",
+						R.attr.attr_icons8_back_key, R.drawable.icons8_back_key,
+						R.attr.attr_icons8_back_key_long, R.drawable.icons8_back_key_long,
+						R.attr.attr_icons8_back_key_double, R.drawable.icons8_back_key_double
+				);
 				addKey(listView, KeyEvent.KEYCODE_HOME, "Home");
 			} else {
 				EnumSet<KeyActionFlag> keyFlags;
@@ -742,13 +786,27 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 				}
 
 				if (KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_MENU))
-					addKey(listView, KeyEvent.KEYCODE_MENU, "Menu", keyFlags);
+					addKey(listView, KeyEvent.KEYCODE_MENU, "Menu", keyFlags,
+							R.attr.attr_icons8_menu_key, R.drawable.icons8_menu_key,
+							R.attr.attr_icons8_menu_key_long, R.drawable.icons8_menu_key_long,
+							R.attr.attr_icons8_menu_key_double, R.drawable.icons8_menu_key_double
+							);
 				if (KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK))
-					addKey(listView, KeyEvent.KEYCODE_BACK, "Back", keyFlags);
+					addKey(listView, KeyEvent.KEYCODE_BACK, "Back", keyFlags,
+							R.attr.attr_icons8_back_key, R.drawable.icons8_back_key,
+							R.attr.attr_icons8_back_key_long, R.drawable.icons8_back_key_long,
+							R.attr.attr_icons8_back_key_double, R.drawable.icons8_back_key_double
+					);
 				if (KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_DPAD_LEFT))
-					addKey(listView, KeyEvent.KEYCODE_DPAD_LEFT, "Left", keyFlags);
+					addKey(listView, KeyEvent.KEYCODE_DPAD_LEFT, "Left", keyFlags,
+							R.attr.attr_icons8_left_key, R.drawable.icons8_left_key,
+							R.attr.attr_icons8_left_key_long, R.drawable.icons8_left_key_long,
+							R.attr.attr_icons8_left_key_double, R.drawable.icons8_left_key_double);
 				if (KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_DPAD_RIGHT))
-					addKey(listView, KeyEvent.KEYCODE_DPAD_RIGHT, "Right", keyFlags);
+					addKey(listView, KeyEvent.KEYCODE_DPAD_RIGHT, "Right", keyFlags,
+							R.attr.attr_icons8_right_key, R.drawable.icons8_right_key,
+							R.attr.attr_icons8_right_key_long, R.drawable.icons8_right_key_long,
+							R.attr.attr_icons8_right_key_double, R.drawable.icons8_right_key_double);
 				if (KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_DPAD_UP))
 					addKey(listView, KeyEvent.KEYCODE_DPAD_UP, "Up", keyFlags);
 				if (KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_DPAD_DOWN))
@@ -1413,7 +1471,6 @@ public class OptionsDialog extends BaseDialog implements TabContentFactory, Opti
 			TextView valueView = (TextView)view.findViewById(R.id.option_value);
 			ImageView icon1 = (ImageView)view.findViewById(R.id.option_icon);
 			setup2IconView(icon1,icon2);
-//asdf
 			String lab1 = label;
 			String lab2 = "";
 			if (lab1.contains("~")) {

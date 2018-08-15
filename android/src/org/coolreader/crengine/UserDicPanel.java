@@ -142,7 +142,7 @@ public class UserDicPanel extends LinearLayout implements Settings {
 
 								}
 								if (sKey.equals(sWord)) {
-									activity.showSuperToast(StrUtils.updateText(ude.getDic_word_translate(),true));
+									activity.showSToast(StrUtils.updateText(ude.getDic_word_translate(),true));
 									activity.getDB().saveUserDic(ude, UserDicEntry.ACTION_UPDATE_CNT);
 									break;
 								}
@@ -162,7 +162,7 @@ public class UserDicPanel extends LinearLayout implements Settings {
 										@Override
 										public void run() {
 											activity.getDB().saveUserDic(ude, UserDicEntry.ACTION_DELETE);
-											activity.getmUserDic().remove(ude.getDic_word());
+											activity.getmUserDic().remove(ude.getIs_citation()+ude.getDic_word());
 											activity.getmReaderFrame().getUserDicPanel().updateUserDicWords();
 										}
 									});

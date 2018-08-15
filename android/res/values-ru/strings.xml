@@ -586,6 +586,7 @@
     <string name="dlg_button_delete_word">Удалить слово</string>
     <string name="dlg_button_pronoun_replace">Замена местоимений (на smb)</string>
     <string name="dlg_button_clear_hist">Очистить историю</string>
+    <string name="dlg_button_search_hist">История поиска</string>
     <string name="search_hist_will_be_cleared">История поиска очищена</string>
     <string name="win_title_reading_pos">Выберите сохраненную позицию</string>
     <string name="load_reading_pos_from_gd">Восстановить позицию чтения с диска Google One</string>

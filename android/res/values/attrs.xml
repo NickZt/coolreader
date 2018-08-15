@@ -103,6 +103,24 @@
     <attr name="attr_icons8_speaker_buttons" format="reference" />
     <attr name="attr_icons8_texture" format="reference" />
     <attr name="attr_icons8_bookmark_simple_color" format="reference" />
+    <attr name="attr_icons8_me_smb" format="reference" />
+    <attr name="attr_icons8_search_history" format="reference" />
+    <attr name="attr_icons8_scissors" format="reference" />
+    <attr name="attr_icons8_back_key" format="reference" />
+    <attr name="attr_icons8_back_key_double" format="reference" />
+    <attr name="attr_icons8_back_key_long" format="reference" />
+    <attr name="attr_icons8_forward_key" format="reference" />
+    <attr name="attr_icons8_forward_key_double" format="reference" />
+    <attr name="attr_icons8_forward_key_long" format="reference" />
+    <attr name="attr_icons8_left_key" format="reference" />
+    <attr name="attr_icons8_left_key_double" format="reference" />
+    <attr name="attr_icons8_left_key_long" format="reference" />
+    <attr name="attr_icons8_right_key" format="reference" />
+    <attr name="attr_icons8_right_key_double" format="reference" />
+    <attr name="attr_icons8_right_key_long" format="reference" />
+    <attr name="attr_icons8_menu_key" format="reference" />
+    <attr name="attr_icons8_menu_key_double" format="reference" />
+    <attr name="attr_icons8_menu_key_long" format="reference" />
 
     <attr name="folder_big_drawable" format="reference" />
     <attr name="folder_big_bookmark_drawable" format="reference" />

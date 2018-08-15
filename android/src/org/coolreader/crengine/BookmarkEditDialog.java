@@ -248,7 +248,7 @@ public class BookmarkEditDialog extends BaseDialog {
 		lblBookmarkLink.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (mIsNew)
+				if ((mIsNew)&&(mBookmark.getType()==Bookmark.TYPE_INTERNAL_LINK))
 					activity.showBookmarksDialog(true, BookmarkEditDialog.this);
 			}
 		});
@@ -261,6 +261,7 @@ public class BookmarkEditDialog extends BaseDialog {
 		if (isCorrection) commentLabel.setText(R.string.dlg_bookmark_edit_correction);
 		if (isUserDic) commentLabel.setText(R.string.dlg_bookmark_edit_translation);
 		if (isInternalLink) commentLabel.setText(R.string.dlg_bookmark_edit_comment);
+		if (isCitation) commentLabel.setText(R.string.dlg_bookmark_edit_comment);
 
 		posEdit.setText(mBookmark.getPosText());
 		commentEdit.setText(bookmark.getCommentText());
@@ -324,19 +325,31 @@ public class BookmarkEditDialog extends BaseDialog {
 			btnUserDic.setClickable(false);
 			btnCitation.setClickable(false);
 		}
-		if (chosenType==Bookmark.TYPE_COMMENT) setChecked(btnComment);
-		if (chosenType==Bookmark.TYPE_CORRECTION) setChecked(btnCorrection);
-		if (chosenType==Bookmark.TYPE_INTERNAL_LINK) setChecked(btnInternalLink);
+		if (chosenType==Bookmark.TYPE_COMMENT) {
+			setChecked(btnComment);
+			mBookmark.setType(Bookmark.TYPE_COMMENT);
+		}
+		if (chosenType==Bookmark.TYPE_CORRECTION) {
+			setChecked(btnCorrection);
+			mBookmark.setType(Bookmark.TYPE_CORRECTION);
+		}
+		if (chosenType==Bookmark.TYPE_INTERNAL_LINK) {
+			setChecked(btnInternalLink);
+			mBookmark.setType(Bookmark.TYPE_INTERNAL_LINK);
+		}
 		if (chosenType==Bookmark.TYPE_USER_DIC) {
 			setChecked(btnUserDic);
+			mBookmark.setType(Bookmark.TYPE_USER_DIC);
 			posEdit.setText(StrUtils.updateText(mBookmark.getPosText(),true));
 			posEdit.setKeyListener(keyList);
 		}
 		if (chosenType==Bookmark.TYPE_CITATION) {
 			setChecked(btnCitation);
+			mBookmark.setType(Bookmark.TYPE_CITATION);
 			posEdit.setKeyListener(keyList);
 		}
 		setView( view );
+		btnUserDic.requestFocus();
 	}
 
 	@Override

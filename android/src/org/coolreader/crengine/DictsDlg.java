@@ -143,7 +143,7 @@ public class DictsDlg extends BaseDialog {
 
 	public DictsDlg( CoolReader activity, ReaderView readerView, String search_text )
 	{
-		super(activity, activity.getResources().getString(R.string.win_title_dicts), false, true);
+		super(activity, activity.getResources().getString(R.string.win_title_dicts), true, true);
 		mInflater = LayoutInflater.from(getContext());
 		mSearchText = StrUtils.updateText(search_text.trim(),false);
 		mCoolReader = activity;
@@ -151,15 +151,11 @@ public class DictsDlg extends BaseDialog {
 		View frame = mInflater.inflate(R.layout.dict_dialog, null);
 		ImageButton btnMinus1 = (ImageButton)frame.findViewById(R.id.dict_dlg_minus1_btn);
 		ImageButton btnMinus2 = (ImageButton)frame.findViewById(R.id.dict_dlg_minus2_btn);
-		Button btnPronoun = (Button)frame.findViewById(R.id.dict_dlg_btn_pronoun);
 		selEdit = (EditText)frame.findViewById(R.id.selection_text);
 		selEdit.setText(mSearchText);
-		btnPronoun.setOnClickListener(new Button.OnClickListener() {
-			public void onClick(View v) {
-				String s = StrUtils.updateDictSelText(selEdit.getText().toString());
-				selEdit.setText(s.trim());
-			}
-		});
+		setPositiveButtonImage(0,0);
+		setThirdButtonImage(R.drawable.icons8_search_history, R.string.dlg_button_search_hist);
+		setAddButtonImage(R.drawable.icons8_me_smb, R.string.dlg_button_pronoun_replace);
 		btnMinus1.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View v) {
 				String s = StrUtils.replacePuncts(selEdit.getText().toString(),true);
@@ -206,7 +202,7 @@ public class DictsDlg extends BaseDialog {
 		body.addView(mList);
 		setView(frame);
 		selEdit.clearFocus();
-		btnPronoun.requestFocus();
+		btnMinus2.requestFocus();
 		setFlingHandlers(mList, null, null);
 	}
 
@@ -228,6 +224,16 @@ public class DictsDlg extends BaseDialog {
 		setCancelable(true);
 		super.onCreate(savedInstanceState);
 		registerForContextMenu(mList);
+	}
+
+	@Override
+	protected void onAddButtonClick() {
+		String s = StrUtils.updateDictSelText(selEdit.getText().toString());
+		selEdit.setText(s.trim());
+	}
+
+	protected void onThirdButtonClick() {
+		mCoolReader.showToast("to come...");
 	}
 
 }

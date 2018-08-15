@@ -1000,6 +1000,7 @@ public class FileBrowser extends LinearLayout implements FileInfoChangeListener 
 	private FileListAdapter currentListAdapter;
 	
 	private class FileListAdapter extends BaseListAdapter {
+
 		public boolean areAllItemsEnabled() {
 			return true;
 		}

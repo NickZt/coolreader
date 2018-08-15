@@ -64,6 +64,8 @@ public class BaseActivity extends Activity implements Settings {
 	private CRDBServiceAccessor mCRDBService;
 	protected Dictionaries mDictionaries;
 
+	private volatile SuperActivityToast myToast;
+
 	protected void unbindCRDBService() {
 		if (mCRDBService != null) {
 			mCRDBService.unbind();
@@ -1045,10 +1047,6 @@ public class BaseActivity extends Activity implements Settings {
 		}
 	}
 
-
-	
-	
-	
 	public void showToast(int stringResourceId) {
 		showToast(stringResourceId, Toast.LENGTH_LONG);
 	}
@@ -1059,10 +1057,10 @@ public class BaseActivity extends Activity implements Settings {
 			showToast(s, duration);
 	}
 
-	public void showSuperToast(int stringResourceId) {
+	public void showSToast(int stringResourceId) {
 		String s = getString(stringResourceId);
 		if (s != null)
-			showSuperToast(s);
+			showSToast(s);
 	}
 
 	public void showToast(String msg) {
@@ -1080,11 +1078,34 @@ public class BaseActivity extends Activity implements Settings {
 		}
 	}
 
-	public void showSuperToast(String msg) {
-		log.v("showing super toast: " + msg);
-		final SuperToast superToast = new SuperActivityToast(this, Style.blueGrey());
-		superToast.setText(msg);
-		superToast.show();
+	public void hideSToast() {
+		final SuperActivityToast toast = myToast;
+		if (toast != null && toast.isShowing()) {
+			myToast = null;
+			runOnUiThread(new Runnable() {
+				public void run() {
+					toast.dismiss();
+				}
+			});
+		}
+	}
+
+	public void showSToast(final SuperActivityToast toast) {
+		hideSToast();
+		myToast = toast;
+		runOnUiThread(new Runnable() {
+			public void run() {
+				toast.show();
+			}
+		});
+	}
+
+	public void showSToast(String msg) {
+		final SuperActivityToast toast;
+		toast = new SuperActivityToast(this, Style.blueGrey(), Style.TYPE_STANDARD);
+		toast.setFrame(Style.FRAME_STANDARD);
+		toast.setText(msg);
+		this.showSToast(toast);
 	}
 
 	protected View contentView;

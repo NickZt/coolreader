@@ -147,10 +147,21 @@ public class UserDicDlg extends BaseDialog {
 				@Override
 				public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
 						int position, long arg3) {
-					openContextMenu(UserDicList.this);
-					DictsDlg dlg = new DictsDlg(mCoolReader, mCoolReader.getReaderView(), mUserDic.get(position).getDic_word());
-					dlg.show();
-					dismiss();
+					if ( mUserDic==null )
+						return true;
+					final UserDicEntry ude = mUserDic.get(position);
+					final UserDicDlg thisDlg = uDDlg;
+					mCoolReader.askConfirmation(R.string.win_title_confirm_ude_delete, new Runnable() {
+						@Override
+						public void run() {
+							activity.getDB().saveUserDic(ude, UserDicEntry.ACTION_DELETE);
+							mCoolReader.getmUserDic().remove(ude.getIs_citation()+ude.getDic_word());
+							mUserDic.remove(ude);
+							if (thisDlg!=null)
+								thisDlg.listUpdated();
+							mCoolReader.getmReaderFrame().getUserDicPanel().updateUserDicWords();
+						}
+					});
 					return true;
 				}
 			});
@@ -158,21 +169,19 @@ public class UserDicDlg extends BaseDialog {
 
 		@Override
 		public boolean performItemClick(View view, int position, long id) {
-			if ( mUserDic==null )
-				return true;
-			final UserDicEntry ude = mUserDic.get(position);
-			final UserDicDlg thisDlg = uDDlg;
-			mCoolReader.askConfirmation(R.string.win_title_confirm_ude_delete, new Runnable() {
-				@Override
-				public void run() {
-					activity.getDB().saveUserDic(ude, UserDicEntry.ACTION_DELETE);
-					mCoolReader.getmUserDic().remove(ude.getDic_word());
-					mUserDic.remove(ude);
-					if (thisDlg!=null)
-						thisDlg.listUpdated();
-					mCoolReader.getmReaderFrame().getUserDicPanel().updateUserDicWords();
-				}
-			});
+			if (mCoolReader.getReaderView()==null) return false;
+			if (openPage==0) {
+				openContextMenu(UserDicList.this);
+				DictsDlg dlg = new DictsDlg(mCoolReader, mCoolReader.getReaderView(), mUserDic.get(position).getDic_word());
+				dlg.show();
+				dismiss();
+			}
+			if (openPage==1) {
+				mCoolReader.getReaderView().copyToClipboard(
+					mUserDic.get(position).getDic_word()+" \n"+
+						mUserDic.get(position).getDic_word_translate()
+				);
+			}
 			return true;
 		}
 
@@ -333,6 +342,7 @@ public class UserDicDlg extends BaseDialog {
 				checkedCallback(null);
 			}
 		});
+		searchButton.requestFocus();
 	}
 
 	private void updUserDic(String sCRC) {
